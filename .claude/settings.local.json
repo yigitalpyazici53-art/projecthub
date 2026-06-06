@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Read(//mnt/c/Users/yigit/**)",
+      "Bash(grep \"NEXT_PUBLIC_APP_URL\" .env.local .env.production.local)"
+    ]
+  }
+}

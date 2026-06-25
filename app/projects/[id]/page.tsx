@@ -42,6 +42,163 @@ function getAvatarColor(id: string | null): string {
   return colors[id.charCodeAt(0) % colors.length] ?? "#6366f1";
 }
 
+// ── Weekly Update Composer ────────────────────────────────────────────────────
+
+const UPDATE_FIELDS = [
+  { key: "shipped",  label: "This week we shipped",  placeholder: "Features, fixes, or milestones shipped this week…" },
+  { key: "blocker",  label: "Current blocker",        placeholder: "The one thing slowing us down right now…" },
+  { key: "nextWeek", label: "Next week we need",      placeholder: "Skills, decisions, or work needed next…" },
+  { key: "looking",  label: "Looking for",            placeholder: "Specific roles or help you're actively seeking…" },
+] as const;
+
+type UpdateFieldKey = typeof UPDATE_FIELDS[number]["key"];
+
+function buildStructuredUpdate(fields: Record<UpdateFieldKey, string>): string {
+  return UPDATE_FIELDS
+    .filter(f => fields[f.key].trim())
+    .map(f => `${f.label}:\n${fields[f.key].trim()}`)
+    .join("\n\n");
+}
+
+function parseStructuredUpdate(content: string): Record<UpdateFieldKey, string> | null {
+  const result: Record<UpdateFieldKey, string> = { shipped: "", blocker: "", nextWeek: "", looking: "" };
+  let matched = 0;
+  for (const f of UPDATE_FIELDS) {
+    const pattern = new RegExp(`${f.label}:\\n([\\s\\S]*?)(?=\\n\\n[A-Z]|$)`, "i");
+    const m = content.match(pattern);
+    if (m) { result[f.key] = m[1].trim(); matched++; }
+  }
+  return matched > 0 ? result : null;
+}
+
+function WeeklyUpdateComposer({
+  postingUpdate,
+  updateError,
+  onSubmit,
+  content,
+  onContentChange,
+}: {
+  postingUpdate: boolean;
+  updateError: string;
+  onSubmit: () => void;
+  content: string;
+  onContentChange: (v: string) => void;
+}) {
+  const MAX_FIELD = 200;
+  const [fields, setFields] = useState<Record<UpdateFieldKey, string>>({ shipped: "", blocker: "", nextWeek: "", looking: "" });
+
+  const handleFieldChange = (key: UpdateFieldKey, val: string) => {
+    const updated = { ...fields, [key]: val.slice(0, MAX_FIELD) };
+    setFields(updated);
+    onContentChange(buildStructuredUpdate(updated));
+  };
+
+  const hasContent = Object.values(fields).some(v => v.trim().length > 0);
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{
+        padding: "14px 16px",
+        borderRadius: 10,
+        background: "rgba(76,142,255,0.04)",
+        border: "1px solid rgba(76,142,255,0.12)",
+        marginBottom: 16,
+        fontSize: 12,
+        color: "var(--text-muted)",
+        lineHeight: 1.5,
+      }}>
+        Share a quick update on what your team shipped this week — even a few lines builds proof-of-work over time.
+      </div>
+
+      <div style={{ display: "grid", gap: 14 }}>
+        {UPDATE_FIELDS.map(f => (
+          <div key={f.key}>
+            <label style={{ ...fieldLabelStyle, display: "block", marginBottom: 6 }}>{f.label}</label>
+            <textarea
+              value={fields[f.key]}
+              onChange={(e) => handleFieldChange(f.key, e.target.value)}
+              placeholder={f.placeholder}
+              rows={2}
+              style={{ ...updateInputStyle, borderColor: fields[f.key].length > 0 ? "color-mix(in srgb, var(--accent) 40%, transparent)" : undefined }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
+        {updateError ? (
+          <p style={{ fontSize: 12, color: "#f87171", margin: 0 }}>{updateError}</p>
+        ) : (
+          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+            Fill in any fields you want to share
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={postingUpdate || !hasContent || content.trim().length === 0}
+          style={{
+            ...postUpdateBtnStyle,
+            opacity: postingUpdate || !hasContent || content.trim().length === 0 ? 0.5 : 1,
+            cursor: postingUpdate || !hasContent || content.trim().length === 0 ? "default" : "pointer",
+          }}
+        >
+          {postingUpdate ? "Posting…" : "Post Update"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Structured update display ─────────────────────────────────────────────────
+
+function UpdateCard({ update, isOwner, onDelete }: {
+  update: { id: string; content: string; created_at: string };
+  isOwner: boolean;
+  onDelete: (id: string) => void;
+}) {
+  const structured = parseStructuredUpdate(update.content);
+
+  return (
+    <div style={updateRowStyle}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: structured ? 14 : 8 }}>
+        <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500 }}>
+          {timeAgoUpdate(update.created_at)}
+        </span>
+        {isOwner && (
+          <button
+            type="button"
+            onClick={() => onDelete(update.id)}
+            style={deleteUpdateBtnStyle}
+            title="Delete update"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {structured ? (
+        <div style={{ display: "grid", gap: 10 }}>
+          {UPDATE_FIELDS.filter(f => structured[f.key]).map(f => (
+            <div key={f.key}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent-bright)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 3 }}>
+                {f.label}
+              </div>
+              <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
+                {structured[f.key]}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.75, margin: 0, whiteSpace: "pre-wrap" }}>
+          {update.content}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ── Apply Modal ───────────────────────────────────────────────────────────────
 
 function ApplyModal({
@@ -54,14 +211,17 @@ function ApplyModal({
   onSuccess: () => void;
 }) {
   const router = useRouter();
-  const MAX = 500;
+  const MAX_FIELD = 300;
 
-  const [message, setMessage] = useState("");
+  const [whyJoin, setWhyJoin] = useState("");
+  const [contribution, setContribution] = useState("");
+  const [proofLink, setProofLink] = useState("");
+  const [availability, setAvailability] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
-    if (!message.trim()) {
+    if (!whyJoin.trim()) {
       setError("Please share why you want to join.");
       return;
     }
@@ -72,17 +232,25 @@ function ApplyModal({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push(`/login?next=/projects/${project.id}`); return; }
 
+    // Combine fields into a structured message
+    const parts: string[] = [];
+    parts.push(`Why I want to join:\n${whyJoin.trim()}`);
+    if (contribution.trim()) parts.push(`What I can contribute:\n${contribution.trim()}`);
+    if (proofLink.trim()) parts.push(`Proof link:\n${proofLink.trim()}`);
+    if (availability.trim()) parts.push(`Weekly availability:\n${availability.trim()}`);
+    const combinedMessage = parts.join("\n\n");
+
     const { error: insertErr } = await supabase.from("applications").insert({
       project_id: project.id,
       applicant_id: user.id,
       role: null,
-      message: message.trim(),
+      message: combinedMessage,
     });
 
     if (insertErr) {
       setError(
         insertErr.message.includes("unique")
-          ? "You've already expressed interest in this project."
+          ? "You've already applied to this project."
           : insertErr.message
       );
       setSubmitting(false);
@@ -102,61 +270,98 @@ function ApplyModal({
     onSuccess();
   };
 
-  const remaining = MAX - message.length;
+  const canSubmit = whyJoin.trim().length > 0 && !submitting;
 
   return (
     <div style={overlayStyle} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={modalStyle}>
+      <div style={modalStyle} className="project-modal">
 
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
           <div>
             <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: 20, color: "var(--text-primary)", marginBottom: 4, letterSpacing: "-0.02em" }}>
-              I want to help build this
+              Apply to join
             </h2>
             <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{project.title}</p>
           </div>
           <button type="button" onClick={onClose} style={modalCloseBtnStyle}>✕</button>
         </div>
 
-        {/* Message field */}
-        <div style={{ marginBottom: 6 }}>
-          <label style={fieldLabelStyle}>Why do you want to join?</label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value.slice(0, MAX))}
-            placeholder="Tell the team what excites you about this project and what you bring to the table…"
-            rows={5}
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            style={{ ...inputStyle, resize: "none", marginTop: 10 }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6, minHeight: 18 }}>
-            <span style={{ fontSize: 12, color: "#f87171" }}>{error}</span>
-            <span style={{
-              fontSize: 11,
-              color: remaining <= 20 ? (remaining <= 0 ? "#f87171" : "#fbbf24") : "var(--text-muted)",
-              fontVariantNumeric: "tabular-nums",
-            }}>
-              {remaining} left
-            </span>
+        <div style={{ display: "grid", gap: 18 }}>
+
+          {/* Why join */}
+          <div>
+            <label style={fieldLabelStyle}>Why do you want to join? <span style={{ color: "#f87171" }}>*</span></label>
+            <textarea
+              value={whyJoin}
+              onChange={(e) => setWhyJoin(e.target.value.slice(0, MAX_FIELD))}
+              placeholder="What excites you about this project? What problem do you want to solve together?"
+              rows={3}
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              style={{ ...inputStyle, resize: "none", marginTop: 8 }}
+            />
+            <div style={{ textAlign: "right", marginTop: 4, fontSize: 11, color: MAX_FIELD - whyJoin.length <= 20 ? "#fbbf24" : "var(--text-muted)" }}>
+              {MAX_FIELD - whyJoin.length} left
+            </div>
           </div>
+
+          {/* What you contribute */}
+          <div>
+            <label style={fieldLabelStyle}>What can you contribute?</label>
+            <textarea
+              value={contribution}
+              onChange={(e) => setContribution(e.target.value.slice(0, MAX_FIELD))}
+              placeholder="Your skills, relevant experience, or what you'd own on this project…"
+              rows={3}
+              style={{ ...inputStyle, resize: "none", marginTop: 8 }}
+            />
+          </div>
+
+          {/* Proof link */}
+          <div>
+            <label style={fieldLabelStyle}>Proof link</label>
+            <input
+              type="url"
+              value={proofLink}
+              onChange={(e) => setProofLink(e.target.value)}
+              placeholder="GitHub, portfolio, a project you've shipped, or a demo…"
+              style={{ ...inputStyle, marginTop: 8 }}
+            />
+          </div>
+
+          {/* Availability */}
+          <div>
+            <label style={fieldLabelStyle}>Weekly availability</label>
+            <input
+              type="text"
+              value={availability}
+              onChange={(e) => setAvailability(e.target.value)}
+              placeholder="e.g. 10–15 hrs/week, more during breaks"
+              style={{ ...inputStyle, marginTop: 8 }}
+            />
+          </div>
+
         </div>
 
+        {error && (
+          <p style={{ fontSize: 13, color: "#f87171", marginTop: 14, marginBottom: 0 }}>{error}</p>
+        )}
+
         {/* Actions */}
-        <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+        <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
           <button type="button" onClick={onClose} style={cancelBtnStyle}>Cancel</button>
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={submitting || message.trim().length === 0}
+            disabled={!canSubmit}
             style={{
               ...submitBtnStyle,
-              opacity: submitting || message.trim().length === 0 ? 0.55 : 1,
-              cursor: submitting || message.trim().length === 0 ? "default" : "pointer",
+              opacity: canSubmit ? 1 : 0.55,
+              cursor: canSubmit ? "pointer" : "default",
             }}
           >
-            {submitting ? "Sending…" : "Send →"}
+            {submitting ? "Sending…" : "Apply →"}
           </button>
         </div>
 
@@ -188,7 +393,7 @@ function DeleteConfirmModal({
       style={overlayStyle}
       onClick={(e) => { if (e.target === e.currentTarget && !deleting) onClose(); }}
     >
-      <div style={modalStyle}>
+      <div style={modalStyle} className="project-modal">
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
@@ -513,7 +718,7 @@ export default function ProjectDetailPage({ params }: Props) {
       )}
 
       {/* ── Hero ── */}
-      <div style={heroSectionStyle}>
+      <div style={heroSectionStyle} className="project-hero-section">
         <div style={heroContentStyle}>
           {/* Top nav row */}
           <div style={heroNavRowStyle}>
@@ -523,6 +728,15 @@ export default function ProjectDetailPage({ params }: Props) {
               {project.stage && (
                 <span style={{ ...stageBadgeBase, color: stageColor, border: `1px solid ${stageColor}44`, background: `${stageColor}12` }}>
                   {project.stage.charAt(0).toUpperCase() + project.stage.slice(1)}
+                </span>
+              )}
+              {project.is_ai_generated && (
+                <span style={{
+                  fontSize: 11, fontWeight: 700, borderRadius: 20, padding: "4px 12px",
+                  color: "#8b9ab0", border: "1px solid rgba(139,154,176,0.22)",
+                  background: "rgba(139,154,176,0.07)", letterSpacing: "0.03em",
+                }}>
+                  Demo Project
                 </span>
               )}
               <span style={metaDateStyle}>Posted {formatDate(project.created_at)}</span>
@@ -536,104 +750,59 @@ export default function ProjectDetailPage({ params }: Props) {
       </div>
 
       {/* ── Body ── */}
-      <div className="page-z" style={bodyContainerStyle}>
+      <div className={"page-z project-body-container" + ((appStatus === "none" || appStatus === "unauthenticated") ? " project-sticky-cta-active" : "")} style={bodyContainerStyle}>
         <div className="responsive-with-sidebar-sm" style={{ gap: 40, alignItems: "start" }}>
 
           {/* ── Left: content sections ── */}
           <div style={leftColStyle}>
 
-            {/* Overview */}
-            <div style={sectionCardStyle}>
-              <h2 style={sectionTitleStyle}>Overview</h2>
+            {/* What we're building */}
+            <div style={sectionCardStyle} className="project-section-card">
+              <h2 style={sectionTitleStyle}>What we&apos;re building</h2>
               <p style={descStyle}>{project.description || project.tagline || "No description provided yet."}</p>
             </div>
 
-            {/* Project Updates */}
-            <div style={sectionCardStyle}>
-              <h2 style={sectionTitleStyle}>Updates</h2>
+            {/* Weekly Build Updates */}
+            <div style={sectionCardStyle} className="project-section-card">
+              <h2 style={sectionTitleStyle}>Weekly Build Updates</h2>
 
-              {/* Owner composer */}
+              {/* Structured owner composer */}
               {appStatus === "owner" && (
-                <div style={{ marginBottom: updates.length > 0 ? 24 : 0 }}>
-                  <textarea
-                    value={newUpdateContent}
-                    onChange={(e) => setNewUpdateContent(e.target.value.slice(0, 280))}
-                    placeholder="What's new with your project?"
-                    rows={3}
-                    style={{
-                      ...updateInputStyle,
-                      borderColor: newUpdateContent.length > 0 ? "color-mix(in srgb, var(--accent) 40%, transparent)" : undefined,
-                    }}
-                  />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
-                    <span style={{
-                      fontSize: 11,
-                      color: (280 - newUpdateContent.length) <= 20
-                        ? (280 - newUpdateContent.length) <= 0 ? "#f87171" : "#fbbf24"
-                        : "var(--text-muted)",
-                      fontVariantNumeric: "tabular-nums",
-                    }}>
-                      {280 - newUpdateContent.length} left
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handlePostUpdate}
-                      disabled={postingUpdate || newUpdateContent.trim().length === 0}
-                      style={{
-                        ...postUpdateBtnStyle,
-                        opacity: postingUpdate || newUpdateContent.trim().length === 0 ? 0.5 : 1,
-                        cursor: postingUpdate || newUpdateContent.trim().length === 0 ? "default" : "pointer",
-                      }}
-                    >
-                      {postingUpdate ? "Posting…" : "Post Update"}
-                    </button>
-                  </div>
-                  {updateError && (
-                    <p style={{ fontSize: 12, color: "#f87171", marginTop: 6, margin: "6px 0 0" }}>{updateError}</p>
-                  )}
-                </div>
+                <WeeklyUpdateComposer
+                  postingUpdate={postingUpdate}
+                  updateError={updateError}
+                  onSubmit={handlePostUpdate}
+                  content={newUpdateContent}
+                  onContentChange={setNewUpdateContent}
+                />
               )}
 
               {/* Updates list */}
               {updatesLoading ? (
                 <div style={{ height: 40 }} />
               ) : updates.length === 0 ? (
-                <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, margin: appStatus === "owner" ? "0" : "0" }}>
-                  No updates yet.
+                <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, margin: 0 }}>
+                  No updates yet.{appStatus !== "owner" ? " The team hasn't posted a weekly update." : ""}
                 </p>
               ) : (
                 <div style={{ display: "grid", gap: 14 }}>
                   {updates.map((update) => (
-                    <div key={update.id} style={updateRowStyle}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                        <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500 }}>
-                          {timeAgoUpdate(update.created_at)}
-                        </span>
-                        {appStatus === "owner" && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteUpdate(update.id)}
-                            style={deleteUpdateBtnStyle}
-                            title="Delete update"
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                      <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.75, margin: 0, whiteSpace: "pre-wrap" }}>
-                        {update.content}
-                      </p>
-                    </div>
+                    <UpdateCard
+                      key={update.id}
+                      update={update}
+                      isOwner={appStatus === "owner"}
+                      onDelete={handleDeleteUpdate}
+                    />
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Needed Roles */}
+            {/* Looking for teammates */}
             {lookingForList.length > 0 && (
-              <div style={sectionCardStyle}>
-                <h2 style={sectionTitleStyle}>Needed Roles</h2>
-                <p style={sectionSubStyle}>This project is actively looking for contributors to join the team.</p>
+              <div style={sectionCardStyle} className="project-section-card">
+                <h2 style={sectionTitleStyle}>Looking for teammates</h2>
+                <p style={sectionSubStyle}>This project is actively looking for serious builders to join the team.</p>
                 <div style={rolesGridStyle}>
                   {lookingForList.map((role) => (
                     <div key={role} style={roleCardStyle}>
@@ -645,19 +814,53 @@ export default function ProjectDetailPage({ params }: Props) {
               </div>
             )}
 
-            {/* Tech Stack */}
+            {/* Required skills */}
             {techList.length > 0 && (
-              <div style={sectionCardStyle}>
-                <h2 style={sectionTitleStyle}>Tech Stack</h2>
+              <div style={sectionCardStyle} className="project-section-card">
+                <h2 style={sectionTitleStyle}>Required skills</h2>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                   {techList.map((tech) => <span key={tech} style={techPillStyle}>{tech}</span>)}
                 </div>
               </div>
             )}
 
+            {/* Proof links */}
+            {(project.github_url || project.demo_url || project.figma_url || project.website_url) && (
+              <div style={sectionCardStyle} className="project-section-card">
+                <h2 style={sectionTitleStyle}>Proof links</h2>
+                <p style={sectionSubStyle}>Verified links to the project&apos;s real work.</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                  {project.github_url && (
+                    <a href={project.github_url} target="_blank" rel="noopener noreferrer" style={proofLinkStyle}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+                      GitHub
+                    </a>
+                  )}
+                  {project.demo_url && (
+                    <a href={project.demo_url} target="_blank" rel="noopener noreferrer" style={proofLinkStyle}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      Live demo
+                    </a>
+                  )}
+                  {project.figma_url && (
+                    <a href={project.figma_url} target="_blank" rel="noopener noreferrer" style={proofLinkStyle}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.332 8.668a3.333 3.333 0 0 0 0-6.663H8.668a3.333 3.333 0 0 0 0 6.663 3.333 3.333 0 0 0 0 6.665 3.333 3.333 0 0 0 3.333 3.333 3.333 3.333 0 0 0 3.331-3.333V8.668zm0 0a3.333 3.333 0 1 0 0 6.665 3.333 3.333 0 0 0 0-6.665z"/></svg>
+                      Figma
+                    </a>
+                  )}
+                  {project.website_url && (
+                    <a href={project.website_url} target="_blank" rel="noopener noreferrer" style={proofLinkStyle}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                      Website
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Similar Projects */}
             {similarProjects.length > 0 && (
-              <div style={sectionCardStyle}>
+              <div style={sectionCardStyle} className="project-section-card">
                 <h2 style={sectionTitleStyle}>More in {project.category}</h2>
                 <div style={{ display: "grid", gap: 10 }}>
                   {similarProjects.map((sp) => (
@@ -790,7 +993,7 @@ export default function ProjectDetailPage({ params }: Props) {
                     )}
                     {appStatus === "unauthenticated" ? (
                       <Link href={`/login?next=/projects/${id}`} style={bigApplyBtnStyle}>
-                        Sign in to apply
+                        Sign in to apply →
                       </Link>
                     ) : (
                       <button
@@ -798,7 +1001,7 @@ export default function ProjectDetailPage({ params }: Props) {
                         onClick={() => setShowModal(true)}
                         style={bigApplyBtnStyle}
                       >
-                        I want to help build this
+                        Apply to join →
                       </button>
                     )}
                   </>
@@ -872,27 +1075,48 @@ export default function ProjectDetailPage({ params }: Props) {
               <h3 style={sideCardTitleStyle}>Project Details</h3>
               <div style={{ display: "grid", gap: 14 }}>
                 <div style={metaRowStyle}>
-                  <span style={metaLabelStyle}>Posted</span>
-                  <span style={metaValueStyle}>{formatDate(project.created_at)}</span>
-                </div>
-                <div style={metaRowStyle}>
-                  <span style={metaLabelStyle}>Stage</span>
+                  <span style={metaLabelStyle}>Current stage</span>
                   <span style={{ ...metaValueStyle, color: stageColor, fontWeight: 700 }}>
                     {project.stage ? project.stage.charAt(0).toUpperCase() + project.stage.slice(1) : "Not set"}
                   </span>
                 </div>
+                {project.time_commitment && (
+                  <div style={metaRowStyle}>
+                    <span style={metaLabelStyle}>Time commitment</span>
+                    <span style={metaValueStyle}>{project.time_commitment}</span>
+                  </div>
+                )}
                 {project.category && (
                   <div style={metaRowStyle}>
                     <span style={metaLabelStyle}>Category</span>
                     <span style={metaValueStyle}>{project.category}</span>
                   </div>
                 )}
+                <div style={metaRowStyle}>
+                  <span style={metaLabelStyle}>Posted</span>
+                  <span style={metaValueStyle}>{formatDate(project.created_at)}</span>
+                </div>
               </div>
             </div>
 
           </div>
         </div>
       </div>
+
+      {/* Mobile sticky CTA — visitor states only, hidden on desktop via CSS */}
+      {(appStatus === "none" || appStatus === "unauthenticated") && (
+        <div className="mobile-sticky-cta">
+          {appStatus === "unauthenticated" ? (
+            <Link href={`/login?next=/projects/${id}`} className="mobile-sticky-cta-btn">
+              Sign in to apply →
+            </Link>
+          ) : (
+            <button type="button" onClick={() => setShowModal(true)} className="mobile-sticky-cta-btn">
+              Apply to join →
+            </button>
+          )}
+        </div>
+      )}
     </main>
   );
 }
@@ -978,6 +1202,8 @@ const heroTitleStyle: React.CSSProperties = {
   letterSpacing: "-0.035em",
   marginBottom: 20,
   maxWidth: 900,
+  overflowWrap: "anywhere",
+  wordBreak: "break-word",
 };
 
 const heroTaglineStyle: React.CSSProperties = {
@@ -1001,6 +1227,7 @@ const leftColStyle: React.CSSProperties = {
   display: "grid",
   gap: 24,
   alignContent: "start",
+  minWidth: 0,
 };
 
 const rightColStyle: React.CSSProperties = {
@@ -1009,6 +1236,7 @@ const rightColStyle: React.CSSProperties = {
   alignContent: "start",
   position: "sticky",
   top: 96,
+  minWidth: 0,
 };
 
 // ── Left column section cards
@@ -1044,6 +1272,7 @@ const descStyle: React.CSSProperties = {
   lineHeight: 1.9,
   whiteSpace: "pre-wrap",
   margin: 0,
+  overflowWrap: "anywhere",
 };
 
 // ── Roles grid
@@ -1608,4 +1837,19 @@ const deleteUpdateBtnStyle: React.CSSProperties = {
   padding: "2px 6px",
   borderRadius: 4,
   lineHeight: 1,
+};
+
+const proofLinkStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  fontSize: 13,
+  fontWeight: 600,
+  color: "var(--accent-bright)",
+  background: "color-mix(in srgb, var(--accent) 10%, transparent)",
+  border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
+  borderRadius: 8,
+  padding: "8px 14px",
+  textDecoration: "none",
+  transition: "background 0.15s ease",
 };

@@ -192,7 +192,7 @@ export default function SignupPage() {
             Back
           </button>
 
-          <div style={cardStyle}>
+          <div style={cardStyle} className="auth-card">
             <div style={{ textAlign: "center", marginBottom: 28 }}>
               <div style={{ width: 52, height: 52, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -284,7 +284,7 @@ export default function SignupPage() {
           Back to home
         </Link>
 
-        <div style={cardStyle}>
+        <div style={cardStyle} className="auth-card">
           <div style={{ textAlign: "center", marginBottom: 28 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
               <Logo size="lg" gradient />

@@ -191,7 +191,7 @@ export default function LoginPage() {
           Back to home
         </Link>
 
-        <div style={cardStyle}>
+        <div style={cardStyle} className="auth-card">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
               <Logo size="lg" gradient />

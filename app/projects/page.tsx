@@ -293,7 +293,7 @@ export default function ProjectsPage() {
         <div className="animate-fade-up" style={headerRowStyle}>
           <div>
             <h1 style={titleStyle}>Projects</h1>
-            <p style={mutedStyle}>Discover what builders on ProjectHub are creating.</p>
+            <p style={mutedStyle}>Discover active student projects looking for serious teammates.</p>
           </div>
           <Link
             href={authed ? "/projects/new" : "/login?next=/projects/new"}
@@ -332,7 +332,7 @@ export default function ProjectsPage() {
                 style={searchInputStyle}
               />
             </div>
-            <div style={{ position: "relative", minWidth: 150 }}>
+            <div style={{ position: "relative", minWidth: 150 }} className="filter-select-wrap">
               <select
                 value={stageFilter}
                 onChange={(e) => setStageFilter(e.target.value)}

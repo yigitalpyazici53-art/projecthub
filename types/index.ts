@@ -32,6 +32,12 @@ export type Project = {
   tech_stack: string | null;
   created_at: string;
   is_ai_generated?: boolean;
+  // Proof-of-work links — backend fields, conditionally shown when present
+  github_url?: string | null;
+  demo_url?: string | null;
+  figma_url?: string | null;
+  website_url?: string | null;
+  time_commitment?: string | null;
 };
 
 export type Connection = {

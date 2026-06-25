@@ -229,18 +229,20 @@ export default function BuildersPage() {
   });
   const joinedThisWeek = builders.filter((b) => isNew(b.created_at)).length;
 
-  const filtered = builders.filter((b) => {
-    const q = search.toLowerCase();
-    const matchesSearch =
-      !q ||
-      (b.full_name ?? "").toLowerCase().includes(q) ||
-      (b.username ?? "").toLowerCase().includes(q) ||
-      (b.role ?? "").toLowerCase().includes(q) ||
-      (b.university ?? "").toLowerCase().includes(q) ||
-      (b.bio ?? "").toLowerCase().includes(q);
-    const matchesRole = roleFilter === "All" || b.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
+  const filtered = builders
+    .filter((b) => {
+      const q = search.toLowerCase();
+      const matchesSearch =
+        !q ||
+        (b.full_name ?? "").toLowerCase().includes(q) ||
+        (b.username ?? "").toLowerCase().includes(q) ||
+        (b.role ?? "").toLowerCase().includes(q) ||
+        (b.university ?? "").toLowerCase().includes(q) ||
+        (b.bio ?? "").toLowerCase().includes(q);
+      const matchesRole = roleFilter === "All" || b.role === roleFilter;
+      return matchesSearch && matchesRole;
+    })
+    .sort((a, b) => (a.is_ai_generated ? 1 : 0) - (b.is_ai_generated ? 1 : 0));
 
   return (
     <main style={pageStyle}>
@@ -249,8 +251,8 @@ export default function BuildersPage() {
       <div className="page-z" style={{ maxWidth: 1200, margin: "0 auto", paddingTop: "80px" }}>
 
         <div className="animate-fade-up" style={{ marginBottom: 20 }}>
-          <h1 style={titleStyle}>Discover Builders</h1>
-          <p style={mutedStyle}>Explore student builders and serious collaborators on ProjectHub.</p>
+          <h1 style={titleStyle}>Serious Builders</h1>
+          <p style={mutedStyle}>Real builders shipping real projects. Find the teammate your project needs.</p>
         </div>
 
         {!loading && totalBuilders > 0 && (
@@ -271,7 +273,7 @@ export default function BuildersPage() {
               placeholder="Search by name, role, university…"
               style={searchInputStyle}
             />
-            <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={selectStyle}>
+            <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={selectStyle} className="role-filter-select">
               {roles.map((r) => (
                 <option key={r} value={r}>{r === "All" ? "All Roles" : r}</option>
               ))}
@@ -342,7 +344,7 @@ export default function BuildersPage() {
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
                           <h2 style={{ fontSize: 16, fontFamily: "Syne, sans-serif", fontWeight: 700, color: "#f0f4f8", marginBottom: 2, lineHeight: 1.2, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                             {builder.full_name || builder.username || "Unnamed Builder"}
-                            {isNew(builder.created_at) && (
+                            {isNew(builder.created_at) && !builder.is_ai_generated && (
                               <span style={{
                                 fontSize: 9, fontWeight: 700, letterSpacing: "0.08em",
                                 color: "#4ade80", background: "rgba(74,222,128,0.12)",
@@ -350,6 +352,16 @@ export default function BuildersPage() {
                                 borderRadius: 4, padding: "2px 6px", textTransform: "uppercase",
                               }}>
                                 New
+                              </span>
+                            )}
+                            {builder.is_ai_generated && (
+                              <span style={{
+                                fontSize: 9, fontWeight: 700, letterSpacing: "0.06em",
+                                color: "#64748b", background: "rgba(139,154,176,0.07)",
+                                border: "1px solid rgba(139,154,176,0.18)",
+                                borderRadius: 4, padding: "2px 6px", textTransform: "uppercase",
+                              }}>
+                                Example
                               </span>
                             )}
                           </h2>
@@ -413,12 +425,12 @@ export default function BuildersPage() {
                     }}>
                       <div style={{ minWidth: 0, flex: 1 }}>
                         {builder.university && (
-                          <div style={{ fontSize: 11, color: "#4a5568", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             🎓 {builder.university}
                           </div>
                         )}
                         {builder.created_at && (
-                          <div style={{ fontSize: 11, color: "#374151", marginTop: builder.university ? 2 : 0 }}>
+                          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: builder.university ? 2 : 0 }}>
                             Joined {timeAgo(builder.created_at)}
                           </div>
                         )}
@@ -426,6 +438,7 @@ export default function BuildersPage() {
                       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                         <Link
                           href={`/builders/${builder.username || builder.id}`}
+                          className="builder-action-btn"
                           style={{
                             fontSize: 12, fontWeight: 600, color: "var(--accent-bright)",
                             background: "color-mix(in srgb, var(--accent) 8%, transparent)",
@@ -443,6 +456,7 @@ export default function BuildersPage() {
                                 ? `/builders/${builder.username || builder.id}#connect`
                                 : `/login?next=${encodeURIComponent(`/builders/${builder.username || builder.id}`)}`
                             }
+                            className="builder-action-btn"
                             style={{
                               fontSize: 12, fontWeight: 700, color: "#fff",
                               background: "var(--gradient-brand)",

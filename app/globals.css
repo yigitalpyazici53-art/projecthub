@@ -977,6 +977,8 @@ input:focus, textarea:focus, select:focus {
   gap: 20px;
   align-items: start;
 }
+/* Prevent grid items from expanding beyond their cell (min-width: auto default causes overflow). */
+.responsive-with-sidebar-sm > * { min-width: 0; }
 @media (max-width: 900px) {
   .responsive-with-sidebar-sm { grid-template-columns: 1fr; }
 }
@@ -1104,4 +1106,171 @@ body { overflow-x: hidden; }
     flex: 1 !important;
     min-height: 0 !important;
   }
+}
+
+/* ── Mobile UX fixes ─────────────────────────────────────────────────────── */
+
+/* Fix 1: Notification dropdown — prevent viewport clip on small phones */
+@media (max-width: 480px) {
+  .notif-dropdown {
+    position: fixed;
+    top: 68px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+  }
+}
+
+/* Fix 4: Builder action buttons — enlarge touch target on mobile */
+@media (max-width: 768px) {
+  .builder-action-btn {
+    padding: 10px 14px !important;
+  }
+}
+
+/* Fix 6: Project detail — reduce excessive bottom padding on mobile */
+@media (max-width: 768px) {
+  .project-body-container {
+    padding-bottom: 40px !important;
+  }
+}
+
+/* Fix 8: Search/filter selects — full width when wrapped on mobile */
+@media (max-width: 640px) {
+  .filter-select-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .role-filter-select {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Fix 10: Auth pages — reduce card padding on very small phones */
+@media (max-width: 400px) {
+  .auth-card {
+    padding: 24px !important;
+  }
+}
+
+/* ── Phase 2 mobile fixes ────────────────────────────────────────────────── */
+
+/* Fix P2-1: Project detail — mobile sticky CTA bar */
+.mobile-sticky-cta { display: none; }
+@media (max-width: 900px) {
+  .mobile-sticky-cta {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    background: linear-gradient(180deg, transparent 0%, var(--background) 32%);
+    z-index: 50;
+  }
+  .mobile-sticky-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    font-family: "Syne", sans-serif;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 16px var(--accent-glow);
+    box-sizing: border-box;
+    letter-spacing: 0.01em;
+  }
+  .project-sticky-cta-active {
+    padding-bottom: 88px !important;
+  }
+}
+
+/* Fix P2-2: Builder connect button — compact label on mobile */
+.connect-label-mobile { display: none; }
+@media (max-width: 640px) {
+  .connect-label-desktop { display: none; }
+  .connect-label-mobile  { display: inline; }
+}
+
+/* Fix P2-4: Endorsement buttons — larger touch target on mobile */
+@media (max-width: 768px) {
+  .endorse-btn {
+    padding: 7px 12px !important;
+    min-height: 36px !important;
+  }
+}
+
+/* Fix P2-5: ThemePicker dropdown — prevent vertical overflow on landscape mobile */
+@media (max-width: 768px) {
+  .theme-dropdown {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* Fix P3-1: ThemePicker button — minimum tap target on mobile */
+@media (max-width: 768px) {
+  .theme-picker-btn {
+    min-height: 36px;
+    padding: 7px 10px;
+  }
+}
+
+/* Fix P2-7: How It Works cards — remove horizontal margin when stacked */
+@media (max-width: 768px) {
+  .how-it-works-card {
+    margin: 0 0 16px !important;
+  }
+}
+
+/* ── Project detail — mobile overflow fixes ──────────────────────────────── */
+
+/* Reduce hero section horizontal padding on small phones */
+@media (max-width: 640px) {
+  .project-hero-section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Reduce body container horizontal and top padding on small phones */
+@media (max-width: 640px) {
+  .project-body-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 32px !important;
+  }
+}
+
+/* Reduce section card padding on small phones and constrain width */
+@media (max-width: 640px) {
+  .project-section-card {
+    padding: 20px !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Fix P3-2: Apply/Delete modals — reduce inner padding on small phones */
+@media (max-width: 480px) {
+  .project-modal {
+    padding: 20px !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* Fix P3-3: Builder profile card — reduce inner horizontal padding on small phones */
+@media (max-width: 640px) {
+  .builder-profile-inner { padding-left: 16px !important; padding-right: 16px !important; }
+  .builder-profile-info  { padding-left: 16px !important; padding-right: 16px !important; padding-bottom: 20px !important; }
 }

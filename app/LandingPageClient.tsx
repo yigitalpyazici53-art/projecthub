@@ -45,8 +45,16 @@ function Navbar() {
             <Link href="/builders" style={navLinkStyle}>Builders</Link>
             <Link href="/login" style={navLinkStyle}>Sign in</Link>
           </div>
-          <Link href="/signup" className="btn-primary" style={{ fontSize: 13, padding: "9px 18px", marginLeft: 6 }}>
-            Start Building
+          {/* Mobile-only nav links (≤640px): Browse · Builders · Sign in */}
+          <div className="mobile-nav-signin" style={{ alignItems: "center", gap: 0 }}>
+            <Link href="/projects" style={mobileNavLinkStyle}>Browse</Link>
+            <span style={{ color: "var(--text-muted)", fontSize: 10, opacity: 0.35, padding: "0 1px" }}>·</span>
+            <Link href="/builders" style={mobileNavLinkStyle}>Builders</Link>
+            <span style={{ color: "var(--text-muted)", fontSize: 10, opacity: 0.35, padding: "0 1px" }}>·</span>
+            <Link href="/login" style={mobileNavLinkStyle}>Sign in</Link>
+          </div>
+          <Link href="/apply" className="btn-primary landing-nav-cta" style={{ fontSize: 13, padding: "9px 18px", marginLeft: 6 }}>
+            Apply Now
           </Link>
         </div>
       </div>
@@ -69,13 +77,13 @@ function Background() {
         maskImage: "radial-gradient(ellipse 100% 80% at 50% 0%, black 20%, transparent 100%)",
       }} />
       <div className="hero-depth" />
-      <div style={{
+      <div className="bg-orb-1" style={{
         position: "absolute", top: "-10%", left: "10%",
         width: 700, height: 700,
         background: "radial-gradient(circle, rgba(76,142,255,0.08) 0%, transparent 60%)",
         animation: "drift 28s ease-in-out infinite",
       }} />
-      <div style={{
+      <div className="bg-orb-2" style={{
         position: "absolute", top: "30%", right: "5%",
         width: 500, height: 500,
         background: "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 60%)",
@@ -92,6 +100,7 @@ type HeroProject = {
   title: string | null;
   stage: string | null;
   looking_for: string | null;
+  is_ai_generated?: boolean;
 };
 
 function heroStage(stage: string | null): {
@@ -118,10 +127,130 @@ function heroAvatarPalette(stage: string | null): { bg: string; border: string; 
 
 // Static demo cards — shown immediately, replaced by real data when available
 const DEMO_PROJECTS: HeroProject[] = [
-  { id: "d1", title: "OfficeHours", stage: "idea", looking_for: "Full-stack Developer, UX Designer" },
-  { id: "d2", title: "Trckr", stage: "mvp", looking_for: "iOS Developer, ML Engineer" },
-  { id: "d3", title: "Lecture.fm", stage: "launched", looking_for: "ML Engineer" },
+  { id: "d1", title: "OfficeHours", stage: "idea", looking_for: "Full-stack Developer, UX Designer", is_ai_generated: true },
+  { id: "d2", title: "Trckr", stage: "mvp", looking_for: "iOS Developer, ML Engineer", is_ai_generated: true },
+  { id: "d3", title: "Lecture.fm", stage: "launched", looking_for: "ML Engineer", is_ai_generated: true },
 ];
+
+// ─── Mobile Project Preview ────────────────────────────────────────────────
+
+function MobileProjectPreview() {
+  const [project, setProject] = useState<HeroProject>(DEMO_PROJECTS[0]);
+
+  useEffect(() => {
+    createClient()
+      .from("projects")
+      .select("id, title, stage, looking_for, is_ai_generated")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) setProject(data[0] as HeroProject);
+      });
+  }, []);
+
+  const stg = heroStage(project.stage);
+  const avatar = heroAvatarPalette(project.stage);
+  const initial = (project.title ?? "?")[0].toUpperCase();
+  const firstRole = (project.looking_for ?? "")
+    .split(",")[0].trim().split(" ").slice(0, 2).join(" ");
+
+  return (
+    <div style={{ width: "100%", maxWidth: "100%" }}>
+      <div className="mobile-preview-card" style={{
+        position: "relative",
+        background: "linear-gradient(145deg, rgba(9,14,26,0.86), rgba(14,22,40,0.80))",
+        border: "1px solid rgba(99,102,241,0.13)",
+        borderRadius: 14,
+        padding: "14px 16px",
+        boxShadow: "0 12px 32px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.04) inset",
+        overflow: "hidden",
+      }}>
+        {/* Ambient glow */}
+        <div className="mobile-preview-glow" style={{
+          position: "absolute", top: -32, right: -32,
+          width: 120, height: 120,
+          background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+
+        {/* Single project card */}
+        <Link href={`/projects/${project.id}`} style={{
+          display: "flex", alignItems: "flex-start", gap: 11,
+          textDecoration: "none", position: "relative",
+        }}>
+          {/* Avatar */}
+          <div style={{
+            width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+            background: avatar.bg, border: `1px solid ${avatar.border}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 13, fontWeight: 700, color: avatar.text,
+            fontFamily: "Syne, sans-serif", marginTop: 1,
+          }}>
+            {initial}
+          </div>
+
+          {/* Content */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Title + stage badge */}
+            <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
+              <div style={{
+                fontSize: 12, fontWeight: 600, color: "var(--text-primary)",
+                fontFamily: "DM Sans, sans-serif",
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                flex: 1, minWidth: 0,
+              }}>
+                {project.title}
+              </div>
+              <div style={{
+                fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 999,
+                background: stg.bg, border: `1px solid ${stg.border}`,
+                color: stg.color, flexShrink: 0, letterSpacing: "0.03em",
+              }}>
+                {stg.label}
+              </div>
+            </div>
+
+            {/* Role chip + recency */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              {firstRole && (
+                <span style={{
+                  fontSize: 11, fontWeight: 500,
+                  padding: "2px 7px", borderRadius: 5,
+                  background: "rgba(99,102,241,0.08)",
+                  border: "1px solid rgba(99,102,241,0.15)",
+                  color: "#a5b4fc", fontFamily: "DM Sans, sans-serif",
+                  whiteSpace: "nowrap",
+                }}>
+                  {firstRole}
+                </span>
+              )}
+              <span style={{
+                fontSize: 10, color: "var(--text-muted)",
+                fontFamily: "DM Sans, sans-serif", opacity: 0.7,
+              }}>
+                Recently posted
+              </span>
+            </div>
+          </div>
+        </Link>
+
+        {/* View all — subtle, below card */}
+        <Link href="/projects" style={{
+          display: "block", fontSize: 10, color: "var(--text-muted)",
+          textDecoration: "none", paddingTop: 11, paddingLeft: 45,
+          opacity: 0.5, transition: "opacity 0.18s ease",
+          fontFamily: "DM Sans, sans-serif", position: "relative",
+        }} onMouseEnter={(e) => {
+          e.currentTarget.style.opacity = "0.85";
+        }} onMouseLeave={(e) => {
+          e.currentTarget.style.opacity = "0.5";
+        }}>
+          View all projects →
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 function HeroMockUI() {
   const [projects, setProjects] = useState<HeroProject[]>(DEMO_PROJECTS);
@@ -129,7 +258,7 @@ function HeroMockUI() {
   useEffect(() => {
     createClient()
       .from("projects")
-      .select("id, title, stage, looking_for")
+      .select("id, title, stage, looking_for, is_ai_generated")
       .order("created_at", { ascending: false })
       .limit(3)
       .then(({ data }) => {
@@ -185,7 +314,7 @@ function HeroMockUI() {
                 Latest Projects
               </div>
               <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
-                {projects.length} active · looking for co-founders
+                {projects.length} active · looking for teammates
               </div>
             </div>
             <Link
@@ -196,7 +325,7 @@ function HeroMockUI() {
                 color: "white", textDecoration: "none",
               }}
             >
-              Post Idea
+              Share Build
             </Link>
           </div>
 
@@ -246,9 +375,9 @@ function HeroMockUI() {
                     </div>
                   </div>
 
-                  {/* Skills row */}
-                  {skills.length > 0 && (
-                    <div style={{ display: "flex", gap: 5, paddingLeft: 40 }}>
+                  {/* Skills row + demo badge */}
+                  {(skills.length > 0 || p.is_ai_generated) && (
+                    <div style={{ display: "flex", gap: 5, paddingLeft: 40, flexWrap: "wrap", alignItems: "center" }}>
                       {skills.map((skill) => (
                         <span key={skill} style={{
                           fontSize: 9, fontWeight: 500, padding: "2px 7px", borderRadius: 5,
@@ -258,6 +387,15 @@ function HeroMockUI() {
                           {skill}
                         </span>
                       ))}
+                      {p.is_ai_generated && (
+                        <span style={{
+                          fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 5,
+                          background: "rgba(139,154,176,0.07)", border: "1px solid rgba(139,154,176,0.18)",
+                          color: "#64748b", whiteSpace: "nowrap", letterSpacing: "0.03em",
+                        }}>
+                          Demo
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -280,6 +418,256 @@ function HeroMockUI() {
   );
 }
 
+// ─── Active Projects Section ──────────────────────────────────────────────────
+
+type ActiveProject = {
+  id: string;
+  title: string | null;
+  stage: string | null;
+  looking_for: string | null;
+  category: string | null;
+  created_at: string | null;
+  is_ai_generated?: boolean;
+};
+
+const DEMO_ACTIVE: ActiveProject[] = [
+  { id: "p1", title: "OfficeHours", stage: "mvp", looking_for: "Full-stack Developer, UX Designer", category: "EdTech", created_at: null, is_ai_generated: true },
+  { id: "p2", title: "Trckr", stage: "building", looking_for: "iOS Developer, ML Engineer", category: "Productivity", created_at: null, is_ai_generated: true },
+  { id: "p3", title: "Lecture.fm", stage: "launched", looking_for: "ML Engineer, Growth", category: "AI", created_at: null, is_ai_generated: true },
+];
+
+function ActiveProjectsSection() {
+  const [projects, setProjects] = useState<ActiveProject[]>(DEMO_ACTIVE);
+
+  useEffect(() => {
+    createClient()
+      .from("projects")
+      .select("id, title, stage, looking_for, category, created_at, is_ai_generated")
+      .order("created_at", { ascending: false })
+      .limit(6)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const withRoles = (data as ActiveProject[]).filter(
+            (p) => p.looking_for && p.looking_for.trim().length > 0
+          );
+          if (withRoles.length > 0) setProjects(withRoles.slice(0, 3));
+        }
+      });
+  }, []);
+
+  return (
+    <section
+      className="landing-content-section"
+      style={{
+        padding: "110px 24px",
+        background: "linear-gradient(180deg, transparent 0%, rgba(76,142,255,0.03) 50%, transparent 100%)",
+      }}
+    >
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: 20,
+            marginBottom: 48,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <div style={sectionLabelStyle}>This Week</div>
+            <h2 style={{ ...sectionTitleStyle, marginBottom: 10 }}>
+              Projects looking for serious teammates
+            </h2>
+            <p style={{ ...sectionSubStyle, margin: 0 }}>
+              Active projects with open roles — updated as builders ship.
+            </p>
+          </div>
+          <Link
+            href="/projects"
+            className="btn-secondary"
+            style={{ fontSize: 14, padding: "10px 20px", whiteSpace: "nowrap" }}
+          >
+            View all projects →
+          </Link>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))",
+            gap: 20,
+          }}
+        >
+          {projects.map((project) => {
+            const stg = heroStage(project.stage);
+            const avatar = heroAvatarPalette(project.stage);
+            const roles = (project.looking_for ?? "")
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
+            const initial = (project.title ?? "?")[0].toUpperCase();
+            const href = project.is_ai_generated
+              ? "/projects"
+              : `/projects/${project.id}`;
+
+            return (
+              <Link key={project.id} href={href} style={{ textDecoration: "none" }}>
+                <div
+                  className="polished-feature-card"
+                  style={{
+                    background: "linear-gradient(145deg, rgba(9,14,26,0.9), rgba(14,22,40,0.8))",
+                    border: "1px solid var(--border)",
+                    borderRadius: 16,
+                    padding: "24px",
+                    height: "100%",
+                    boxSizing: "border-box",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 14,
+                  }}
+                >
+                  {/* Header row */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 10,
+                        flexShrink: 0,
+                        background: avatar.bg,
+                        border: `1px solid ${avatar.border}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: avatar.text,
+                        fontFamily: "Syne, sans-serif",
+                      }}
+                    >
+                      {initial}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: "var(--text-primary)",
+                          fontFamily: "Syne, sans-serif",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {project.title}
+                      </div>
+                      {project.category && (
+                        <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
+                          {project.category}
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: "3px 9px",
+                        borderRadius: 999,
+                        background: stg.bg,
+                        border: `1px solid ${stg.border}`,
+                        color: stg.color,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {stg.label}
+                    </div>
+                  </div>
+
+                  {/* Open roles */}
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "var(--text-muted)",
+                        letterSpacing: "0.06em",
+                        textTransform: "uppercase",
+                        marginBottom: 8,
+                      }}
+                    >
+                      Looking for
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {roles.slice(0, 3).map((role) => (
+                        <span
+                          key={role}
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 500,
+                            padding: "3px 9px",
+                            borderRadius: 6,
+                            background: "rgba(74,222,128,0.07)",
+                            border: "1px solid rgba(74,222,128,0.18)",
+                            color: "#4ade80",
+                          }}
+                        >
+                          {role}
+                        </span>
+                      ))}
+                      {roles.length > 3 && (
+                        <span style={{ fontSize: 11, color: "var(--text-muted)", padding: "3px 4px" }}>
+                          +{roles.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingTop: 12,
+                      borderTop: "1px solid rgba(255,255,255,0.05)",
+                      marginTop: "auto",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: "2px 8px",
+                        borderRadius: 999,
+                        background: "rgba(74,222,128,0.08)",
+                        border: "1px solid rgba(74,222,128,0.2)",
+                        color: "#4ade80",
+                      }}
+                    >
+                      Actively Looking
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: "var(--accent-bright)",
+                        fontWeight: 600,
+                        fontFamily: "DM Sans, sans-serif",
+                      }}
+                    >
+                      View project →
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function LandingPage({ stats }: { stats: PublicStats | null }) {
@@ -294,8 +682,8 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
         <section style={{
           minHeight: "100vh", display: "flex", alignItems: "center",
           padding: "120px 24px 80px",
-        }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", display: "flex", alignItems: "center", gap: 80 }}>
+        }} className="hero-section">
+          <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", display: "flex", alignItems: "center", gap: 80 }} className="hero-inner">
 
             {/* Left copy */}
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -308,14 +696,13 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                 color: "var(--text-primary)",
                 marginBottom: 24,
               }}>
-                Find Your{" "}
+                Find your team.{" "}
                 <span style={{
                   background: "var(--gradient-brand)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 }}>
-                  Co-Founder
+                  Show what you're building.
                 </span>
-                {" "}at University
               </h1>
 
               <p style={{
@@ -324,15 +711,19 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                 maxWidth: 500,
                 fontFamily: "DM Sans, sans-serif",
               }}>
-                Post your startup idea, meet talented students, and start building real projects together. No recruiters. No noise. Just builders.
+                A curated network for serious student builders to showcase real projects, find teammates, and build proof-of-work through what they actually ship.
               </p>
 
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <Link href="/signup" className="btn-primary" style={{ fontSize: 15, padding: "13px 28px" }}>
-                  Post Your Idea →
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }} className="hero-cta-group">
+                <Link href="/apply" className="btn-primary hero-cta-btn" style={{ fontSize: 15, padding: "13px 28px" }}>
+                  Join the first 100 builders →
                 </Link>
-                <Link href="/projects" className="btn-secondary" style={{ fontSize: 15, padding: "12px 24px" }}>
-                  Browse Projects
+                <Link href="/projects" className="btn-secondary hero-browse-btn" style={{ fontSize: 15, padding: "12px 24px" }}>
+                  Browse real projects
+                </Link>
+                {/* Mobile-only text link replaces the ghost button */}
+                <Link href="/projects" className="hero-browse-link">
+                  Browse real projects →
                 </Link>
               </div>
 
@@ -352,6 +743,11 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                   </span>
                 </div>
               )}
+
+              {/* Mobile project preview */}
+              <div style={{ marginTop: 20 }} className="hero-mobile-preview">
+                <MobileProjectPreview />
+              </div>
             </div>
 
             {/* Right mock UI */}
@@ -364,7 +760,7 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
         <div className="section-divider" />
 
         {/* ── PROBLEM ───────────────────────────────────────────────── */}
-        <section style={{ padding: "110px 24px" }}>
+        <section className="landing-content-section" style={{ padding: "110px 24px" }}>
           <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
             <div style={sectionLabelStyle}>The Problem</div>
             <h2 style={sectionTitleStyle}>Great ideas die alone.</h2>
@@ -387,8 +783,8 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                   color: "#ef4444",
                   bg: "rgba(239,68,68,0.08)",
                   border: "rgba(239,68,68,0.2)",
-                  title: "No technical co-founder",
-                  desc: "You have the vision and market insight, but can't build the product. Finding a technical partner who actually ships is nearly impossible.",
+                  title: "No technical teammate",
+                  desc: "You have the vision and market insight, but can't build the product. Finding a serious technical teammate who actually ships is nearly impossible.",
                 },
                 {
                   icon: (
@@ -443,15 +839,15 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
         <div className="section-divider" />
 
         {/* ── SOLUTION ──────────────────────────────────────────────── */}
-        <section style={{
+        <section className="landing-content-section" style={{
           padding: "110px 24px",
           background: "linear-gradient(180deg, transparent 0%, rgba(76,142,255,0.03) 50%, transparent 100%)",
         }}>
           <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
             <div style={sectionLabelStyle}>The Fix</div>
-            <h2 style={sectionTitleStyle}>ProjectHub fixes this.</h2>
+            <h2 style={sectionTitleStyle}>Proof-of-work, not promises.</h2>
             <p style={sectionSubStyle}>
-              One place purpose-built for student builders. Every person on here is looking to build something real.
+              ProjectHub is built for builders who ship. Every profile shows real projects. Every project shows weekly progress.
             </p>
 
             <div style={{
@@ -462,20 +858,20 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
               {[
                 {
                   icon: "⚡",
-                  title: "Post your idea in minutes",
-                  desc: "Describe your startup, pick your stage, and specify exactly who you need. Go live in under 5 minutes.",
+                  title: "Showcase what you ship",
+                  desc: "Post your project with stage, stack, and weekly updates. Let the work speak for itself — not your resume.",
                   color: "#4c8eff",
                 },
                 {
                   icon: "🎯",
-                  title: "Match by skills and interests",
-                  desc: "Profiles show what people can build and what they want to work on — not just their LinkedIn headline.",
+                  title: "Find serious teammates",
+                  desc: "Profiles show what people actually build, not their LinkedIn headline. Filter by role, stack, and what they want to work on.",
                   color: "#8b5cf6",
                 },
                 {
                   icon: "🚀",
-                  title: "Build with motivated students",
-                  desc: "Everyone here opted in to building startups. The bar for seriousness is already set before you say a word.",
+                  title: "Build credibility over time",
+                  desc: "Weekly updates accumulate into a proof-of-work track record. Builders who ship consistently get noticed.",
                   color: "#22d3ee",
                 },
               ].map((s, i) => (
@@ -500,8 +896,131 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
 
         <div className="section-divider" />
 
+        {/* ── FIRST 100 BUILDERS ────────────────────────────────────── */}
+        <section
+          className="landing-content-section"
+          style={{
+            padding: "110px 24px",
+            background: "linear-gradient(180deg, transparent 0%, rgba(99,102,241,0.04) 50%, transparent 100%)",
+          }}
+        >
+          <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
+            <div style={sectionLabelStyle}>Early Access</div>
+            <h2 style={sectionTitleStyle}>
+              Join the first 100 serious student builders
+            </h2>
+            <p style={sectionSubStyle}>
+              We&apos;re curating the first batch of real student builders shipping AI,
+              software, hackathon, and startup projects.
+            </p>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: 16,
+                marginTop: 52,
+                textAlign: "left",
+              }}
+            >
+              {[
+                {
+                  icon: "🏗️",
+                  title: "Showcase real projects",
+                  desc: "Post your project with stage, tech stack, and weekly shipping updates.",
+                  color: "#4c8eff",
+                },
+                {
+                  icon: "🎯",
+                  title: "Find serious teammates",
+                  desc: "Connect with builders who have a track record of shipping, not just intentions.",
+                  color: "#8b5cf6",
+                },
+                {
+                  icon: "📅",
+                  title: "Post weekly shipping updates",
+                  desc: "Build a proof-of-work timeline that shows consistent progress over time.",
+                  color: "#22d3ee",
+                },
+                {
+                  icon: "⭐",
+                  title: "Get featured as an early builder",
+                  desc: "Early members shape what ProjectHub becomes — and get featured in the network directory.",
+                  color: "#4ade80",
+                },
+              ].map((b, i) => (
+                <div
+                  key={i}
+                  className="polished-feature-card"
+                  style={{
+                    background: "linear-gradient(145deg, rgba(9,14,26,0.9), rgba(14,22,40,0.8))",
+                    border: "1px solid var(--border)",
+                    borderRadius: 16,
+                    padding: "28px 24px",
+                  }}
+                >
+                  <div style={{ fontSize: 26, marginBottom: 14 }}>{b.icon}</div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: "var(--text-primary)",
+                      fontFamily: "Syne, sans-serif",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {b.title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: "var(--text-secondary)",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {b.desc}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                marginTop: 48,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
+              }}
+            >
+              <Link
+                href="/apply"
+                className="btn-primary"
+                style={{ fontSize: 15, padding: "14px 32px" }}
+              >
+                Apply to join the first 100 →
+              </Link>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "var(--text-muted)",
+                  fontFamily: "DM Sans, sans-serif",
+                  maxWidth: 440,
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
+                Every early application is reviewed manually so ProjectHub stays
+                focused on real builders, not empty profiles.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="section-divider" />
+
         {/* ── HOW IT WORKS ──────────────────────────────────────────── */}
-        <section style={{ padding: "110px 24px" }}>
+        <section className="landing-content-section" style={{ padding: "110px 24px" }}>
           <div style={{ maxWidth: 1000, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 64 }}>
               <div style={sectionLabelStyle}>How It Works</div>
@@ -526,8 +1045,8 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                 },
                 {
                   num: "02",
-                  title: "Post your startup idea",
-                  desc: "Describe the problem, the solution, your current stage, and the exact skills you're looking for in a co-founder.",
+                  title: "Post your real project",
+                  desc: "Describe what you're building, your current stage, and the exact roles you're looking for. Ship weekly updates to build credibility.",
                   icon: (
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -539,8 +1058,8 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                 },
                 {
                   num: "03",
-                  title: "Connect and build",
-                  desc: "Browse builders, send connection requests, start the conversation, and assemble your founding team.",
+                  title: "Apply and get building",
+                  desc: "Browse real projects, apply with your proof of work, and connect with serious builders who actually ship.",
                   icon: (
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
@@ -552,7 +1071,7 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                 },
               ].map((step, i) => (
                 <div key={i} style={{ flex: 1, minWidth: 240, display: "flex", alignItems: "stretch" }}>
-                  <div style={{
+                  <div className="how-it-works-card" style={{
                     flex: 1,
                     background: "linear-gradient(145deg, rgba(9,14,26,0.9), rgba(14,22,40,0.8))",
                     border: "1px solid var(--border)",
@@ -607,7 +1126,7 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
         <div className="section-divider" />
 
         {/* ── FEATURES ──────────────────────────────────────────────── */}
-        <section style={{
+        <section className="landing-content-section" style={{
           padding: "110px 24px",
           background: "linear-gradient(180deg, transparent 0%, rgba(139,92,246,0.03) 50%, transparent 100%)",
         }}>
@@ -685,8 +1204,13 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
 
         <div className="section-divider" />
 
+        {/* ── ACTIVE PROJECTS ───────────────────────────────────────── */}
+        <ActiveProjectsSection />
+
+        <div className="section-divider" />
+
         {/* ── FINAL CTA ─────────────────────────────────────────────── */}
-        <section style={{ padding: "110px 24px 128px" }}>
+        <section className="landing-content-section landing-cta-section" style={{ padding: "110px 24px 128px" }}>
           <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
             <div className="cta-card" style={{
               background: "linear-gradient(145deg, rgba(9,14,26,0.98), rgba(14,22,40,0.95))",
@@ -706,7 +1230,7 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                   textTransform: "uppercase", color: "var(--accent-bright)",
                   marginBottom: 20,
                 }}>
-                  Ready to build?
+                  Early access
                 </div>
 
                 <h2 style={{
@@ -718,7 +1242,7 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                   color: "var(--text-primary)",
                   marginBottom: 16,
                 }}>
-                  Ready to build your startup?
+                  Join the first 100 builders.
                 </h2>
 
                 <p style={{
@@ -726,21 +1250,21 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                   lineHeight: 1.65, marginBottom: 36,
                   fontFamily: "DM Sans, sans-serif",
                 }}>
-                  Your co-founder might already be here.
-                  Post your idea today — it takes less than 5 minutes.
+                  ProjectHub is early and curated. The builders who join now shape what this becomes.
+                  Show your work. Find your team. Ship something real.
                 </p>
 
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                  <Link href="/signup" className="btn-primary" style={{ fontSize: 15, padding: "14px 32px" }}>
-                    Get Started Free →
+                  <Link href="/apply" className="btn-primary" style={{ fontSize: 15, padding: "14px 32px" }}>
+                    Apply to join the first 100 →
                   </Link>
                   <Link href="/projects" className="btn-secondary" style={{ fontSize: 15, padding: "13px 24px" }}>
-                    Browse Projects
+                    Browse real projects
                   </Link>
                 </div>
 
                 <div style={{ marginTop: 28, fontSize: 12, color: "var(--text-muted)" }}>
-                  Free forever · For students and builders · No spam
+                  Curated · Free for builders · No recruiters
                 </div>
               </div>
             </div>
@@ -762,7 +1286,7 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
                 <Logo size="md" gradient />
               </div>
               <div style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "DM Sans, sans-serif", lineHeight: 1.6, marginBottom: 10 }}>
-                Built for student founders looking to meet co-founders at university.
+                A curated network for serious student builders. Find your team. Ship real projects. Build proof-of-work.
               </div>
               <div style={{ fontSize: 12, color: "var(--text-muted)", fontFamily: "DM Sans, sans-serif" }}>
                 © {new Date().getFullYear()} ProjectHub
@@ -815,12 +1339,181 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
 
       {/* Responsive styles */}
       <style>{`
-        @media (max-width: 768px) {
-          .hero-mock { display: none !important; }
-          .how-it-works-arrow { display: none !important; }
+        /* ── Preview card animations ─────────────────────────────── */
+        .mobile-preview-card {
+          animation: float 8s ease-in-out infinite;
         }
+
+        .mobile-preview-glow {
+          animation: drift2 16s ease-in-out infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .mobile-preview-card,
+          .mobile-preview-glow,
+          .bg-orb-1,
+          .bg-orb-2 { animation: none !important; }
+        }
+
+        /* ── Elements hidden on desktop, shown on mobile ─────────── */
+        .mobile-nav-signin { display: none !important; }
+        .hero-browse-link  { display: none !important; }
+
+        /* ── Mobile hero (≤768px) ────────────────────────────────── */
+        @media (max-width: 768px) {
+          .hero-mock         { display: none !important; }
+          .how-it-works-arrow { display: none !important; }
+
+          .hero-section {
+            min-height: auto !important;
+            padding: 72px 22px 44px !important;
+          }
+
+          .hero-inner {
+            flex-direction: column !important;
+            gap: 0 !important;
+          }
+
+          .hero-section h1 {
+            font-size: clamp(28px, 7vw, 42px) !important;
+            line-height: 1.06 !important;
+            letter-spacing: -0.038em !important;
+            margin-bottom: 16px !important;
+          }
+
+          .hero-section p {
+            font-size: 15px !important;
+            line-height: 1.64 !important;
+            margin-bottom: 20px !important;
+          }
+
+          /* Primary CTA: compact, centered, not full-width */
+          .hero-cta-group {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+            margin-bottom: 18px !important;
+          }
+
+          .hero-cta-group .btn-primary {
+            width: auto !important;
+            min-width: 210px !important;
+            max-width: 260px !important;
+            font-size: 13px !important;
+            padding: 10px 20px !important;
+            box-shadow: 0 4px 16px rgba(76,142,255,0.2), 0 1px 0 rgba(255,255,255,0.1) inset !important;
+          }
+
+          /* Hide ghost button, show text link */
+          .hero-browse-btn  { display: none !important; }
+          .hero-browse-link {
+            display: inline-block !important;
+            font-size: 12px !important;
+            color: var(--text-muted) !important;
+            text-decoration: none !important;
+            font-family: "DM Sans", sans-serif !important;
+            opacity: 0.7 !important;
+            transition: opacity 0.15s ease !important;
+            padding: 8px 0 !important;
+          }
+          .hero-browse-link:hover { opacity: 1 !important; }
+
+          .hero-mobile-preview {
+            display: block !important;
+            margin-top: 20px !important;
+            max-width: 330px !important;
+          }
+        }
+
+        @media (min-width: 769px) {
+          .hero-mobile-preview { display: none !important; }
+        }
+
+        /* ── Small phones (≤640px) ───────────────────────────────── */
         @media (max-width: 640px) {
+          /* Swap nav CTA → minimal text links on mobile */
           .landing-nav-links { display: none !important; }
+          .landing-nav-cta   { display: none !important; }
+          .mobile-nav-signin { display: flex !important; align-items: center !important; }
+
+          .hero-section {
+            padding: 60px 18px 36px !important;
+          }
+
+          .hero-section h1 {
+            font-size: clamp(24px, 7.5vw, 36px) !important;
+            line-height: 1.07 !important;
+            letter-spacing: -0.04em !important;
+            margin-bottom: 13px !important;
+          }
+
+          .hero-section p {
+            font-size: 14px !important;
+            margin-bottom: 18px !important;
+            line-height: 1.62 !important;
+          }
+
+          .hero-cta-group {
+            gap: 9px !important;
+            margin-bottom: 16px !important;
+          }
+
+          .hero-cta-group .btn-primary {
+            min-width: 190px !important;
+            font-size: 12.5px !important;
+            padding: 9px 18px !important;
+          }
+
+          .hero-mobile-preview {
+            margin-top: 18px !important;
+            max-width: 310px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-section {
+            padding: 54px 16px 30px !important;
+          }
+
+          .hero-section h1 {
+            font-size: clamp(22px, 7vw, 32px) !important;
+            margin-bottom: 11px !important;
+          }
+
+          .hero-section p {
+            font-size: 13.5px !important;
+            margin-bottom: 15px !important;
+          }
+
+          .hero-mobile-preview {
+            max-width: 290px !important;
+          }
+        }
+
+        /* Fix 2: Landing content sections — reduce vertical padding on mobile */
+        @media (max-width: 768px) {
+          .landing-content-section {
+            padding-top: 60px !important;
+            padding-bottom: 60px !important;
+            padding-left: 22px !important;
+            padding-right: 22px !important;
+          }
+          .landing-cta-section {
+            padding-bottom: 80px !important;
+          }
+          /* Fix 3: CTA card inner padding */
+          .cta-card {
+            padding: 40px 28px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .landing-content-section {
+            padding-top: 48px !important;
+            padding-bottom: 48px !important;
+          }
+          .cta-card {
+            padding: 32px 20px !important;
+          }
         }
       `}</style>
     </>
@@ -834,6 +1527,12 @@ const navLinkStyle: React.CSSProperties = {
   textDecoration: "none", padding: "6px 10px",
   borderRadius: 8, fontFamily: "DM Sans, sans-serif",
   fontWeight: 500, transition: "color 0.15s ease",
+};
+
+const mobileNavLinkStyle: React.CSSProperties = {
+  fontSize: 12, color: "var(--text-secondary)",
+  textDecoration: "none", padding: "6px 5px",
+  fontFamily: "DM Sans, sans-serif", fontWeight: 500,
 };
 
 const sectionLabelStyle: React.CSSProperties = {

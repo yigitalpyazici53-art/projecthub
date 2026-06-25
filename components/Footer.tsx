@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
 
-const HIDDEN_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-password"];
+const HIDDEN_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/apply"];
 
 export default function Footer() {
   const pathname = usePathname();

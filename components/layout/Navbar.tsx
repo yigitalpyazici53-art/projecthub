@@ -26,7 +26,7 @@ const publicNavItems = [
   { href: "/builders", label: "Builders" },
 ];
 
-const HIDDEN_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-password"];
+const HIDDEN_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/apply"];
 
 // Defined outside Navbar so React sees a stable component type across re-renders.
 // If defined inside, React would treat it as a new type on every Navbar render,

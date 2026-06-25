@@ -52,8 +52,10 @@ function timeAgo(iso: string | null | undefined): string {
 function stagePalette(stage: string | null | undefined): { color: string; bg: string; border: string; label: string } {
   switch ((stage ?? "").toLowerCase()) {
     case "idea":     return { color: "#fbbf24", bg: "rgba(251,191,36,0.12)",  border: "rgba(251,191,36,0.28)",  label: "Idea" };
-    case "mvp":      return { color: "#60a5fa", bg: "rgba(96,165,250,0.12)",  border: "rgba(96,165,250,0.28)",  label: "Building" };
-    case "launched": return { color: "#4ade80", bg: "rgba(74,222,128,0.12)", border: "rgba(74,222,128,0.28)", label: "Live" };
+    case "mvp":      return { color: "#60a5fa", bg: "rgba(96,165,250,0.12)",  border: "rgba(96,165,250,0.28)",  label: "MVP" };
+    case "building": return { color: "#a78bfa", bg: "rgba(167,139,250,0.12)", border: "rgba(167,139,250,0.28)", label: "Building" };
+    case "launched": return { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.28)",  label: "Launched" };
+    case "paused":   return { color: "#8b9ab0", bg: "rgba(139,154,176,0.10)", border: "rgba(139,154,176,0.20)", label: "Paused" };
     default:         return { color: "#8b9ab0", bg: "rgba(139,154,176,0.10)", border: "rgba(139,154,176,0.20)", label: stage ? stage.charAt(0).toUpperCase() + stage.slice(1) : "—" };
   }
 }
@@ -203,7 +205,7 @@ export default function ProjectCard({
         </p>
       )}
 
-      {/* Stage badge + open spots */}
+      {/* Stage badge + open spots + trust badges */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
         <span style={{
           fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
@@ -214,12 +216,23 @@ export default function ProjectCard({
         </span>
         {rolesOpen > 0 && (
           <span style={{
-            fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 999,
-            color: "var(--accent-bright)",
-            background: "color-mix(in srgb, var(--accent) 10%, transparent)",
-            border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
+            fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
+            color: "#4ade80",
+            background: "rgba(74,222,128,0.08)",
+            border: "1px solid rgba(74,222,128,0.22)",
           }}>
-            {rolesOpen} open {rolesOpen === 1 ? "spot" : "spots"}
+            Actively Looking
+          </span>
+        )}
+        {project.is_ai_generated && (
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
+            color: "#8b9ab0",
+            background: "rgba(139,154,176,0.07)",
+            border: "1px solid rgba(139,154,176,0.18)",
+            letterSpacing: "0.03em",
+          }}>
+            Demo Project
           </span>
         )}
       </div>

@@ -285,6 +285,15 @@ export default function BuilderProfilePage({ params }: PageProps) {
     own_profile: "Edit Profile",
     error: "Try again",
   };
+  const connectLabelsMobile: Record<ConnectStatus, string> = {
+    idle: "Connect →",
+    sending: "Sending…",
+    sent: "Sent ✓",
+    incoming: "Respond →",
+    already_connected: "Connected ✓",
+    own_profile: "Edit Profile",
+    error: "Try again",
+  };
   const builderFirstName = (builder.full_name || builder.username || "them").split(" ")[0];
 
   return (
@@ -325,7 +334,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
           </div>
 
           {/* Avatar + action row — avatar has a clean surface-colored ring so the overlap looks intentional, not cropped */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "0 28px", gap: 16, flexWrap: "wrap" }}>
+          <div className="builder-profile-inner" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "0 28px", gap: 16, flexWrap: "wrap" }}>
             {/* Avatar — half-overlaps banner. Ring is two box-shadows (outer = surface color match, inner = accent glow) */}
             <div style={{
               width: 112, height: 112, borderRadius: "50%",
@@ -396,7 +405,8 @@ export default function BuilderProfilePage({ params }: PageProps) {
                       boxShadow: canConnect ? "0 4px 16px var(--accent-glow)" : "none",
                     }}
                   >
-                    {connectLabels[connectStatus]}
+                    <span className="connect-label-desktop">{connectLabels[connectStatus]}</span>
+                    <span className="connect-label-mobile">{connectLabelsMobile[connectStatus]}</span>
                   </button>
                   {connectStatus === "already_connected" && (
                     <Link href={`/messages?with=${builder.id}`} style={{ ...actionBtn, color: "var(--accent-bright)" }}>
@@ -412,7 +422,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
           </div>
 
           {/* Profile info */}
-          <div style={{ padding: "18px 28px 28px" }}>
+          <div className="builder-profile-info" style={{ padding: "18px 28px 28px" }}>
             <h1 style={{ fontSize: 22, fontFamily: "Syne, sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: 4, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
               {builder.full_name || builder.username || "Unnamed Builder"}
             </h1>
@@ -536,7 +546,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
                       <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>+{count}</span>
                     )}
                     {canEndorse && (
-                      <button type="button" onClick={() => handleEndorse(skill)} disabled={endorsing === skill} style={{
+                      <button type="button" onClick={() => handleEndorse(skill)} disabled={endorsing === skill} className="endorse-btn" style={{
                         padding: "3px 9px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer",
                         background: hasEndorsed ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "rgba(255,255,255,0.04)",
                         border: `1px solid ${hasEndorsed ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "var(--border)"}`,

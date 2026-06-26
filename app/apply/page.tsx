@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import Logo from "@/components/Logo";
+import { createClient } from "@/utils/supabase/client";
 
 type FormData = {
   full_name: string;
@@ -40,6 +41,7 @@ export default function ApplyPage() {
   const [form, setForm] = useState<FormData>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const field =
     (key: keyof FormData) =>
@@ -48,9 +50,33 @@ export default function ApplyPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (submitting) return;
     setSubmitting(true);
-    // TODO: wire to Supabase "applications" table
-    await new Promise((r) => setTimeout(r, 900));
+    setSubmitError(null);
+
+    const supabase = createClient();
+    const { error } = await supabase.from("builder_applications").insert({
+      full_name: form.full_name.trim(),
+      email: form.email.trim().toLowerCase(),
+      university: form.university.trim() || null,
+      role: form.role.trim() || null,
+      skills: form.skills.trim() || null,
+      project_name: form.project_name.trim() || null,
+      what_building: form.what_building.trim() || null,
+      looking_for_teammates: form.looking_for_teammates === "yes",
+      looking_for_roles: form.roles_looking_for.trim() || null,
+      github_url: form.github_url.trim() || null,
+      linkedin_url: form.linkedin_url.trim() || null,
+      demo_url: form.demo_url.trim() || null,
+      why_join: form.why_join.trim() || null,
+    });
+
+    if (error) {
+      setSubmitError("Something went wrong. Please try again in a moment.");
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitted(true);
     setSubmitting(false);
   }
@@ -510,6 +536,23 @@ export default function ApplyPage() {
               </FormSection>
 
               <div>
+                {submitError && (
+                  <div
+                    style={{
+                      marginBottom: 12,
+                      padding: "11px 16px",
+                      borderRadius: 9,
+                      background: "rgba(239,68,68,0.08)",
+                      border: "1px solid rgba(239,68,68,0.25)",
+                      color: "#f87171",
+                      fontSize: 13,
+                      fontFamily: "DM Sans, sans-serif",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {submitError}
+                  </div>
+                )}
                 <button
                   type="submit"
                   disabled={submitting}

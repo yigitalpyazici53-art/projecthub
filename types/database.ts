@@ -253,6 +253,66 @@ export type Database = {
         };
         Relationships: [];
       };
+      builder_applications: {
+        Row: {
+          id: string;
+          full_name: string;
+          email: string;
+          university: string | null;
+          role: string | null;
+          skills: string | null;
+          project_name: string | null;
+          what_building: string | null;
+          looking_for_teammates: boolean;
+          looking_for_roles: string | null;
+          github_url: string | null;
+          linkedin_url: string | null;
+          demo_url: string | null;
+          why_join: string | null;
+          status: string;
+          admin_notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          email: string;
+          university?: string | null;
+          role?: string | null;
+          skills?: string | null;
+          project_name?: string | null;
+          what_building?: string | null;
+          looking_for_teammates?: boolean;
+          looking_for_roles?: string | null;
+          github_url?: string | null;
+          linkedin_url?: string | null;
+          demo_url?: string | null;
+          why_join?: string | null;
+          status?: string;
+          admin_notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          email?: string;
+          university?: string | null;
+          role?: string | null;
+          skills?: string | null;
+          project_name?: string | null;
+          what_building?: string | null;
+          looking_for_teammates?: boolean;
+          looking_for_roles?: string | null;
+          github_url?: string | null;
+          linkedin_url?: string | null;
+          demo_url?: string | null;
+          why_join?: string | null;
+          status?: string;
+          admin_notes?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

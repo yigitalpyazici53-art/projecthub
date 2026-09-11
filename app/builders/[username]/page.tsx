@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import SkeletonLoader from "@/components/SkeletonLoader";
-import ProjectCard from "@/components/cards/ProjectCard";
 import { getInitials } from "@/utils/getInitials";
+import { stageBadge } from "@/utils/stage";
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import type { Profile, Project } from "@/types";
 
 type PageProps = { params: Promise<{ username: string }> };
@@ -19,7 +20,7 @@ type ConnectStatus =
   | "own_profile"
   | "error";
 
-// Local row type — extends Project so it can be passed straight to ProjectCard
+// Local row type — extends Project so it can be passed straight through
 // without re-shaping. We select only the fields we need below.
 type ProjectRow = Project;
 
@@ -31,20 +32,6 @@ interface EndorsementRow {
   endorserProfile?: { full_name: string | null; username: string | null; avatar_url: string | null };
 }
 type SkillEndorsements = Record<string, EndorsementRow[]>;
-
-function getAvatarColor(id: string) {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
-  return colors[id.charCodeAt(0) % colors.length];
-}
-
-function stageBadge(stage: string | null): { label: string; color: string; bg: string } {
-  switch (stage) {
-    case "idea":     return { label: "In Progress", color: "#fbbf24", bg: "rgba(251,191,36,0.12)" };
-    case "mvp":      return { label: "Active",      color: "#4ade80", bg: "rgba(74,222,128,0.12)" };
-    case "launched": return { label: "Done",        color: "#60a5fa", bg: "rgba(96,165,250,0.12)" };
-    default:         return { label: "Active",      color: "#4ade80", bg: "rgba(74,222,128,0.12)" };
-  }
-}
 
 const OPEN_AVAILABILITY = ["Open to cofound", "Open to join"];
 
@@ -96,7 +83,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
       try {
         const { data, error: dbError } = await supabase
           .from("profiles")
-          .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url")
+          .select("id, full_name, username, university, role, bio, skills, interests, github_url, linkedin_url, portfolio_url, avatar_url")
           .eq("username", username)
           .maybeSingle();
 
@@ -248,7 +235,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
   if (loading) {
     return (
       <main style={page}>
-        <div className="page-pad-x" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 80 }}>
+        <div className="page-pad-x" style={{ maxWidth: 760, margin: "0 auto", paddingTop: 110 }}>
           <SkeletonLoader count={3} columns="1fr" />
         </div>
       </main>
@@ -258,9 +245,9 @@ export default function BuilderProfilePage({ params }: PageProps) {
   if (notFound || !builder) {
     return (
       <main style={page}>
-        <div className="page-pad-x" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 80 }}>
+        <div className="page-pad-x" style={{ maxWidth: 760, margin: "0 auto", paddingTop: 110 }}>
           <div style={card}>
-            <h1 style={{ fontSize: 20, fontFamily: "Syne, sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: 8 }}>
+            <h1 className="font-serif" style={{ fontSize: 24, color: "var(--text-primary)", marginBottom: 8 }}>
               Builder not found
             </h1>
             <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>No builder with username &ldquo;{username}&rdquo; exists.</p>
@@ -274,192 +261,149 @@ export default function BuilderProfilePage({ params }: PageProps) {
   const skills = (builder.skills ?? "").split(",").map(s => s.trim()).filter(Boolean);
   const availability = (builder.interests ?? "").trim();
   const isOpenToCollaborate = OPEN_AVAILABILITY.includes(availability);
-  const avatarColor = getAvatarColor(builder.id);
   const canConnect = connectStatus === "idle" || connectStatus === "error";
   const connectLabels: Record<ConnectStatus, string> = {
-    idle: "Send connection request",
+    idle: "Connect",
     sending: "Sending…",
     sent: "Request sent ✓",
-    incoming: "They want to connect",
+    incoming: "Respond to request",
     already_connected: "Connected ✓",
-    own_profile: "Edit Profile",
-    error: "Try again",
-  };
-  const connectLabelsMobile: Record<ConnectStatus, string> = {
-    idle: "Connect →",
-    sending: "Sending…",
-    sent: "Sent ✓",
-    incoming: "Respond →",
-    already_connected: "Connected ✓",
-    own_profile: "Edit Profile",
+    own_profile: "Edit profile",
     error: "Try again",
   };
   const builderFirstName = (builder.full_name || builder.username || "them").split(" ")[0];
 
+  const shippedCount = projects.filter((p) => (p.stage ?? "").toLowerCase() === "launched").length;
+  const endorsementsCount = Object.values(endorsements).reduce((acc, list) => acc + list.length, 0);
+
+  // Skills with endorsement counts — endorsed skills first, then the rest.
+  const skillsWithCounts = [
+    ...skills,
+    ...Object.keys(endorsements).filter((s) => !skills.includes(s)),
+  ].map((skill) => ({ skill, count: endorsements[skill]?.length ?? 0 }))
+    .sort((a, b) => b.count - a.count);
+
   return (
     <main style={page}>
-      <div className="page-pad-x" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 80, paddingBottom: 80 }}>
+      <div className="page-pad-x" style={{ maxWidth: 760, margin: "0 auto", paddingTop: 110, paddingBottom: 96 }}>
 
         {/* Back */}
-        <Link href="/builders" style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: 13, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 20 }}>
-          ← Back to builders
+        <Link href="/builders" className="u-link" style={{ color: "var(--text-muted)", fontSize: 13, fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 40 }}>
+          ← All builders
         </Link>
 
-        {/* ── Profile Card (full-width hero) ── */}
-        {/* overflow:visible so the avatar ring isn't clipped when it overlaps the banner edge */}
-        <div style={{ ...card, padding: 0, overflow: "visible", marginBottom: 20 }}>
-
-          {/* Banner — themed: uses surface vars for the base + accent-mix for the dot pattern/orb so it tracks the active theme */}
-          <div style={{
-            height: 140,
-            background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-raised) 55%, var(--surface-overlay) 100%)",
-            position: "relative", overflow: "hidden",
-            borderTopLeftRadius: 16, borderTopRightRadius: 16,
-          }}>
-            <div style={{
-              position: "absolute", inset: 0,
-              backgroundImage: "radial-gradient(color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1px)",
-              backgroundSize: "22px 22px",
-            }} />
-            <div style={{
-              position: "absolute", top: -60, right: -40, width: 280, height: 280,
-              background: "radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)",
-              pointerEvents: "none",
-            }} />
-            <div style={{
-              position: "absolute", bottom: 0, left: 0, right: 0, height: 48,
-              background: "linear-gradient(180deg, transparent 0%, var(--surface) 100%)",
-              pointerEvents: "none",
-            }} />
-          </div>
-
-          {/* Avatar + action row — avatar has a clean surface-colored ring so the overlap looks intentional, not cropped */}
-          <div className="builder-profile-inner" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "0 28px", gap: 16, flexWrap: "wrap" }}>
-            {/* Avatar — half-overlaps banner. Ring is two box-shadows (outer = surface color match, inner = accent glow) */}
-            <div style={{
-              width: 112, height: 112, borderRadius: "50%",
-              background: avatarColor,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 34, fontFamily: "Syne, sans-serif", fontWeight: 700, color: "white",
-              marginTop: -56, flexShrink: 0, overflow: "hidden",
-              boxShadow: "0 0 0 5px var(--surface), 0 0 0 6px color-mix(in srgb, var(--accent) 30%, transparent), 0 12px 28px rgba(0,0,0,0.45)",
-              position: "relative",
-              zIndex: 2,
-            }}>
-              {builder.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={builder.avatar_url} alt={builder.full_name || "avatar"} loading="lazy"
-                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-              ) : getInitials(builder.full_name, builder.username)}
-            </div>
-
-            {/* Action buttons */}
-            <div style={{ display: "flex", gap: 8, paddingTop: 16, flexWrap: "wrap" }}>
-              {connectStatus === "own_profile" ? (
-                <Link href="/profile/edit" style={actionBtn}>Edit Profile</Link>
-              ) : connectStatus === "incoming" ? (
-                <Link
-                  href="/connections"
-                  style={{
-                    ...actionBtnBase,
-                    background: "color-mix(in srgb, var(--accent) 22%, transparent)",
-                    borderColor: "color-mix(in srgb, var(--accent) 50%, transparent)",
-                    color: "var(--accent-bright)",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 16px var(--accent-glow)",
-                  }}
-                >
-                  Respond to request →
-                </Link>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleConnect}
-                    disabled={!canConnect}
-                    aria-label={connectLabels[connectStatus]}
-                    style={{
-                      ...actionBtnBase,
-                      padding: "9px 18px",
-                      fontWeight: 700,
-                      background:
-                        connectStatus === "sent" || connectStatus === "already_connected"
-                          ? "rgba(74,222,128,0.12)"
-                          : connectStatus === "error"
-                          ? "rgba(239,68,68,0.12)"
-                          : "var(--gradient-brand)",
-                      borderColor:
-                        connectStatus === "sent" || connectStatus === "already_connected"
-                          ? "rgba(74,222,128,0.35)"
-                          : connectStatus === "error"
-                          ? "rgba(239,68,68,0.35)"
-                          : "color-mix(in srgb, var(--accent) 50%, transparent)",
-                      color:
-                        connectStatus === "sent" || connectStatus === "already_connected"
-                          ? "var(--accent-green)"
-                          : connectStatus === "error"
-                          ? "#fca5a5"
-                          : "#ffffff",
-                      opacity: connectStatus === "sending" ? 0.75 : 1,
-                      cursor: canConnect ? "pointer" : "default",
-                      boxShadow: canConnect ? "0 4px 16px var(--accent-glow)" : "none",
-                    }}
-                  >
-                    <span className="connect-label-desktop">{connectLabels[connectStatus]}</span>
-                    <span className="connect-label-mobile">{connectLabelsMobile[connectStatus]}</span>
-                  </button>
-                  {connectStatus === "already_connected" && (
-                    <Link href={`/messages?with=${builder.id}`} style={{ ...actionBtn, color: "var(--accent-bright)" }}>
-                      💬 Message
-                    </Link>
+        {/* ── Header ── */}
+        <Reveal>
+          <header style={{ marginBottom: 48 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 20, minWidth: 0 }}>
+                <div style={{
+                  width: 72, height: 72, borderRadius: "50%", flexShrink: 0,
+                  background: "#F5F5F3", border: "1px solid var(--border)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 24, fontWeight: 600, color: "var(--text-secondary)",
+                  overflow: "hidden",
+                }}>
+                  {builder.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={builder.avatar_url} alt={builder.full_name || "avatar"} loading="lazy"
+                      style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                  ) : getInitials(builder.full_name, builder.username)}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <h1 className="font-serif" style={{
+                    fontSize: "clamp(30px, 5vw, 42px)", fontWeight: 500,
+                    color: "var(--text-primary)", lineHeight: 1.1, letterSpacing: "-0.015em",
+                    marginBottom: 6,
+                  }}>
+                    {builder.full_name || builder.username || "Unnamed Builder"}
+                  </h1>
+                  {builder.bio && (
+                    <p style={{ fontSize: 15, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 8, maxWidth: 520 }}>
+                      {builder.bio}
+                    </p>
                   )}
-                </>
-              )}
-              <button type="button" onClick={handleShare} style={{ ...actionBtnBase, background: "rgba(255,255,255,0.04)", borderColor: "var(--border)", color: "var(--text-muted)", cursor: "pointer" }}>
-                {copied ? "Copied ✓" : "Share ↗"}
-              </button>
-            </div>
-          </div>
+                  <div className="label-caps">
+                    {[builder.university, builder.role].filter(Boolean).join(" · ") || `@${builder.username}`}
+                  </div>
+                </div>
+              </div>
 
-          {/* Profile info */}
-          <div className="builder-profile-info" style={{ padding: "18px 28px 28px" }}>
-            <h1 style={{ fontSize: 22, fontFamily: "Syne, sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: 4, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
-              {builder.full_name || builder.username || "Unnamed Builder"}
-            </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: builder.bio ? 12 : 8, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>
-                @{builder.username || "no-username"}
-              </span>
-              {builder.university && (
-                <>
-                  <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 13 }}>·</span>
-                  <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500 }}>{builder.university}</span>
-                </>
-              )}
+              {/* Actions */}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {connectStatus === "own_profile" ? (
+                  <Link href="/profile/edit" className="btn-secondary" style={{ fontSize: 13 }}>Edit profile</Link>
+                ) : connectStatus === "incoming" ? (
+                  <Link href="/connections" className="btn-secondary" style={{ fontSize: 13 }}>
+                    Respond to request →
+                  </Link>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleConnect}
+                      disabled={!canConnect}
+                      aria-label={connectLabels[connectStatus]}
+                      className="btn-secondary"
+                      style={{
+                        fontSize: 13,
+                        opacity: connectStatus === "sending" ? 0.7 : 1,
+                        cursor: canConnect ? "pointer" : "default",
+                        color: connectStatus === "sent" || connectStatus === "already_connected"
+                          ? "#0F6E56"
+                          : connectStatus === "error" ? "#B91C1C" : "var(--text-primary)",
+                      }}
+                    >
+                      {connectLabels[connectStatus]}
+                    </button>
+                    {connectStatus === "already_connected" && (
+                      <Link href={`/messages?with=${builder.id}`} className="btn-secondary" style={{ fontSize: 13 }}>
+                        Message
+                      </Link>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
-            {builder.bio && (
-              <p style={{ fontSize: 14.5, color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: 16, maxWidth: 720 }}>
-                {builder.bio}
-              </p>
+            {/* Links */}
+            {(builder.github_url || builder.linkedin_url || builder.portfolio_url) && (
+              <div style={{ display: "flex", gap: 18, marginTop: 20, flexWrap: "wrap" }}>
+                {builder.github_url && (
+                  <a href={builder.github_url} target="_blank" rel="noreferrer" className="u-link" style={iconLink}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+                    GitHub
+                  </a>
+                )}
+                {builder.linkedin_url && (
+                  <a href={builder.linkedin_url} target="_blank" rel="noreferrer" className="u-link" style={iconLink}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.554V9h3.565v11.452z"/></svg>
+                    LinkedIn
+                  </a>
+                )}
+                {builder.portfolio_url && (
+                  <a href={builder.portfolio_url} target="_blank" rel="noreferrer" className="u-link" style={iconLink}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    Portfolio
+                  </a>
+                )}
+              </div>
             )}
 
-            {connectError && <p style={{ color: "#fca5a5", fontSize: 12, marginBottom: 10 }}>{connectError}</p>}
-
-            {/* Connection state banners */}
+            {/* Connection state notes */}
+            {connectError && <p style={{ color: "#B91C1C", fontSize: 12, marginTop: 14 }}>{connectError}</p>}
             {showSentToast && connectStatus === "sent" && (
               <div
                 role="status"
                 style={{
                   display: "flex", alignItems: "center", gap: 10,
-                  background: "rgba(74,222,128,0.08)",
-                  border: "1px solid rgba(74,222,128,0.28)",
-                  borderRadius: 10, padding: "10px 14px",
-                  marginBottom: 14,
+                  background: "#ECFDF5",
+                  border: "1px solid #D1FAE5",
+                  borderRadius: 8, padding: "10px 14px",
+                  marginTop: 16,
                 }}
               >
-                <span style={{ fontSize: 16, lineHeight: 1 }}>✅</span>
-                <span style={{ fontSize: 13, color: "#bbf7d0", flex: 1, lineHeight: 1.5 }}>
+                <span style={{ fontSize: 13, color: "#0F6E56", flex: 1, lineHeight: 1.5 }}>
                   Connection request sent to <strong>{builderFirstName}</strong>. You&apos;ll get notified if they accept.
                 </span>
                 <button
@@ -467,8 +411,8 @@ export default function BuilderProfilePage({ params }: PageProps) {
                   onClick={() => setShowSentToast(false)}
                   aria-label="Dismiss"
                   style={{
-                    background: "transparent", border: "none", color: "#6ee7b7",
-                    fontSize: 14, cursor: "pointer", padding: "2px 6px", fontWeight: 700,
+                    background: "transparent", border: "none", color: "#0F6E56",
+                    fontSize: 13, cursor: "pointer", padding: "2px 6px", fontWeight: 600,
                   }}
                 >
                   ✕
@@ -478,184 +422,189 @@ export default function BuilderProfilePage({ params }: PageProps) {
             {connectStatus === "incoming" && (
               <div
                 style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  background: "color-mix(in srgb, var(--accent) 10%, transparent)",
-                  border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
-                  borderRadius: 10, padding: "10px 14px",
-                  marginBottom: 14,
+                  background: "#F7F7F5",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8, padding: "10px 14px",
+                  marginTop: 16,
                 }}
               >
-                <span style={{ fontSize: 16, lineHeight: 1 }}>👋</span>
-                <span style={{ fontSize: 13, color: "var(--accent-bright)", lineHeight: 1.5 }}>
-                  <strong>{builderFirstName}</strong> sent you a connection request. Respond in <Link href="/connections" style={{ color: "var(--accent-bright)", fontWeight: 700 }}>your connections</Link>.
+                <span style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                  <strong style={{ color: "var(--text-primary)" }}>{builderFirstName}</strong> sent you a connection request. Respond in <Link href="/connections" className="u-link" style={{ color: "var(--text-primary)", fontWeight: 500 }}>your connections</Link>.
                 </span>
               </div>
             )}
-            {connectStatus === "idle" && myId && (
-              <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--text-muted)", display: "inline-block" }} />
-                Not connected yet — send a request to unlock messaging and endorsements.
-              </p>
+            {isOpenToCollaborate && availability && (
+              <div className="label-caps" style={{ marginTop: 16, color: "#0F6E56" }}>
+                {availability}
+              </div>
             )}
+          </header>
+        </Reveal>
 
-            {/* Meta row */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-              {builder.university && (
-                <span style={metaItem}>🎓 {builder.university}</span>
-              )}
-              {builder.role && (
-                <span style={metaItem}>💼 {builder.role}</span>
-              )}
-              {builder.github_url && (
-                <a href={builder.github_url} target="_blank" rel="noreferrer" style={{ ...metaItem, color: "var(--accent-bright)", textDecoration: "none" }}>
-                  ⌥ GitHub ↗
-                </a>
-              )}
-            </div>
+        {/* ── Stats row ── */}
+        <Reveal delay={0.08}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 64 }}>
+            {[
+              { label: "Projects shipped", value: shippedCount },
+              { label: "Endorsements received", value: endorsementsCount },
+            ].map(({ label, value }) => (
+              <div key={label} style={{
+                background: "#F7F7F5",
+                borderRadius: 12,
+                padding: "24px 24px",
+              }}>
+                <div className="font-serif" style={{ fontSize: 32, color: "var(--text-primary)", lineHeight: 1 }}>{value}</div>
+                <div className="label-caps" style={{ marginTop: 8 }}>{label}</div>
+              </div>
+            ))}
           </div>
-        </div>
+        </Reveal>
 
-        {/* ── Two-column: main content + sidebar ── */}
-        <div className="responsive-with-sidebar">
-          {/* LEFT / MAIN COLUMN */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-        {/* ── Skills & Endorsements ── */}
-        {skills.length > 0 && (
-          <div style={{ ...card, marginBottom: 0 }}>
-            <h2 style={sectionTitle}>Skills & Endorsements</h2>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
-              {skills.map((skill, idx) => {
-                const skillEndorsers = endorsements[skill] ?? [];
-                const count = skillEndorsers.length;
-                const isFeatured = idx < 3;
-                const hasEndorsed = myId ? skillEndorsers.some(e => e.endorser_id === myId) : false;
-                const canEndorse = connectStatus === "already_connected" && myId && myId !== builder.id;
-
+        {/* ── Selected work ── */}
+        <section style={{ marginBottom: 64 }}>
+          <Reveal>
+            <div className="label-caps" style={{ marginBottom: 8 }}>Selected work</div>
+          </Reveal>
+          {projects.length === 0 ? (
+            <p style={{ fontSize: 14, color: "var(--text-muted)", padding: "20px 0", borderTop: "1px solid var(--border)" }}>
+              Nothing shipped yet — {connectStatus === "own_profile" ? "add your first project to start your track record." : "this builder hasn't documented a project yet."}
+            </p>
+          ) : (
+            <RevealGroup>
+              {projects.map((proj, i) => {
+                const stage = stageBadge(proj.stage);
+                const year = proj.created_at ? new Date(proj.created_at).getFullYear() : "";
                 return (
-                  <div key={skill} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{
-                      fontSize: 13, fontWeight: 600, borderRadius: 8, padding: "5px 12px",
-                      background: isFeatured ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.05)",
-                      border: `1px solid ${isFeatured ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "var(--border)"}`,
-                      color: isFeatured ? "var(--accent-bright)" : "var(--text-muted)",
-                    }}>
-                      {skill}
-                    </span>
-                    {count > 0 && (
-                      <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>+{count}</span>
-                    )}
-                    {canEndorse && (
-                      <button type="button" onClick={() => handleEndorse(skill)} disabled={endorsing === skill} className="endorse-btn" style={{
-                        padding: "3px 9px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer",
-                        background: hasEndorsed ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "rgba(255,255,255,0.04)",
-                        border: `1px solid ${hasEndorsed ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "var(--border)"}`,
-                        color: hasEndorsed ? "var(--accent-bright)" : "var(--text-muted)",
-                        opacity: endorsing === skill ? 0.5 : 1,
+                  <RevealItem key={proj.id}>
+                    <Link
+                      href={`/projects/${proj.id}`}
+                      className="work-row"
+                      style={{
+                        display: "flex", alignItems: "center", gap: 16,
+                        padding: "20px 0",
+                        borderTop: i === 0 ? "1px solid var(--border)" : "none",
+                        borderBottom: "1px solid var(--border)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <span className="font-serif u-link work-row-title" style={{
+                          fontSize: 19, fontWeight: 500, color: "var(--text-primary)",
+                        }}>
+                          {proj.title || "Untitled Project"}
+                        </span>
+                        {proj.tagline && (
+                          <div style={{
+                            fontSize: 13, color: "var(--text-secondary)", marginTop: 4,
+                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          }}>
+                            {proj.tagline}
+                          </div>
+                        )}
+                      </div>
+                      <span style={{
+                        fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
+                        color: stage.color, background: stage.bg, flexShrink: 0,
                       }}>
-                        {hasEndorsed ? "✓" : "+1"}
-                      </button>
-                    )}
-                  </div>
+                        {stage.label}
+                      </span>
+                      <span style={{ fontSize: 13, color: "var(--text-muted)", flexShrink: 0 }}>{year}</span>
+                    </Link>
+                  </RevealItem>
                 );
               })}
-            </div>
-            {connectStatus !== "own_profile" && connectStatus !== "already_connected" && myId && (
-              <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: -4 }}>Connect with this builder to endorse their skills.</p>
-            )}
-          </div>
+            </RevealGroup>
+          )}
+          {projectsCount > projects.length && (
+            <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 12 }}>
+              Showing {projects.length} of {projectsCount} projects
+            </p>
+          )}
+        </section>
+
+        {/* ── Endorsed skills ── */}
+        {skillsWithCounts.length > 0 && (
+          <section style={{ marginBottom: 64 }}>
+            <Reveal>
+              <div className="label-caps" style={{ marginBottom: 16 }}>Endorsed skills</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {skillsWithCounts.map(({ skill, count }) => {
+                  const hasEndorsed = myId ? (endorsements[skill] ?? []).some(e => e.endorser_id === myId) : false;
+                  const canEndorse = connectStatus === "already_connected" && myId && myId !== builder.id;
+                  return (
+                    <span key={skill} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <span style={{
+                        fontSize: 13, fontWeight: 400, borderRadius: 999, padding: "5px 14px",
+                        background: "#F5F5F3",
+                        color: "var(--text-secondary)",
+                      }}>
+                        {skill}{count > 0 ? ` (${count})` : ""}
+                      </span>
+                      {canEndorse && (
+                        <button
+                          type="button"
+                          onClick={() => handleEndorse(skill)}
+                          disabled={endorsing === skill}
+                          className="endorse-btn"
+                          title={hasEndorsed ? "Remove endorsement" : `Endorse ${skill}`}
+                          style={{
+                            padding: "3px 9px", borderRadius: 999, fontSize: 11, fontWeight: 500, cursor: "pointer",
+                            background: hasEndorsed ? "#ECFDF5" : "transparent",
+                            border: `1px solid ${hasEndorsed ? "#D1FAE5" : "var(--border)"}`,
+                            color: hasEndorsed ? "#0F6E56" : "var(--text-muted)",
+                            opacity: endorsing === skill ? 0.5 : 1,
+                          }}
+                        >
+                          {hasEndorsed ? "✓" : "+1"}
+                        </button>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+              {connectStatus !== "own_profile" && connectStatus !== "already_connected" && myId && (
+                <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 12 }}>
+                  Connect with {builderFirstName} to endorse their skills.
+                </p>
+              )}
+            </Reveal>
+          </section>
         )}
 
-        {/* ── Projects (main column) ── */}
-        {projects.length > 0 && (
-          <div style={{ ...card, marginBottom: 0 }}>
-            <h2 style={{ ...sectionTitle, marginBottom: 16 }}>Projects</h2>
-            <div className="project-grid-profile">
-              {projects.map((proj) => (
-                <ProjectCard
-                  key={proj.id}
-                  project={proj}
-                  variant="profile"
-                  ownerProfile={builder}
-                  isOwner={myId === builder.id}
-                  currentUserId={myId}
-                  latestUpdateAt={latestUpdatesMap[proj.id] ?? null}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-          </div>{/* /left column */}
-
-          {/* RIGHT / SIDEBAR COLUMN */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-            {/* Stats — compact 2x2 for sidebar */}
-            <div style={{ ...card, marginBottom: 0, padding: "18px 20px" }}>
-              <h2 style={{ ...sectionTitle, marginBottom: 14, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-muted)" }}>Stats</h2>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                {[
-                  { label: "Projects", value: projectsCount },
-                  { label: "Connections", value: connectionsCount },
-                ].map(({ label, value }) => (
-                  <div key={label} style={{
-                    display: "flex", flexDirection: "column",
-                    padding: "10px 12px", borderRadius: 10,
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid var(--border-subtle)",
-                  }}>
-                    <span style={{ fontSize: 22, fontFamily: "Syne, sans-serif", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1 }}>{value}</span>
-                    <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500, marginTop: 4 }}>{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Open to Collaborate */}
-            {isOpenToCollaborate && availability && (
-              <div style={{
-                background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)",
-                borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12,
-              }}>
-                <span style={{ fontSize: 18, lineHeight: 1 }}>🟢</span>
-                <div>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7", marginBottom: 4, letterSpacing: "0.02em" }}>Open to collaborate</p>
-                  <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.5 }}>{availability}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Share / secondary actions */}
-            <div style={{ ...card, marginBottom: 0, padding: "16px 20px" }}>
-              <h2 style={{ ...sectionTitle, marginBottom: 10, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-muted)" }}>Quick actions</h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {builder.github_url && (
-                  <a href={builder.github_url} target="_blank" rel="noreferrer" style={{
-                    display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                    borderRadius: 10, background: "rgba(255,255,255,0.03)",
-                    border: "1px solid var(--border)", color: "var(--text-secondary)",
-                    textDecoration: "none", fontSize: 13, fontWeight: 500,
-                  }}>
-                    <span>⌥</span> View GitHub ↗
-                  </a>
-                )}
-                <button type="button" onClick={handleShare} style={{
-                  display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                  borderRadius: 10, background: "rgba(255,255,255,0.03)",
-                  border: "1px solid var(--border)", color: "var(--text-secondary)",
-                  cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "DM Sans, sans-serif",
-                  textAlign: "left",
-                }}>
-                  <span>{copied ? "✓" : "↗"}</span> {copied ? "Link copied" : "Share profile"}
-                </button>
-              </div>
-            </div>
-
-          </div>{/* /right column */}
-        </div>{/* /responsive-with-sidebar */}
+        {/* ── Share profile ── */}
+        <Reveal>
+          <button
+            type="button"
+            onClick={handleShare}
+            className="btn-secondary"
+            style={{ width: "100%", justifyContent: "center", padding: "14px 20px", fontSize: 14 }}
+          >
+            {copied ? "Link copied ✓" : "Share profile"}
+          </button>
+        </Reveal>
 
       </div>
+
+      {/* Copied toast */}
+      {copied && (
+        <div
+          role="status"
+          style={{
+            position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+            background: "#1A1A18", color: "#FFFFFF",
+            fontSize: 13, fontWeight: 500,
+            padding: "10px 18px", borderRadius: 8,
+            zIndex: 300,
+            animation: "slide-down 0.18s ease forwards",
+          }}
+        >
+          Profile link copied to clipboard
+        </div>
+      )}
+
+      <style>{`
+        .work-row:hover .work-row-title { background-size: 100% 1px; }
+      `}</style>
     </main>
   );
 }
@@ -669,34 +618,18 @@ const page: React.CSSProperties = {
 };
 
 const card: React.CSSProperties = {
-  background: "var(--gradient-card)",
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
-  borderRadius: 16,
-  padding: 24,
+  borderRadius: 12,
+  padding: 28,
   marginBottom: 16,
 };
 
-const sectionTitle: React.CSSProperties = {
-  fontSize: 15, fontFamily: "Syne, sans-serif", fontWeight: 700,
-  color: "var(--text-primary)", marginBottom: 16,
-};
-
-const metaItem: React.CSSProperties = {
-  display: "inline-flex", alignItems: "center", gap: 6,
-  fontSize: 13, color: "var(--text-muted)", fontWeight: 500,
-};
-
-const actionBtnBase: React.CSSProperties = {
-  padding: "8px 16px", borderRadius: 9, border: "1px solid",
-  fontSize: 13, fontWeight: 600, fontFamily: "DM Sans, sans-serif",
-  transition: "all 0.15s ease", textDecoration: "none",
-  display: "inline-flex", alignItems: "center",
-};
-
-const actionBtn: React.CSSProperties = {
-  ...actionBtnBase,
-  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-  borderColor: "color-mix(in srgb, var(--accent) 30%, transparent)",
-  color: "var(--accent-bright)",
-  cursor: "pointer",
+const iconLink: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  fontSize: 13,
+  color: "var(--text-secondary)",
+  fontWeight: 400,
 };

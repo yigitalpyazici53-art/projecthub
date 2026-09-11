@@ -28,12 +28,29 @@ function formatDate(iso: string | null): string {
 
 function getStageColor(stage: string | null): string {
   switch (stage) {
-    case "idea": return "#fbbf24";
-    case "mvp": return "#60a5fa";
-    case "building": return "#a78bfa";
-    case "launched": return "#4ade80";
-    default: return "#8b9ab0";
+    case "idea": return "#6B6B66";
+    case "mvp": return "#B45309";
+    case "building": return "#B45309";
+    case "launched": return "#0F6E56";
+    default: return "#6B6B66";
   }
+}
+
+function getStageBg(stage: string | null): string {
+  switch (stage) {
+    case "idea": return "#F5F5F3";
+    case "mvp": return "#FFFBEB";
+    case "building": return "#FFFBEB";
+    case "launched": return "#ECFDF5";
+    default: return "#F5F5F3";
+  }
+}
+
+function getStageLabel(stage: string | null): string {
+  if (stage === "launched") return "Shipped";
+  if (stage === "mvp") return "MVP";
+  if (!stage) return "";
+  return stage.charAt(0).toUpperCase() + stage.slice(1);
 }
 
 function getAvatarColor(id: string | null): string {
@@ -100,8 +117,8 @@ function WeeklyUpdateComposer({
       <div style={{
         padding: "14px 16px",
         borderRadius: 10,
-        background: "rgba(76,142,255,0.04)",
-        border: "1px solid rgba(76,142,255,0.12)",
+        background: "#F7F7F5",
+        border: "1px solid var(--border)",
         marginBottom: 16,
         fontSize: 12,
         color: "var(--text-muted)",
@@ -127,7 +144,7 @@ function WeeklyUpdateComposer({
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
         {updateError ? (
-          <p style={{ fontSize: 12, color: "#f87171", margin: 0 }}>{updateError}</p>
+          <p style={{ fontSize: 12, color: "#B91C1C", margin: 0 }}>{updateError}</p>
         ) : (
           <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
             Fill in any fields you want to share
@@ -181,7 +198,7 @@ function UpdateCard({ update, isOwner, onDelete }: {
         <div style={{ display: "grid", gap: 10 }}>
           {UPDATE_FIELDS.filter(f => structured[f.key]).map(f => (
             <div key={f.key}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent-bright)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 3 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 3 }}>
                 {f.label}
               </div>
               <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
@@ -279,7 +296,7 @@ function ApplyModal({
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
           <div>
-            <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: 20, color: "var(--text-primary)", marginBottom: 4, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontFamily: "var(--font-sans)", fontWeight: 800, fontSize: 20, color: "var(--text-primary)", marginBottom: 4, letterSpacing: "-0.02em" }}>
               Apply to join
             </h2>
             <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{project.title}</p>
@@ -291,7 +308,7 @@ function ApplyModal({
 
           {/* Why join */}
           <div>
-            <label style={fieldLabelStyle}>Why do you want to join? <span style={{ color: "#f87171" }}>*</span></label>
+            <label style={fieldLabelStyle}>Why do you want to join? <span style={{ color: "#B91C1C" }}>*</span></label>
             <textarea
               value={whyJoin}
               onChange={(e) => setWhyJoin(e.target.value.slice(0, MAX_FIELD))}
@@ -301,7 +318,7 @@ function ApplyModal({
               autoFocus
               style={{ ...inputStyle, resize: "none", marginTop: 8 }}
             />
-            <div style={{ textAlign: "right", marginTop: 4, fontSize: 11, color: MAX_FIELD - whyJoin.length <= 20 ? "#fbbf24" : "var(--text-muted)" }}>
+            <div style={{ textAlign: "right", marginTop: 4, fontSize: 11, color: MAX_FIELD - whyJoin.length <= 20 ? "#B45309" : "var(--text-muted)" }}>
               {MAX_FIELD - whyJoin.length} left
             </div>
           </div>
@@ -345,7 +362,7 @@ function ApplyModal({
         </div>
 
         {error && (
-          <p style={{ fontSize: 13, color: "#f87171", marginTop: 14, marginBottom: 0 }}>{error}</p>
+          <p style={{ fontSize: 13, color: "#B91C1C", marginTop: 14, marginBottom: 0 }}>{error}</p>
         )}
 
         {/* Actions */}
@@ -400,19 +417,19 @@ function DeleteConfirmModal({
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
-              background: "rgba(239,68,68,0.12)",
-              border: "1px solid rgba(239,68,68,0.28)",
+              background: "#FEF2F2",
+              border: "1px solid #FECACA",
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0,
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                 <path d="M10 11v6M14 11v6" />
                 <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
               </svg>
             </div>
-            <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: 18, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontFamily: "var(--font-sans)", fontWeight: 800, fontSize: 18, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
               Delete Project
             </h2>
           </div>
@@ -425,13 +442,13 @@ function DeleteConfirmModal({
         <div style={{
           padding: "14px 16px",
           borderRadius: 10,
-          background: "rgba(239,68,68,0.07)",
-          border: "1px solid rgba(239,68,68,0.2)",
+          background: "#FEF2F2",
+          border: "1px solid #FECACA",
           marginBottom: 24,
         }}>
-          <p style={{ fontSize: 14, color: "#fca5a5", lineHeight: 1.65, margin: 0 }}>
+          <p style={{ fontSize: 14, color: "#B91C1C", lineHeight: 1.65, margin: 0 }}>
             This will permanently delete{" "}
-            <strong style={{ color: "#f87171" }}>{projectTitle || "this project"}</strong>,
+            <strong style={{ color: "#B91C1C" }}>{projectTitle || "this project"}</strong>,
             its updates, applications, and related data. This action cannot be undone.
           </p>
         </div>
@@ -440,7 +457,7 @@ function DeleteConfirmModal({
         <div style={{ marginBottom: error ? 12 : 22 }}>
           <label style={fieldLabelStyle}>
             Type{" "}
-            <span style={{ color: "#f87171", fontFamily: "monospace", fontWeight: 700, letterSpacing: "0.04em" }}>
+            <span style={{ color: "#B91C1C", fontFamily: "monospace", fontWeight: 700, letterSpacing: "0.04em" }}>
               delete
             </span>{" "}
             to confirm
@@ -455,14 +472,14 @@ function DeleteConfirmModal({
             autoFocus
             style={{
               ...inputStyle,
-              borderColor: confirm === "delete" ? "rgba(239,68,68,0.45)" : undefined,
+              borderColor: confirm === "delete" ? "#B91C1C" : undefined,
             }}
           />
         </div>
 
         {/* Error */}
         {error && (
-          <p style={{ fontSize: 13, color: "#f87171", marginBottom: 16, lineHeight: 1.5 }}>{error}</p>
+          <p style={{ fontSize: 13, color: "#B91C1C", marginBottom: 16, lineHeight: 1.5 }}>{error}</p>
         )}
 
         {/* Actions */}
@@ -483,14 +500,14 @@ function DeleteConfirmModal({
               flex: 2,
               padding: "12px 20px",
               borderRadius: 10,
-              background: canDelete ? "linear-gradient(135deg, #dc2626, #b91c1c)" : "rgba(239,68,68,0.18)",
+              background: canDelete ? "#B91C1C" : "#FEE2E2",
               border: "none",
-              color: canDelete ? "white" : "rgba(248,113,113,0.45)",
+              color: canDelete ? "white" : "#E5A3A3",
               fontWeight: 700,
               fontSize: 14,
               cursor: canDelete ? "pointer" : "default",
-              fontFamily: "Syne, sans-serif",
-              boxShadow: canDelete ? "0 4px 14px rgba(220,38,38,0.3)" : "none",
+              fontFamily: "var(--font-sans)",
+              boxShadow: "none",
               transition: "all 0.15s ease",
             }}
           >
@@ -675,7 +692,7 @@ export default function ProjectDetailPage({ params }: Props) {
           <Link href="/projects" style={backLinkStyle}>← Back to projects</Link>
           <div style={notFoundStyle}>
             <div style={{ fontSize: 52, marginBottom: 20 }}>🔍</div>
-            <h1 style={{ fontSize: 26, fontFamily: "Syne, sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: 10, letterSpacing: "-0.02em" }}>
+            <h1 style={{ fontSize: 26, fontFamily: "var(--font-sans)", fontWeight: 800, color: "var(--text-primary)", marginBottom: 10, letterSpacing: "-0.02em" }}>
               Project not found
             </h1>
             <p style={{ color: "var(--text-muted)", fontSize: 15, lineHeight: 1.6, maxWidth: 360, margin: "0 auto 28px" }}>
@@ -726,8 +743,8 @@ export default function ProjectDetailPage({ params }: Props) {
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               {project.category && <span style={categoryBadgeStyle}>{project.category}</span>}
               {project.stage && (
-                <span style={{ ...stageBadgeBase, color: stageColor, border: `1px solid ${stageColor}44`, background: `${stageColor}12` }}>
-                  {project.stage.charAt(0).toUpperCase() + project.stage.slice(1)}
+                <span style={{ ...stageBadgeBase, color: stageColor, background: getStageBg(project.stage) }}>
+                  {getStageLabel(project.stage)}
                 </span>
               )}
               {project.is_ai_generated && (
@@ -744,7 +761,7 @@ export default function ProjectDetailPage({ params }: Props) {
           </div>
 
           {/* Title block */}
-          <h1 style={heroTitleStyle}>{project.title || "Untitled Project"}</h1>
+          <h1 className="font-serif" style={heroTitleStyle}>{project.title || "Untitled Project"}</h1>
           {project.tagline && <p style={heroTaglineStyle}>{project.tagline}</p>}
         </div>
       </div>
@@ -756,15 +773,15 @@ export default function ProjectDetailPage({ params }: Props) {
           {/* ── Left: content sections ── */}
           <div style={leftColStyle}>
 
-            {/* What we're building */}
+            {/* Description */}
             <div style={sectionCardStyle} className="project-section-card">
-              <h2 style={sectionTitleStyle}>What we&apos;re building</h2>
+              <h2 style={sectionTitleStyle}>About this project</h2>
               <p style={descStyle}>{project.description || project.tagline || "No description provided yet."}</p>
             </div>
 
-            {/* Weekly Build Updates */}
+            {/* Project updates */}
             <div style={sectionCardStyle} className="project-section-card">
-              <h2 style={sectionTitleStyle}>Weekly Build Updates</h2>
+              <h2 style={sectionTitleStyle}><span className="label-caps" style={{ fontSize: 12 }}>Project updates</span></h2>
 
               {/* Structured owner composer */}
               {appStatus === "owner" && (
@@ -781,9 +798,12 @@ export default function ProjectDetailPage({ params }: Props) {
               {updatesLoading ? (
                 <div style={{ height: 40 }} />
               ) : updates.length === 0 ? (
-                <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, margin: 0 }}>
-                  No updates yet.{appStatus !== "owner" ? " The team hasn't posted a weekly update." : ""}
-                </p>
+                <div style={{ background: "#F7F7F5", borderRadius: 16, padding: 48, textAlign: "center" }}>
+                  <div aria-hidden="true" style={{ fontSize: 48, lineHeight: 1, marginBottom: 16 }}>📓</div>
+                  <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
+                    No updates yet — {appStatus !== "owner" ? "the builder hasn't posted progress on this project." : "post your first update to start the timeline."}
+                  </p>
+                </div>
               ) : (
                 <div style={{ display: "grid", gap: 14 }}>
                   {updates.map((update) => (
@@ -801,8 +821,8 @@ export default function ProjectDetailPage({ params }: Props) {
             {/* Looking for teammates */}
             {lookingForList.length > 0 && (
               <div style={sectionCardStyle} className="project-section-card">
-                <h2 style={sectionTitleStyle}>Looking for teammates</h2>
-                <p style={sectionSubStyle}>This project is actively looking for serious builders to join the team.</p>
+                <h2 style={sectionTitleStyle}>Looking for</h2>
+                <p style={sectionSubStyle}>Open roles on this project — apply with your proof of work.</p>
                 <div style={rolesGridStyle}>
                   {lookingForList.map((role) => (
                     <div key={role} style={roleCardStyle}>
@@ -817,7 +837,7 @@ export default function ProjectDetailPage({ params }: Props) {
             {/* Required skills */}
             {techList.length > 0 && (
               <div style={sectionCardStyle} className="project-section-card">
-                <h2 style={sectionTitleStyle}>Required skills</h2>
+                <h2 style={sectionTitleStyle}>Tech stack</h2>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                   {techList.map((tech) => <span key={tech} style={techPillStyle}>{tech}</span>)}
                 </div>
@@ -891,9 +911,9 @@ export default function ProjectDetailPage({ params }: Props) {
                   <div>
                     {/* Badge + title */}
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                      <span style={ownerControlBadgeStyle}>⚡ Owner</span>
+                      <span style={ownerControlBadgeStyle}>Owner</span>
                     </div>
-                    <div style={{ fontSize: 19, fontFamily: "Syne, sans-serif", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.025em", marginBottom: 6 }}>
+                    <div style={{ fontSize: 19, fontFamily: "var(--font-sans)", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.025em", marginBottom: 6 }}>
                       Project Controls
                     </div>
                     <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.55, marginBottom: 0 }}>
@@ -909,7 +929,7 @@ export default function ProjectDetailPage({ params }: Props) {
                       <div style={ownerStatDivStyle} />
                       <div style={ownerStatCellStyle}>
                         <span style={{ ...ownerStatNumStyle, color: stageColor, fontSize: 14 }}>
-                          {project.stage ? project.stage.charAt(0).toUpperCase() + project.stage.slice(1) : "—"}
+                          {project.stage ? getStageLabel(project.stage) : "—"}
                         </span>
                         <span style={ownerStatLblStyle}>Stage</span>
                       </div>
@@ -945,7 +965,7 @@ export default function ProjectDetailPage({ params }: Props) {
                     </div>
 
                     {/* Delete project */}
-                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(239,68,68,0.1)" }}>
+                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #FECACA" }}>
                       <button
                         type="button"
                         onClick={() => { setDeleteError(""); setShowDeleteModal(true); }}
@@ -1012,21 +1032,21 @@ export default function ProjectDetailPage({ params }: Props) {
                   <div style={{
                     padding: "24px 20px",
                     borderRadius: 12,
-                    background: appStatus === "accepted" ? "rgba(74,222,128,0.08)" : appStatus === "pending" ? "rgba(251,191,36,0.08)" : "rgba(239,68,68,0.08)",
-                    border: `1px solid ${appStatus === "accepted" ? "rgba(74,222,128,0.22)" : appStatus === "pending" ? "rgba(251,191,36,0.22)" : "rgba(239,68,68,0.22)"}`,
+                    background: appStatus === "accepted" ? "#ECFDF5" : appStatus === "pending" ? "#FFFBEB" : "#FEF2F2",
+                    border: `1px solid ${appStatus === "accepted" ? "#D1FAE5" : appStatus === "pending" ? "#FDE68A" : "#FECACA"}`,
                     textAlign: "center",
                   }}>
                     <div style={{ fontSize: 32, marginBottom: 12 }}>
                       {appStatus === "accepted" ? "✅" : appStatus === "pending" ? (
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="12" cy="12" r="10"/>
                           <polyline points="12 6 12 12 16 14"/>
                         </svg>
                       ) : "✗"}
                     </div>
                     <div style={{
-                      fontSize: 15, fontWeight: 800, fontFamily: "Syne, sans-serif", marginBottom: 8, letterSpacing: "-0.01em",
-                      color: appStatus === "accepted" ? "#4ade80" : appStatus === "pending" ? "#fbbf24" : "#f87171",
+                      fontSize: 15, fontWeight: 800, fontFamily: "var(--font-sans)", marginBottom: 8, letterSpacing: "-0.01em",
+                      color: appStatus === "accepted" ? "#0F6E56" : appStatus === "pending" ? "#B45309" : "#B91C1C",
                     }}>
                       {appStatus === "accepted" ? "You're in!" : appStatus === "pending" ? "Application pending" : "Not selected"}
                     </div>
@@ -1076,8 +1096,8 @@ export default function ProjectDetailPage({ params }: Props) {
               <div style={{ display: "grid", gap: 14 }}>
                 <div style={metaRowStyle}>
                   <span style={metaLabelStyle}>Current stage</span>
-                  <span style={{ ...metaValueStyle, color: stageColor, fontWeight: 700 }}>
-                    {project.stage ? project.stage.charAt(0).toUpperCase() + project.stage.slice(1) : "Not set"}
+                  <span style={{ ...metaValueStyle, color: stageColor, fontWeight: 600 }}>
+                    {project.stage ? getStageLabel(project.stage) : "Not set"}
                   </span>
                 </div>
                 {project.time_commitment && (
@@ -1135,9 +1155,9 @@ const pageStyle: React.CSSProperties = {
 // ── Hero section (full-width atmospheric header)
 
 const heroSectionStyle: React.CSSProperties = {
-  padding: "90px 24px 64px",
-  background: "linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, var(--background)) 0%, var(--background) 100%)",
-  borderBottom: "1px solid var(--border-subtle)",
+  padding: "110px 24px 64px",
+  background: "var(--background)",
+  borderBottom: "1px solid var(--border)",
   position: "relative",
   zIndex: 1,
 };
@@ -1169,21 +1189,20 @@ const backLinkStyle: React.CSSProperties = {
 };
 
 const categoryBadgeStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 700,
-  color: "var(--accent-bright)",
-  background: "color-mix(in srgb, var(--accent) 14%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
-  borderRadius: 20,
-  padding: "5px 13px",
+  fontSize: 11,
+  fontWeight: 500,
+  color: "var(--text-secondary)",
+  background: "#F5F5F3",
+  borderRadius: 999,
+  padding: "4px 12px",
   letterSpacing: "0.02em",
 };
 
 const stageBadgeBase: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 700,
-  borderRadius: 20,
-  padding: "5px 13px",
+  fontSize: 11,
+  fontWeight: 500,
+  borderRadius: 999,
+  padding: "4px 12px",
   letterSpacing: "0.02em",
 };
 
@@ -1194,12 +1213,12 @@ const metaDateStyle: React.CSSProperties = {
 };
 
 const heroTitleStyle: React.CSSProperties = {
-  fontSize: "clamp(36px, 5vw, 62px)",
-  fontWeight: 800,
-  fontFamily: "Syne, sans-serif",
+  fontSize: "clamp(36px, 5vw, 58px)",
+  fontWeight: 500,
+  fontFamily: "var(--font-serif)",
   color: "var(--text-primary)",
   lineHeight: 1.1,
-  letterSpacing: "-0.035em",
+  letterSpacing: "-0.02em",
   marginBottom: 20,
   maxWidth: 900,
   overflowWrap: "anywhere",
@@ -1242,17 +1261,16 @@ const rightColStyle: React.CSSProperties = {
 // ── Left column section cards
 
 const sectionCardStyle: React.CSSProperties = {
-  background: "var(--gradient-card)",
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
-  borderRadius: 18,
-  padding: "32px",
-  boxShadow: "0 4px 24px rgba(0,0,0,0.16)",
+  borderRadius: 12,
+  padding: "28px",
 };
 
 const sectionTitleStyle: React.CSSProperties = {
   fontSize: 17,
   fontWeight: 700,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   color: "var(--text-primary)",
   letterSpacing: "-0.01em",
   marginBottom: 16,
@@ -1287,22 +1305,21 @@ const roleCardStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 10,
-  padding: "14px 16px",
-  borderRadius: 12,
-  background: "rgba(74,222,128,0.06)",
-  border: "1px solid rgba(74,222,128,0.18)",
+  padding: "12px 16px",
+  borderRadius: 8,
+  background: "#ECFDF5",
 };
 
 const roleIconStyle: React.CSSProperties = {
   fontSize: 9,
-  color: "#4ade80",
+  color: "#0F6E56",
   flexShrink: 0,
 };
 
 const roleLabelStyle: React.CSSProperties = {
   fontSize: 13,
-  fontWeight: 700,
-  color: "#4ade80",
+  fontWeight: 500,
+  color: "#0F6E56",
   lineHeight: 1.2,
 };
 
@@ -1310,12 +1327,11 @@ const roleLabelStyle: React.CSSProperties = {
 
 const techPillStyle: React.CSSProperties = {
   fontSize: 13,
-  fontWeight: 600,
+  fontWeight: 400,
   color: "var(--text-secondary)",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid var(--border)",
+  background: "#F5F5F3",
   borderRadius: 8,
-  padding: "8px 16px",
+  padding: "7px 14px",
 };
 
 // ── Similar projects
@@ -1325,8 +1341,8 @@ const similarRowStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 12,
   padding: "13px 14px",
-  borderRadius: 10,
-  background: "rgba(255,255,255,0.02)",
+  borderRadius: 8,
+  background: "#FAFAF8",
   border: "1px solid var(--border-subtle)",
   textDecoration: "none",
 };
@@ -1334,15 +1350,15 @@ const similarRowStyle: React.CSSProperties = {
 const similarIconStyle: React.CSSProperties = {
   width: 36,
   height: 36,
-  borderRadius: 9,
-  background: "color-mix(in srgb, var(--accent) 14%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
+  borderRadius: 8,
+  background: "#F5F5F3",
+  border: "1px solid var(--border)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   fontSize: 14,
-  fontWeight: 700,
-  color: "var(--accent-bright)",
+  fontWeight: 600,
+  color: "var(--text-secondary)",
   flexShrink: 0,
 };
 
@@ -1367,16 +1383,14 @@ const similarTaglineStyle: React.CSSProperties = {
 // ── Action panel (right sidebar — primary card)
 
 const actionPanelStyle: React.CSSProperties = {
-  background: "var(--gradient-card)",
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
-  borderRadius: 18,
+  borderRadius: 12,
   overflow: "hidden",
-  boxShadow: "0 12px 40px rgba(0,0,0,0.28), 0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent) inset",
 };
 
 const actionPanelAccentStyle: React.CSSProperties = {
-  height: 4,
-  background: "linear-gradient(90deg, var(--accent), var(--accent-hover), color-mix(in srgb, var(--accent) 35%, transparent))",
+  display: "none",
 };
 
 const actionPanelInnerStyle: React.CSSProperties = {
@@ -1389,10 +1403,10 @@ const actionPanelHeaderStyle: React.CSSProperties = {
 
 const actionPanelTitleStyle: React.CSSProperties = {
   fontSize: 18,
-  fontWeight: 800,
-  fontFamily: "Syne, sans-serif",
+  fontWeight: 600,
+  fontFamily: "var(--font-sans)",
   color: "var(--text-primary)",
-  letterSpacing: "-0.02em",
+  letterSpacing: "-0.01em",
   marginBottom: 5,
 };
 
@@ -1404,11 +1418,10 @@ const actionPanelSubStyle: React.CSSProperties = {
 
 const actionRolePillStyle: React.CSSProperties = {
   fontSize: 12,
-  fontWeight: 600,
-  color: "var(--accent-bright)",
-  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
-  borderRadius: 20,
+  fontWeight: 500,
+  color: "#0F6E56",
+  background: "#ECFDF5",
+  borderRadius: 999,
   padding: "4px 12px",
 };
 
@@ -1417,19 +1430,19 @@ const bigApplyBtnStyle: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
-  padding: "16px 24px",
-  borderRadius: 12,
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
-  color: "white",
-  fontWeight: 800,
+  padding: "14px 24px",
+  borderRadius: 8,
+  background: "transparent",
+  color: "var(--text-primary)",
+  fontWeight: 500,
   fontSize: 15,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   textDecoration: "none",
-  border: "none",
+  border: "1px solid var(--border)",
   cursor: "pointer",
-  boxShadow: "0 6px 24px var(--accent-glow)",
   letterSpacing: "0.01em",
   boxSizing: "border-box",
+  transition: "background 0.15s ease, border-color 0.15s ease",
 };
 
 const ownerBadgeStyle: React.CSSProperties = {
@@ -1437,23 +1450,22 @@ const ownerBadgeStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   padding: "10px 22px",
-  borderRadius: 12,
-  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)",
-  color: "var(--accent-bright)",
-  fontWeight: 700,
+  borderRadius: 8,
+  background: "#F5F5F3",
+  border: "1px solid var(--border)",
+  color: "var(--text-secondary)",
+  fontWeight: 500,
   fontSize: 14,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
 };
 
 // ── Sidebar cards (builder + details)
 
 const sideCardStyle: React.CSSProperties = {
-  background: "var(--gradient-card)",
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
-  borderRadius: 16,
+  borderRadius: 12,
   padding: "22px 24px",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.14)",
 };
 
 const sideCardTitleStyle: React.CSSProperties = {
@@ -1482,16 +1494,15 @@ const ownerAvatarStyle: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   fontSize: 17,
-  fontWeight: 700,
+  fontWeight: 600,
   color: "white",
   flexShrink: 0,
-  boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
 };
 
 const ownerNameStyle: React.CSSProperties = {
   fontSize: 15,
   fontWeight: 700,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   color: "var(--text-primary)",
   marginBottom: 3,
 };
@@ -1504,11 +1515,10 @@ const ownerMetaStyle: React.CSSProperties = {
 
 const ownerRoleStyle: React.CSSProperties = {
   fontSize: 11,
-  fontWeight: 600,
-  color: "var(--accent-bright)",
-  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 24%, transparent)",
-  borderRadius: 20,
+  fontWeight: 500,
+  color: "var(--text-secondary)",
+  background: "#F5F5F3",
+  borderRadius: 999,
   padding: "2px 9px",
   display: "inline-block",
 };
@@ -1517,13 +1527,14 @@ const viewProfileBtnStyle: React.CSSProperties = {
   display: "block",
   textAlign: "center",
   padding: "10px 14px",
-  borderRadius: 10,
-  background: "color-mix(in srgb, var(--accent) 10%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
-  color: "var(--accent-bright)",
+  borderRadius: 8,
+  background: "transparent",
+  border: "1px solid var(--border)",
+  color: "var(--text-primary)",
   textDecoration: "none",
-  fontWeight: 700,
+  fontWeight: 500,
   fontSize: 13,
+  transition: "background 0.15s ease",
 };
 
 // ── Project details card internals
@@ -1551,21 +1562,21 @@ const notFoundStyle: React.CSSProperties = {
   marginTop: 60,
   textAlign: "center",
   padding: "60px 40px",
-  background: "var(--gradient-card)",
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
-  borderRadius: 20,
+  borderRadius: 12,
 };
 
 const browseAllBtnStyle: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   padding: "12px 28px",
-  borderRadius: 12,
-  background: "color-mix(in srgb, var(--accent) 14%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)",
-  color: "var(--accent-bright)",
+  borderRadius: 8,
+  background: "transparent",
+  border: "1px solid var(--border)",
+  color: "var(--text-primary)",
   textDecoration: "none",
-  fontWeight: 700,
+  fontWeight: 500,
   fontSize: 14,
 };
 
@@ -1574,8 +1585,7 @@ const browseAllBtnStyle: React.CSSProperties = {
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0,0,0,0.75)",
-  backdropFilter: "blur(4px)",
+  background: "rgba(26,26,24,0.4)",
   zIndex: 200,
   display: "flex",
   alignItems: "center",
@@ -1584,19 +1594,18 @@ const overlayStyle: React.CSSProperties = {
 };
 
 const modalStyle: React.CSSProperties = {
-  background: "var(--gradient-card)",
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
-  borderRadius: 20,
+  borderRadius: 12,
   padding: "32px",
   width: "100%",
   maxWidth: 500,
   maxHeight: "90vh",
   overflowY: "auto",
-  boxShadow: "0 32px 80px rgba(0,0,0,0.5)",
 };
 
 const modalCloseBtnStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.05)",
+  background: "transparent",
   border: "1px solid var(--border)",
   color: "var(--text-muted)",
   width: 32,
@@ -1629,7 +1638,7 @@ const inputStyle: React.CSSProperties = {
   fontSize: 14,
   outline: "none",
   boxSizing: "border-box",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   marginTop: 10,
 };
 
@@ -1649,15 +1658,14 @@ const cancelBtnStyle: React.CSSProperties = {
 const submitBtnStyle: React.CSSProperties = {
   flex: 2,
   padding: "12px 20px",
-  borderRadius: 10,
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
-  border: "none",
-  color: "white",
-  fontWeight: 700,
+  borderRadius: 8,
+  background: "#1A1A18",
+  border: "1px solid #1A1A18",
+  color: "#FFFFFF",
+  fontWeight: 500,
   fontSize: 14,
   cursor: "pointer",
-  fontFamily: "Syne, sans-serif",
-  boxShadow: "0 4px 14px var(--accent-glow)",
+  fontFamily: "var(--font-sans)",
 };
 
 // ── Owner control panel
@@ -1667,11 +1675,10 @@ const ownerControlBadgeStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 5,
   padding: "4px 12px",
-  borderRadius: 20,
-  background: "color-mix(in srgb, var(--accent) 15%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 32%, transparent)",
-  color: "var(--accent-bright)",
-  fontWeight: 700,
+  borderRadius: 999,
+  background: "#F5F5F3",
+  color: "var(--text-secondary)",
+  fontWeight: 500,
   fontSize: 11,
   letterSpacing: "0.06em",
   textTransform: "uppercase",
@@ -1680,8 +1687,7 @@ const ownerControlBadgeStyle: React.CSSProperties = {
 const ownerStatsRowStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  background: "rgba(255,255,255,0.03)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "#F7F7F5",
   borderRadius: 12,
   padding: "14px 0",
   marginTop: 20,
@@ -1697,8 +1703,8 @@ const ownerStatCellStyle: React.CSSProperties = {
 
 const ownerStatNumStyle: React.CSSProperties = {
   fontSize: 18,
-  fontWeight: 800,
-  fontFamily: "Syne, sans-serif",
+  fontWeight: 600,
+  fontFamily: "var(--font-sans)",
   color: "var(--text-primary)",
   lineHeight: 1,
   letterSpacing: "-0.02em",
@@ -1715,7 +1721,7 @@ const ownerStatLblStyle: React.CSSProperties = {
 const ownerStatDivStyle: React.CSSProperties = {
   width: 1,
   height: 30,
-  background: "rgba(255,255,255,0.08)",
+  background: "var(--border)",
   flexShrink: 0,
 };
 
@@ -1725,15 +1731,14 @@ const ownerActionPrimaryStyle: React.CSSProperties = {
   justifyContent: "center",
   gap: 8,
   width: "100%",
-  padding: "14px 20px",
-  borderRadius: 12,
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
-  color: "white",
-  fontWeight: 700,
+  padding: "13px 20px",
+  borderRadius: 8,
+  background: "#1A1A18",
+  color: "#FFFFFF",
+  fontWeight: 500,
   fontSize: 14,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   textDecoration: "none",
-  boxShadow: "0 4px 20px var(--accent-glow)",
   letterSpacing: "0.01em",
   boxSizing: "border-box",
 };
@@ -1744,12 +1749,12 @@ const ownerActionSecondaryStyle: React.CSSProperties = {
   justifyContent: "center",
   gap: 8,
   width: "100%",
-  padding: "13px 20px",
-  borderRadius: 12,
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.12)",
-  color: "var(--text-secondary)",
-  fontWeight: 700,
+  padding: "12px 20px",
+  borderRadius: 8,
+  background: "transparent",
+  border: "1px solid var(--border)",
+  color: "var(--text-primary)",
+  fontWeight: 500,
   fontSize: 14,
   textDecoration: "none",
   letterSpacing: "0.01em",
@@ -1758,9 +1763,8 @@ const ownerActionSecondaryStyle: React.CSSProperties = {
 
 const ownerShareStripStyle: React.CSSProperties = {
   marginTop: 18,
-  background: "rgba(255,255,255,0.025)",
-  border: "1px solid rgba(255,255,255,0.07)",
-  borderRadius: 10,
+  background: "#F7F7F5",
+  borderRadius: 8,
   padding: "10px 14px",
 };
 
@@ -1771,11 +1775,11 @@ const deleteProjectBtnStyle: React.CSSProperties = {
   gap: 7,
   width: "100%",
   padding: "10px 14px",
-  borderRadius: 10,
-  background: "rgba(239,68,68,0.07)",
-  border: "1px solid rgba(239,68,68,0.18)",
-  color: "#f87171",
-  fontWeight: 600,
+  borderRadius: 8,
+  background: "#FEF2F2",
+  border: "1px solid #FECACA",
+  color: "#B91C1C",
+  fontWeight: 500,
   fontSize: 13,
   cursor: "pointer",
   fontFamily: "inherit",
@@ -1795,14 +1799,14 @@ function timeAgoUpdate(iso: string): string {
 const updateInputStyle: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
-  borderRadius: 10,
-  background: "rgba(255,255,255,0.03)",
+  borderRadius: 8,
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
   color: "var(--text-primary)",
   fontSize: 14,
   outline: "none",
   boxSizing: "border-box",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   resize: "none",
   lineHeight: 1.6,
   transition: "border-color 0.15s ease",
@@ -1811,20 +1815,20 @@ const updateInputStyle: React.CSSProperties = {
 const postUpdateBtnStyle: React.CSSProperties = {
   padding: "8px 18px",
   borderRadius: 8,
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
-  border: "none",
-  color: "white",
-  fontWeight: 700,
+  background: "#1A1A18",
+  border: "1px solid #1A1A18",
+  color: "#FFFFFF",
+  fontWeight: 500,
   fontSize: 13,
-  fontFamily: "Syne, sans-serif",
-  boxShadow: "0 3px 12px var(--accent-glow)",
+  fontFamily: "var(--font-sans)",
   letterSpacing: "0.01em",
+  cursor: "pointer",
 };
 
 const updateRowStyle: React.CSSProperties = {
   padding: "16px 18px",
-  borderRadius: 12,
-  background: "rgba(255,255,255,0.025)",
+  borderRadius: 8,
+  background: "#FAFAF8",
   border: "1px solid var(--border-subtle)",
 };
 
@@ -1844,10 +1848,10 @@ const proofLinkStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   fontSize: 13,
-  fontWeight: 600,
-  color: "var(--accent-bright)",
-  background: "color-mix(in srgb, var(--accent) 10%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
+  fontWeight: 500,
+  color: "var(--text-primary)",
+  background: "transparent",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: "8px 14px",
   textDecoration: "none",

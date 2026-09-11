@@ -50,15 +50,15 @@ function getStageLabel(stage: string | null): string {
 function getStageBadgeStyle(stage: string | null): React.CSSProperties {
   switch (stage) {
     case "idea":
-      return { background: "rgba(251,191,36,0.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.3)" };
+      return { background: "#FDE68A", color: "#B45309", border: "1px solid #FDE68A" };
     case "mvp":
-      return { background: "rgba(96,165,250,0.15)", color: "#60a5fa", border: "1px solid rgba(96,165,250,0.3)" };
+      return { background: "#E8E8E4", color: "#60a5fa", border: "1px solid #E8E8E4" };
     case "building":
-      return { background: "rgba(167,139,250,0.15)", color: "#a78bfa", border: "1px solid rgba(167,139,250,0.3)" };
+      return { background: "#E8E8E4", color: "#a78bfa", border: "1px solid #E8E8E4" };
     case "launched":
-      return { background: "rgba(74,222,128,0.15)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.3)" };
+      return { background: "#D1FAE5", color: "#0F6E56", border: "1px solid #D1FAE5" };
     default:
-      return { background: "rgba(139,154,176,0.1)", color: "#8b9ab0", border: "1px solid rgba(139,154,176,0.2)" };
+      return { background: "rgba(139,154,176,0.1)", color: "#6B6B66", border: "1px solid rgba(139,154,176,0.2)" };
   }
 }
 
@@ -69,7 +69,7 @@ function getInitials(profile: Profile | undefined): string {
 }
 
 function getAvatarColor(id: string): string {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6"];
   return colors[id.charCodeAt(0) % colors.length];
 }
 
@@ -524,13 +524,13 @@ export default function DashboardPage() {
           const smartCta = incomingRequests.length > 0
             ? { href: "/connections", label: `Review ${incomingRequests.length} ${incomingRequests.length === 1 ? "request" : "requests"} →` }
             : myProjects.length === 0
-              ? { href: "/projects/new", label: "Post your first project →" }
+              ? { href: "/projects/new", label: "Add your first project →" }
               : { href: "/builders", label: "Browse builders →" };
           return (
             <div className="animate-fade-up" style={headerStyle}>
               <div>
                 <h1 style={headingStyle}>{getDayGreeting()}, {firstName}</h1>
-                <p style={subtitleStyle}>Here&apos;s what&apos;s happening with your projects today.</p>
+                <p style={subtitleStyle}>Here&apos;s your proof-of-work at a glance.</p>
               </div>
               <Link href={smartCta.href} className="btn-primary">{smartCta.label}</Link>
             </div>
@@ -542,19 +542,19 @@ export default function DashboardPage() {
 
         {/* ── Stats row — 3 numbers; "Profile views" removed (always 0) ── */}
         <div className="animate-fade-up animate-delay-1 responsive-stats-row-3" style={statsRowStyle}>
-          <div style={statCardStyle}>
+          <div className="card-hover" style={statCardStyle}>
             <div style={statLabelStyle}>Projects</div>
             <div style={statNumStyle}>{myProjects.length}</div>
             <div style={statSubStyle}>total created</div>
           </div>
-          <div style={statCardStyle}>
+          <div className="card-hover" style={statCardStyle}>
             <div style={statLabelStyle}>Connections</div>
-            <div style={{ ...statNumStyle, color: "#4ade80" }}>{connectionsCount}</div>
+            <div style={{ ...statNumStyle, color: "#0F6E56" }}>{connectionsCount}</div>
             <div style={statSubStyle}>active connections</div>
           </div>
-          <div style={statCardStyle}>
+          <div className="card-hover" style={statCardStyle}>
             <div style={statLabelStyle}>Pending requests</div>
-            <div style={{ ...statNumStyle, color: incomingRequests.length > 0 ? "#fbbf24" : "white" }}>
+            <div style={{ ...statNumStyle, color: incomingRequests.length > 0 ? "#B45309" : "var(--text-primary)" }}>
               {incomingRequests.length}
             </div>
             <div style={statSubStyle}>awaiting response</div>
@@ -566,7 +566,7 @@ export default function DashboardPage() {
           <div className="animate-fade-up animate-delay-2" style={{ ...cardStyle, marginBottom: 20 }}>
             <div style={cardHeaderStyle}>
               <h2 style={cardTitleStyle}>Get started</h2>
-              <span style={{ fontSize: 12, color: "#4a5568" }}>
+              <span style={{ fontSize: 12, color: "#9B9B94" }}>
                 {checklistItems.filter(i => i.done).length} of {checklistItems.length} complete
               </span>
             </div>
@@ -582,16 +582,16 @@ export default function DashboardPage() {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
-                      fontFamily: "DM Sans, sans-serif",
+                      fontFamily: "var(--font-sans)",
                       fontSize: 14,
                       fontWeight: 600,
-                      color: item.done ? "#4a5568" : "#f0f4f8",
+                      color: item.done ? "#9B9B94" : "#1A1A18",
                       textDecoration: item.done ? "line-through" : "none",
                     }}>
                       {item.label}
                     </div>
                     {!item.done && (
-                      <div style={{ fontSize: 12, color: "#4a5568", marginTop: 2 }}>{item.hint}</div>
+                      <div style={{ fontSize: 12, color: "#9B9B94", marginTop: 2 }}>{item.hint}</div>
                     )}
                   </div>
                   {!item.done && (
@@ -619,14 +619,14 @@ export default function DashboardPage() {
               {myProjects.length === 0 ? (
                 <div style={emptyStateStyle}>
                   <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 16, opacity: 0.85 }}>
-                    <circle cx="40" cy="40" r="38" fill="rgba(234,179,8,0.06)" stroke="rgba(234,179,8,0.18)" strokeWidth="1.5" strokeDasharray="6 3" />
-                    <path d="M40 18C32.3 18 26 24.3 26 32c0 5.2 2.8 9.7 7 12.2V48c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-3.8c4.2-2.5 7-7 7-12.2 0-7.7-6.3-14-14-14z" fill="rgba(234,179,8,0.15)" stroke="#fbbf24" strokeWidth="1.5" strokeLinejoin="round" />
-                    <path d="M33 54h14M35 58h10" stroke="rgba(234,179,8,0.5)" strokeWidth="1.5" strokeLinecap="round" />
-                    <path d="M37 32l2 2 4-4" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="40" cy="40" r="38" fill="#FFFBEB" stroke="#FDE68A" strokeWidth="1.5" strokeDasharray="6 3" />
+                    <path d="M40 18C32.3 18 26 24.3 26 32c0 5.2 2.8 9.7 7 12.2V48c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-3.8c4.2-2.5 7-7 7-12.2 0-7.7-6.3-14-14-14z" fill="#FDE68A" stroke="#B45309" strokeWidth="1.5" strokeLinejoin="round" />
+                    <path d="M33 54h14M35 58h10" stroke="#FDE68A" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M37 32l2 2 4-4" stroke="#B45309" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 16, color: "var(--text-primary)", marginBottom: 6 }}>Share your first idea</p>
-                  <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 16 }}>Post a project and find collaborators.</p>
-                  <Link href="/projects/new" className="btn-primary">+ Create project</Link>
+                  <p style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 16, color: "var(--text-primary)", marginBottom: 6 }}>Document your first project</p>
+                  <p style={{ color: "var(--text-secondary)", fontSize: 13, marginBottom: 16 }}>Add what you&apos;re building to start your track record.</p>
+                  <Link href="/projects/new" className="btn-primary">+ Add project</Link>
                 </div>
               ) : (
                 <div className="project-grid-dashboard">
@@ -683,29 +683,29 @@ export default function DashboardPage() {
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={requestNameStyle}>{p?.full_name || p?.username || "Unknown"}</div>
                             <div style={requestUniStyle}>
-                              {app.role && <span style={{ color: "#a5b4fc", fontWeight: 600 }}>{app.role}</span>}
+                              {app.role && <span style={{ color: "#6B6B66", fontWeight: 600 }}>{app.role}</span>}
                               {app.role && (p?.university || p?.role) && " · "}
                               {p?.university || p?.role}
                             </div>
                           </div>
                           {/* Status badge */}
                           {app.status === "accepted" && (
-                            <span style={{ fontSize: 11, fontWeight: 600, color: "#4ade80", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 20, padding: "3px 9px" }}>Accepted</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: "#0F6E56", background: "#ECFDF5", border: "1px solid #D1FAE5", borderRadius: 20, padding: "3px 9px" }}>Accepted</span>
                           )}
                           {app.status === "rejected" && (
-                            <span style={{ fontSize: 11, fontWeight: 600, color: "#f87171", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 20, padding: "3px 9px" }}>Rejected</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: "#B91C1C", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 20, padding: "3px 9px" }}>Rejected</span>
                           )}
                         </div>
 
                         {app.message && (
-                          <p style={{ fontSize: 13, color: "#8b9ab0", lineHeight: 1.6, margin: "0 0 0 54px", fontStyle: "italic" }}>
+                          <p style={{ fontSize: 13, color: "#6B6B66", lineHeight: 1.6, margin: "0 0 0 54px", fontStyle: "italic" }}>
                             &ldquo;{app.message.length > 120 ? app.message.slice(0, 120) + "…" : app.message}&rdquo;
                           </p>
                         )}
 
                         {app.projectTitle && (
-                          <div style={{ fontSize: 11, color: "#4a5568", marginLeft: 54 }}>
-                            Project: <span style={{ color: "#6b7280" }}>{app.projectTitle}</span>
+                          <div style={{ fontSize: 11, color: "#9B9B94", marginLeft: 54 }}>
+                            Project: <span style={{ color: "#9B9B94" }}>{app.projectTitle}</span>
                           </div>
                         )}
 
@@ -714,7 +714,7 @@ export default function DashboardPage() {
                             <button type="button" disabled={!!actionLoadingId} style={{ ...acceptBtnStyle, opacity: actionLoadingId === app.id ? 0.6 : 1 }} onClick={() => handleAcceptApp(app.id)}>{actionLoadingId === app.id ? "…" : "Accept"}</button>
                             <button type="button" disabled={!!actionLoadingId} style={{ ...declineBtnStyle, opacity: actionLoadingId === app.id + "_reject" ? 0.6 : 1 }} onClick={() => handleRejectApp(app.id)}>{actionLoadingId === app.id + "_reject" ? "…" : "Reject"}</button>
                             {p?.username && (
-                              <Link href={`/builders/${p.username}`} style={{ ...declineBtnStyle, background: "transparent", color: "#6b7280", border: "1px solid rgba(255,255,255,0.07)", textDecoration: "none" }}>
+                              <Link href={`/builders/${p.username}`} style={{ ...declineBtnStyle, background: "transparent", color: "#9B9B94", border: "1px solid #EFEFEC", textDecoration: "none" }}>
                                 View profile
                               </Link>
                             )}
@@ -739,8 +739,8 @@ export default function DashboardPage() {
                 <div style={{ ...completionBarFillStyle, width: `${profileCompletion}%` }} />
               </div>
               <div style={{ marginTop: 8, fontSize: 14 }}>
-                <span style={{ color: "#4ade80", fontWeight: 600 }}>{profileCompletion}%</span>
-                <span style={{ color: "#4a5568" }}> complete</span>
+                <span style={{ color: "#0F6E56", fontWeight: 600 }}>{profileCompletion}%</span>
+                <span style={{ color: "#9B9B94" }}> complete</span>
               </div>
               <div style={{ display: "grid", gap: 8, marginTop: 16 }}>
                 {([
@@ -752,8 +752,8 @@ export default function DashboardPage() {
                   ["GitHub URL", profile?.github_url],
                 ] as [string, string | null | undefined][]).map(([label, val]) => (
                   <div key={label} style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ color: val ? "#4ade80" : "#4a5568" }}>{val ? "✓" : "○"}</span>
-                    <span style={{ color: val ? "#d7deea" : "#4a5568", fontSize: 13 }}>{label}</span>
+                    <span style={{ color: val ? "#0F6E56" : "#9B9B94" }}>{val ? "✓" : "○"}</span>
+                    <span style={{ color: val ? "#1A1A18" : "#9B9B94", fontSize: 13 }}>{label}</span>
                   </div>
                 ))}
               </div>
@@ -844,12 +844,12 @@ export default function DashboardPage() {
 
               {/* Divider — only when both requests AND notifications exist */}
               {incomingRequests.length > 0 && notifications.length > 0 && (
-                <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "4px 0 8px" }} />
+                <div style={{ height: 1, background: "#EFEFEC", margin: "4px 0 8px" }} />
               )}
 
               {/* Notifications */}
               {incomingRequests.length === 0 && notifications.length === 0 ? (
-                <p style={{ color: "#4a5568", fontSize: 14 }}>No activity yet. Connect with builders to get started.</p>
+                <p style={{ color: "#9B9B94", fontSize: 14 }}>No activity yet. Connect with builders to get started.</p>
               ) : notifications.length === 0 ? null : (
                 <div style={{ display: "grid", gap: 0 }}>
                   {notifications.map((n, idx) => {
@@ -862,37 +862,37 @@ export default function DashboardPage() {
 
                     if (n.type === "connection_request") {
                       icon = "🤝";
-                      dotColor = "#fbbf24";
-                      text = <><strong style={{ color: "#f0f4f8" }}>{fromName}</strong> sent you a connection request</>;
+                      dotColor = "#B45309";
+                      text = <><strong style={{ color: "#1A1A18" }}>{fromName}</strong> sent you a connection request</>;
                       actionBtn = <Link href="/connections" style={notifActionStyle}>Review</Link>;
                     } else if (n.type === "connection_accepted") {
                       icon = "✅";
-                      dotColor = "#4ade80";
-                      text = <><strong style={{ color: "#f0f4f8" }}>{fromName}</strong> accepted your connection request</>;
+                      dotColor = "#0F6E56";
+                      text = <><strong style={{ color: "#1A1A18" }}>{fromName}</strong> accepted your connection request</>;
                       actionBtn = n.fromProfile?.username
                         ? <Link href={`/builders/${n.fromProfile.username}`} style={notifActionStyle}>View</Link>
                         : null;
                     } else if (n.type === "project_liked") {
                       icon = "❤️";
                       dotColor = "#ec4899";
-                      text = <><strong style={{ color: "#f0f4f8" }}>{fromName}</strong> liked your project</>;
+                      text = <><strong style={{ color: "#1A1A18" }}>{fromName}</strong> liked your project</>;
                     } else if (n.type === "profile_viewed") {
                       icon = "👁️";
                       dotColor = "#3b82f6";
-                      text = <><strong style={{ color: "#f0f4f8" }}>{fromName}</strong> viewed your profile</>;
+                      text = <><strong style={{ color: "#1A1A18" }}>{fromName}</strong> viewed your profile</>;
                     } else if (n.type === "application_received") {
                       icon = "📋";
                       dotColor = "#8b5cf6";
-                      text = <><strong style={{ color: "#f0f4f8" }}>{fromName}</strong> applied to join your project</>;
+                      text = <><strong style={{ color: "#1A1A18" }}>{fromName}</strong> applied to join your project</>;
                       actionBtn = <Link href="/dashboard" style={notifActionStyle}>Review</Link>;
                     } else if (n.type === "application_accepted") {
                       icon = "🎉";
-                      dotColor = "#4ade80";
-                      text = <>Your application was <strong style={{ color: "#4ade80" }}>accepted</strong> by {fromName}</>;
+                      dotColor = "#0F6E56";
+                      text = <>Your application was <strong style={{ color: "#0F6E56" }}>accepted</strong> by {fromName}</>;
                     } else if (n.type === "application_rejected") {
                       icon = "😞";
-                      dotColor = "#f87171";
-                      text = <>Your application was not accepted by <strong style={{ color: "#f0f4f8" }}>{fromName}</strong></>;
+                      dotColor = "#B91C1C";
+                      text = <>Your application was not accepted by <strong style={{ color: "#1A1A18" }}>{fromName}</strong></>;
                     }
 
                     return (
@@ -900,7 +900,7 @@ export default function DashboardPage() {
                         display: "flex",
                         gap: 12,
                         padding: "12px 0",
-                        borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.04)",
+                        borderBottom: isLast ? "none" : "1px solid #F7F7F5",
                         alignItems: "flex-start",
                       }}>
                         {/* Icon + timeline line */}
@@ -919,14 +919,14 @@ export default function DashboardPage() {
                             {icon}
                           </div>
                           {!isLast && (
-                            <div style={{ width: 1, flex: 1, background: "rgba(255,255,255,0.05)", minHeight: 8, marginTop: 4 }} />
+                            <div style={{ width: 1, flex: 1, background: "#F7F7F5", minHeight: 8, marginTop: 4 }} />
                           )}
                         </div>
                         {/* Content */}
                         <div style={{ flex: 1, minWidth: 0, paddingTop: 4 }}>
-                          <p style={{ fontSize: 13, color: "#8b9ab0", lineHeight: 1.5, marginBottom: 4 }}>{text}</p>
+                          <p style={{ fontSize: 13, color: "#6B6B66", lineHeight: 1.5, marginBottom: 4 }}>{text}</p>
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <span style={{ fontSize: 11, color: "#4a5568" }}>{timeAgoShort(n.created_at)}</span>
+                            <span style={{ fontSize: 11, color: "#9B9B94" }}>{timeAgoShort(n.created_at)}</span>
                             {!n.read && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />}
                             {actionBtn}
                           </div>
@@ -966,25 +966,25 @@ const headerStyle: React.CSSProperties = {
 
 const headingStyle: React.CSSProperties = {
   fontSize: "clamp(24px, 3.5vw, 36px)",
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   color: "var(--text-primary)",
   letterSpacing: "-0.02em",
   marginBottom: 6,
 };
 
 const subtitleStyle: React.CSSProperties = {
-  fontSize: 15,
-  color: "var(--text-secondary)",
+  fontSize: 18,
+  color: "#6B6B66",
 };
 
 const errorBannerStyle: React.CSSProperties = {
   padding: "10px 14px",
   borderRadius: 8,
   marginBottom: 16,
-  background: "rgba(239,68,68,0.1)",
-  border: "1px solid rgba(239,68,68,0.3)",
-  color: "#fca5a5",
+  background: "#FEF2F2",
+  border: "1px solid #FECACA",
+  color: "#B91C1C",
   fontSize: 13,
 };
 
@@ -1040,7 +1040,7 @@ const rightColStyle: React.CSSProperties = {
 // (YOUR PROJECTS / MATCHED FOR YOU / APPLICATIONS / ACTIVITY).
 const sectionLabelStyle: React.CSSProperties = {
   fontSize: 11,
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   letterSpacing: "0.12em",
   textTransform: "uppercase",
@@ -1064,7 +1064,7 @@ const cardHeaderStyle: React.CSSProperties = {
 
 const cardTitleStyle: React.CSSProperties = {
   fontSize: 17,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   color: "var(--text-primary)",
 };
@@ -1083,15 +1083,17 @@ const badgeCountStyle: React.CSSProperties = {
   width: 22,
   height: 22,
   borderRadius: "50%",
-  background: "#fbbf24",
-  color: "#0d1117",
+  background: "#B45309",
+  color: "#FFFFFF",
   fontSize: 12,
   fontWeight: 700,
 };
 
 const emptyStateStyle: React.CSSProperties = {
   textAlign: "center",
-  padding: "24px 0",
+  padding: 48,
+  background: "#F7F7F5",
+  borderRadius: 16,
 };
 
 const checklistRowStyle: React.CSSProperties = {
@@ -1100,8 +1102,8 @@ const checklistRowStyle: React.CSSProperties = {
   gap: 14,
   padding: "10px 12px",
   borderRadius: 10,
-  border: "1px solid rgba(255,255,255,0.05)",
-  background: "rgba(255,255,255,0.02)",
+  border: "1px solid #F7F7F5",
+  background: "#FAFAF8",
 };
 
 const checklistIconStyle: React.CSSProperties = {
@@ -1115,14 +1117,14 @@ const checklistIconStyle: React.CSSProperties = {
 };
 
 const checklistIconPendingStyle: React.CSSProperties = {
-  border: "1.5px solid rgba(255,255,255,0.15)",
+  border: "1.5px solid #E8E8E4",
   background: "transparent",
 };
 
 const checklistIconDoneStyle: React.CSSProperties = {
-  background: "rgba(74,222,128,0.15)",
-  border: "1.5px solid rgba(74,222,128,0.45)",
-  color: "#4ade80",
+  background: "#D1FAE5",
+  border: "1.5px solid #D1FAE5",
+  color: "#0F6E56",
 };
 
 const projectRowStyle: React.CSSProperties = {
@@ -1131,8 +1133,8 @@ const projectRowStyle: React.CSSProperties = {
   gap: 14,
   padding: "13px 14px",
   borderRadius: 10,
-  background: "rgba(255,255,255,0.02)",
-  border: "1px solid rgba(255,255,255,0.05)",
+  background: "#FAFAF8",
+  border: "1px solid #F7F7F5",
   textDecoration: "none",
   cursor: "pointer",
 };
@@ -1145,13 +1147,13 @@ const projectEmojiStyle: React.CSSProperties = {
   justifyContent: "center",
   fontSize: 20,
   borderRadius: 10,
-  background: "rgba(255,255,255,0.04)",
+  background: "#F7F7F5",
   flexShrink: 0,
 };
 
 const projectNameStyle: React.CSSProperties = {
   fontSize: 15,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   color: "var(--text-primary)",
   marginBottom: 3,
@@ -1183,8 +1185,8 @@ const requestRowStyle: React.CSSProperties = {
   gap: 14,
   padding: "13px 14px",
   borderRadius: 10,
-  background: "rgba(255,255,255,0.02)",
-  border: "1px solid rgba(255,255,255,0.05)",
+  background: "#FAFAF8",
+  border: "1px solid #F7F7F5",
   flexWrap: "wrap",
 };
 
@@ -1203,7 +1205,7 @@ const avatarStyle: React.CSSProperties = {
 
 const requestNameStyle: React.CSSProperties = {
   fontSize: 15,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   color: "var(--text-primary)",
   marginBottom: 2,
@@ -1223,9 +1225,9 @@ const requestActionsStyle: React.CSSProperties = {
 const acceptBtnStyle: React.CSSProperties = {
   padding: "7px 14px",
   borderRadius: 8,
-  border: "1px solid rgba(34,197,94,0.3)",
-  background: "rgba(34,197,94,0.15)",
-  color: "#4ade80",
+  border: "1px solid #D1FAE5",
+  background: "#D1FAE5",
+  color: "#0F6E56",
   fontWeight: 600,
   fontSize: 13,
   cursor: "pointer",
@@ -1234,9 +1236,9 @@ const acceptBtnStyle: React.CSSProperties = {
 const declineBtnStyle: React.CSSProperties = {
   padding: "7px 14px",
   borderRadius: 8,
-  border: "1px solid rgba(239,68,68,0.25)",
-  background: "rgba(239,68,68,0.1)",
-  color: "#f87171",
+  border: "1px solid #FECACA",
+  background: "#FEF2F2",
+  color: "#B91C1C",
   fontWeight: 600,
   fontSize: 13,
   cursor: "pointer",
@@ -1246,14 +1248,14 @@ const completionBarBgStyle: React.CSSProperties = {
   width: "100%",
   height: 8,
   borderRadius: 4,
-  background: "rgba(255,255,255,0.07)",
+  background: "#EFEFEC",
   overflow: "hidden",
 };
 
 const completionBarFillStyle: React.CSSProperties = {
   height: "100%",
   borderRadius: 4,
-  background: "linear-gradient(90deg, #3b82f6, #4ade80)",
+  background: "#1A1A18",
   transition: "width 0.5s ease",
 };
 
@@ -1271,8 +1273,8 @@ const quickActionStyle: React.CSSProperties = {
   gap: 8,
   padding: "16px 12px",
   borderRadius: 10,
-  background: "rgba(255,255,255,0.02)",
-  border: "1px solid rgba(255,255,255,0.06)",
+  background: "#FAFAF8",
+  border: "1px solid #EFEFEC",
   textDecoration: "none",
   cursor: "pointer",
 };

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { publicMetadata } from "@/utils/seo";
 
-export const metadata: Metadata = {
-  title: "Terms of Service | ProjectHub",
+export const metadata: Metadata = publicMetadata({
+  title: "Terms of Service",
   description:
     "The rules for using ProjectHub during our pre-launch period. Be respectful, don't spam or impersonate others, and build cool things.",
-};
+  path: "/terms",
+});
 
 const LAST_UPDATED = "April 24, 2026";
 
@@ -22,8 +24,8 @@ const wrapStyle: React.CSSProperties = {
 };
 
 const h1Style: React.CSSProperties = {
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   fontSize: "clamp(32px, 5vw, 44px)",
   letterSpacing: "-0.02em",
   color: "var(--text-primary)",
@@ -31,7 +33,7 @@ const h1Style: React.CSSProperties = {
 };
 
 const leadStyle: React.CSSProperties = {
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontSize: 15,
   color: "var(--text-secondary)",
   lineHeight: 1.7,
@@ -39,7 +41,7 @@ const leadStyle: React.CSSProperties = {
 };
 
 const updatedStyle: React.CSSProperties = {
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontSize: 12,
   color: "var(--text-muted)",
   letterSpacing: "0.04em",
@@ -56,7 +58,7 @@ const sectionStyle: React.CSSProperties = {
 };
 
 const h2Style: React.CSSProperties = {
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   fontSize: 20,
   color: "var(--text-primary)",
@@ -65,7 +67,7 @@ const h2Style: React.CSSProperties = {
 };
 
 const pStyle: React.CSSProperties = {
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontSize: 14.5,
   color: "var(--text-secondary)",
   lineHeight: 1.7,
@@ -73,7 +75,7 @@ const pStyle: React.CSSProperties = {
 };
 
 const ulStyle: React.CSSProperties = {
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontSize: 14.5,
   color: "var(--text-secondary)",
   lineHeight: 1.75,
@@ -180,7 +182,7 @@ export default function TermsPage() {
           </p>
         </section>
 
-        <div style={{ marginTop: 32, fontSize: 13, color: "var(--text-muted)", fontFamily: "DM Sans, sans-serif" }}>
+        <div style={{ marginTop: 32, fontSize: 13, color: "var(--text-muted)", fontFamily: "var(--font-sans)" }}>
           See also:{" "}
           <Link href="/privacy" style={linkStyle}>Privacy Policy</Link>
           {"  ·  "}

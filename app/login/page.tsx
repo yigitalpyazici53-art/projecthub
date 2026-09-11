@@ -173,14 +173,14 @@ export default function LoginPage() {
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `
-            linear-gradient(var(--grid-line, rgba(80,120,220,0.04)) 1px, transparent 1px),
-            linear-gradient(90deg, var(--grid-line, rgba(80,120,220,0.04)) 1px, transparent 1px)
+            linear-gradient(var(--grid-line, #F5F5F3) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line, #F5F5F3) 1px, transparent 1px)
           `,
           backgroundSize: "64px 64px",
           maskImage: "radial-gradient(ellipse 100% 100% at 50% 0%, black 30%, transparent 100%)",
         }} />
-        <div style={{ position: "absolute", top: "10%", left: "20%", width: 500, height: 500, background: "radial-gradient(circle, var(--orb1, rgba(76,142,255,0.09)) 0%, transparent 65%)", animation: "drift 18s ease-in-out infinite" }} />
-        <div style={{ position: "absolute", bottom: "10%", right: "15%", width: 400, height: 400, background: "radial-gradient(circle, var(--orb2, rgba(139,92,246,0.08)) 0%, transparent 65%)", animation: "drift2 22s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", top: "10%", left: "20%", width: 500, height: 500, background: "radial-gradient(circle, var(--orb1, #F5F5F3) 0%, transparent 65%)", animation: "drift 18s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", bottom: "10%", right: "15%", width: 400, height: 400, background: "radial-gradient(circle, var(--orb2, #F5F5F3) 0%, transparent 65%)", animation: "drift2 22s ease-in-out infinite" }} />
       </div>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 420 }}>
@@ -219,19 +219,19 @@ export default function LoginPage() {
 }
 
 const pageStyle: React.CSSProperties = { minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" };
-const backLinkStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)", textDecoration: "none", marginBottom: 20, padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.03)", transition: "all 0.15s ease", fontFamily: "DM Sans, sans-serif" };
-const cardStyle: React.CSSProperties = { width: "100%", background: "var(--gradient-card)", border: "1px solid var(--border-highlight)", borderRadius: 20, padding: 36, boxShadow: "0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 60px rgba(0,0,0,0.55), 0 0 40px color-mix(in srgb, var(--accent) 8%, transparent) inset" };
-const titleStyle: React.CSSProperties = { fontSize: 24, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6, fontFamily: "Syne, sans-serif" };
+const backLinkStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)", textDecoration: "none", marginBottom: 20, padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "#FAFAF8", transition: "all 0.15s ease", fontFamily: "var(--font-sans)" };
+const cardStyle: React.CSSProperties = { width: "100%", background: "var(--gradient-card)", border: "1px solid var(--border-highlight)", borderRadius: 20, padding: 36, boxShadow: "0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 60px rgba(26,26,24,0.4), 0 0 40px color-mix(in srgb, var(--accent) 8%, transparent) inset" };
+const titleStyle: React.CSSProperties = { fontSize: 24, fontWeight: 500, color: "var(--text-primary)", marginBottom: 6, fontFamily: "var(--font-serif)" };
 const subtitleStyle: React.CSSProperties = { color: "var(--text-secondary)", fontSize: 14 };
-const googleButtonStyle: React.CSSProperties = { width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "12px 16px", borderRadius: 10, border: "1px solid #e0e0e0", background: "#ffffff", color: "#3c4043", fontWeight: 600, fontSize: 14, fontFamily: "DM Sans, sans-serif", marginBottom: 4, boxShadow: "0 1px 3px rgba(0,0,0,0.12)", transition: "box-shadow 0.18s ease" };
+const googleButtonStyle: React.CSSProperties = { width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "12px 16px", borderRadius: 10, border: "1px solid #e0e0e0", background: "#ffffff", color: "#3c4043", fontWeight: 600, fontSize: 14, fontFamily: "var(--font-sans)", marginBottom: 4, boxShadow: "0 1px 3px rgba(26,26,24,0.08)", transition: "box-shadow 0.18s ease" };
 const dividerStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 12, margin: "20px 0" };
 const dividerLineStyle: React.CSSProperties = { flex: 1, height: 1, background: "var(--border)" };
 const dividerTextStyle: React.CSSProperties = { fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap" };
 const formStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 16, marginBottom: 20 };
 const labelStyle: React.CSSProperties = { display: "block", marginBottom: 8, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" };
-const forgotStyle: React.CSSProperties = { fontSize: 12, color: "var(--accent-bright, #7aa8ff)", textDecoration: "none", fontWeight: 500 };
-const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "rgba(9,14,26,0.9)", color: "var(--text-primary)", fontSize: 14, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s ease, box-shadow 0.2s ease" };
-const buttonStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background: "linear-gradient(135deg, var(--accent), var(--accent-hover))", color: "white", fontWeight: 700, fontSize: 14, fontFamily: "Syne, sans-serif", transition: "all 0.18s ease", boxShadow: "0 4px 16px var(--accent-glow)" };
-const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#fca5a5", fontSize: 13 };
+const forgotStyle: React.CSSProperties = { fontSize: 12, color: "var(--accent-bright, #6B6B66)", textDecoration: "none", fontWeight: 500 };
+const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "#FFFFFF", color: "var(--text-primary)", fontSize: 14, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s ease, box-shadow 0.2s ease" };
+const buttonStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background: "#1A1A18", color: "white", fontWeight: 700, fontSize: 14, fontFamily: "var(--font-sans)", transition: "all 0.18s ease", boxShadow: "0 4px 16px transparent" };
+const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, background: "#FEF2F2", border: "1px solid #FECACA", color: "#B91C1C", fontSize: 13 };
 const footerStyle: React.CSSProperties = { marginTop: 20, textAlign: "center", fontSize: 13, color: "var(--text-muted)" };
-const linkStyle: React.CSSProperties = { color: "var(--accent-bright, #7aa8ff)", textDecoration: "none", fontWeight: 600 };
+const linkStyle: React.CSSProperties = { color: "var(--accent-bright, #6B6B66)", textDecoration: "none", fontWeight: 600 };

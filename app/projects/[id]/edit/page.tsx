@@ -310,8 +310,8 @@ const badgeStyle: React.CSSProperties = {
 
 const pageTitleStyle: React.CSSProperties = {
   fontSize: "clamp(28px, 4vw, 40px)",
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   color: "var(--text-primary)",
   letterSpacing: "-0.03em",
   marginBottom: 10,
@@ -326,7 +326,7 @@ const pageSubStyle: React.CSSProperties = {
 
 const headingStyle: React.CSSProperties = {
   fontSize: 28,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 800,
   color: "var(--text-primary)",
   letterSpacing: "-0.02em",
@@ -345,7 +345,7 @@ const cardStyle: React.CSSProperties = {
   border: "1px solid var(--border)",
   borderRadius: 22,
   padding: "40px",
-  boxShadow: "0 28px 72px rgba(0,0,0,0.4), 0 0 0 1px color-mix(in srgb, var(--accent) 5%, transparent) inset",
+  boxShadow: "0 28px 72px rgba(26,26,24,0.4), 0 0 0 1px color-mix(in srgb, var(--accent) 5%, transparent) inset",
   display: "flex",
   flexDirection: "column",
   gap: 28,
@@ -357,7 +357,7 @@ const sectionStyle: React.CSSProperties = {
   gap: 16,
   padding: "22px",
   borderRadius: 14,
-  background: "rgba(255,255,255,0.02)",
+  background: "#FAFAF8",
   border: "1px solid var(--border-subtle)",
 };
 
@@ -384,7 +384,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const reqStyle: React.CSSProperties = {
-  color: "#f87171",
+  color: "#B91C1C",
 };
 
 const inputStyle: React.CSSProperties = {
@@ -392,7 +392,7 @@ const inputStyle: React.CSSProperties = {
   padding: "13px 15px",
   borderRadius: 12,
   border: "1px solid var(--border)",
-  background: "rgba(255,255,255,0.03)",
+  background: "#FAFAF8",
   color: "var(--text-primary)",
   fontSize: 15,
   outline: "none",
@@ -413,9 +413,9 @@ const hintStyle: React.CSSProperties = {
 const errorStyle: React.CSSProperties = {
   padding: "12px 16px",
   borderRadius: 10,
-  background: "rgba(239,68,68,0.1)",
-  border: "1px solid rgba(239,68,68,0.3)",
-  color: "#fca5a5",
+  background: "#FEF2F2",
+  border: "1px solid #FECACA",
+  color: "#B91C1C",
   fontSize: 13,
 };
 
@@ -446,11 +446,11 @@ const saveBtnStyle: React.CSSProperties = {
   padding: "12px 32px",
   borderRadius: 12,
   border: "none",
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+  background: "#1A1A18",
   color: "white",
   fontSize: 14,
   fontWeight: 700,
-  fontFamily: "Syne, sans-serif",
-  boxShadow: "0 4px 16px var(--accent-glow)",
+  fontFamily: "var(--font-sans)",
+  boxShadow: "0 4px 16px transparent",
   letterSpacing: "0.01em",
 };

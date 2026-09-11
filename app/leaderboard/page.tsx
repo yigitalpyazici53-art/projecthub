@@ -35,7 +35,7 @@ const PTS_ENDORSEMENT = 2;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getAvatarColor(id: string): string {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6"];
   return colors[id.charCodeAt(0) % colors.length];
 }
 
@@ -255,8 +255,8 @@ export default function LeaderboardPage() {
               { pts: `${PTS_ENDORSEMENT}pts`, label: "per endorsement" },
             ].map(({ pts, label }) => (
               <div key={label} style={pointPillStyle}>
-                <span style={{ color: "#f0f4f8", fontWeight: 700 }}>{pts}</span>
-                <span style={{ color: "#4a5568" }}> {label}</span>
+                <span style={{ color: "#1A1A18", fontWeight: 700 }}>{pts}</span>
+                <span style={{ color: "#9B9B94" }}> {label}</span>
               </div>
             ))}
           </div>
@@ -267,9 +267,9 @@ export default function LeaderboardPage() {
           <h2 style={sectionTitleStyle}>Builders</h2>
 
           {loading ? (
-            <div style={{ padding: "40px 0", textAlign: "center", color: "#4a5568", fontSize: 14 }}>Loading leaderboard…</div>
+            <div style={{ padding: "40px 0", textAlign: "center", color: "#9B9B94", fontSize: 14 }}>Loading leaderboard…</div>
           ) : builders.length === 0 ? (
-            <div style={{ padding: "40px 0", textAlign: "center", color: "#4a5568", fontSize: 14 }}>
+            <div style={{ padding: "40px 0", textAlign: "center", color: "#9B9B94", fontSize: 14 }}>
               No builders yet. Be the first to build something!
             </div>
           ) : (
@@ -290,7 +290,7 @@ export default function LeaderboardPage() {
                       alignItems: "center",
                       gap: 16,
                       padding: "16px 0",
-                      borderBottom: idx < builders.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                      borderBottom: idx < builders.length - 1 ? "1px solid #F7F7F5" : "none",
                     }}
                   >
                     {/* Rank */}
@@ -300,8 +300,8 @@ export default function LeaderboardPage() {
                       flexShrink: 0,
                       fontSize: isTop3 ? 22 : 15,
                       fontWeight: 700,
-                      color: isTop3 ? "white" : "#4a5568",
-                      fontFamily: "Syne, sans-serif",
+                      color: isTop3 ? "var(--text-primary)" : "#9B9B94",
+                      fontFamily: "var(--font-sans)",
                     }}>
                       {medal ?? `#${rank}`}
                     </div>
@@ -316,7 +316,7 @@ export default function LeaderboardPage() {
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 15, fontWeight: 700, color: "white",
                       overflow: "hidden",
-                      border: isTop3 ? `2px solid ${rank === 1 ? "#fbbf24" : rank === 2 ? "#9ca3af" : "#cd7c2d"}` : "2px solid transparent",
+                      border: isTop3 ? `2px solid ${rank === 1 ? "#B45309" : rank === 2 ? "#9B9B94" : "#cd7c2d"}` : "2px solid transparent",
                     }}>
                       {builder.avatar_url
                         ? <img src={builder.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
@@ -329,29 +329,29 @@ export default function LeaderboardPage() {
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
                         <Link
                           href={builder.username ? `/builders/${builder.username}` : "#"}
-                          style={{ fontSize: 15, fontWeight: 700, color: "#f0f4f8", fontFamily: "Syne, sans-serif", textDecoration: "none" }}
+                          style={{ fontSize: 15, fontWeight: 700, color: "#1A1A18", fontFamily: "var(--font-sans)", textDecoration: "none" }}
                         >
                           {builder.full_name || builder.username || "Builder"}
                         </Link>
                         {isRising && (
-                          <span style={{ fontSize: 10, fontWeight: 700, color: "#fbbf24", background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 10, padding: "2px 7px" }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: "#B45309", background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10, padding: "2px 7px" }}>
                             ↑ Rising
                           </span>
                         )}
                       </div>
                       {builder.university && (
-                        <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>{builder.university}</div>
+                        <div style={{ fontSize: 12, color: "#9B9B94", marginBottom: 6 }}>{builder.university}</div>
                       )}
                       {/* Points bar */}
-                      <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.05)", overflow: "hidden", maxWidth: 300 }}>
+                      <div style={{ height: 4, borderRadius: 2, background: "#F7F7F5", overflow: "hidden", maxWidth: 300 }}>
                         <div style={{
                           height: "100%",
                           width: `${barPct}%`,
                           borderRadius: 2,
-                          background: rank === 1 ? "linear-gradient(90deg, #fbbf24, #f59e0b)"
-                            : rank === 2 ? "linear-gradient(90deg, #9ca3af, #d1d5db)"
-                            : rank === 3 ? "linear-gradient(90deg, #cd7c2d, #f0a060)"
-                            : "linear-gradient(90deg, #6366f1, #818cf8)",
+                          background: rank === 1 ? "linear-gradient(90deg, #B45309, #B45309)"
+                            : rank === 2 ? "linear-gradient(90deg, #9B9B94, #9B9B94)"
+                            : rank === 3 ? "linear-gradient(90deg, #cd7c2d, #B45309)"
+                            : "linear-gradient(90deg, #6366f1, #6B6B66)",
                           transition: "width 0.5s ease",
                         }} />
                       </div>
@@ -360,35 +360,35 @@ export default function LeaderboardPage() {
                     {/* Stats */}
                     <div style={{ display: "flex", gap: 16, flexShrink: 0, alignItems: "center" }}>
                       <div className="leaderboard-stat-col" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 2 }}>
-                        <span style={{ fontSize: 11, color: "#4a5568" }}>Projects</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#8b9ab0" }}>{builder.projectCount}</span>
+                        <span style={{ fontSize: 11, color: "#9B9B94" }}>Projects</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: "#6B6B66" }}>{builder.projectCount}</span>
                       </div>
                       <div className="leaderboard-stat-col" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 2 }}>
-                        <span style={{ fontSize: 11, color: "#4a5568" }}>Connects</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#8b9ab0" }}>{builder.connectionCount}</span>
+                        <span style={{ fontSize: 11, color: "#9B9B94" }}>Connects</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: "#6B6B66" }}>{builder.connectionCount}</span>
                       </div>
                       <div className="leaderboard-stat-col" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 2 }}>
-                        <span style={{ fontSize: 11, color: "#4a5568" }}>Endorsements</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#8b9ab0" }}>{builder.endorsementCount}</span>
+                        <span style={{ fontSize: 11, color: "#9B9B94" }}>Endorsements</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: "#6B6B66" }}>{builder.endorsementCount}</span>
                       </div>
                       {/* Points badge */}
                       <div style={{
                         padding: "6px 14px",
                         borderRadius: 20,
-                        background: isTop3 ? (rank === 1 ? "rgba(251,191,36,0.12)" : rank === 2 ? "rgba(156,163,175,0.1)" : "rgba(205,124,45,0.1)") : "rgba(99,102,241,0.1)",
-                        border: `1px solid ${isTop3 ? (rank === 1 ? "rgba(251,191,36,0.3)" : rank === 2 ? "rgba(156,163,175,0.25)" : "rgba(205,124,45,0.25)") : "rgba(99,102,241,0.25)"}`,
+                        background: isTop3 ? (rank === 1 ? "#FFFBEB" : rank === 2 ? "rgba(156,163,175,0.1)" : "rgba(205,124,45,0.1)") : "#F5F5F3",
+                        border: `1px solid ${isTop3 ? (rank === 1 ? "#FDE68A" : rank === 2 ? "rgba(156,163,175,0.25)" : "rgba(205,124,45,0.25)") : "#E8E8E4"}`,
                         minWidth: 64,
                         textAlign: "center",
                       }}>
                         <div style={{
                           fontSize: 16,
                           fontWeight: 800,
-                          fontFamily: "Syne, sans-serif",
-                          color: isTop3 ? (rank === 1 ? "#fbbf24" : rank === 2 ? "#d1d5db" : "#f0a060") : "#a5b4fc",
+                          fontFamily: "var(--font-sans)",
+                          color: isTop3 ? (rank === 1 ? "#B45309" : rank === 2 ? "#9B9B94" : "#B45309") : "#6B6B66",
                         }}>
                           {builder.points}
                         </div>
-                        <div style={{ fontSize: 9, color: "#4a5568", fontWeight: 600 }}>PTS</div>
+                        <div style={{ fontSize: 9, color: "#9B9B94", fontWeight: 600 }}>PTS</div>
                       </div>
                     </div>
                   </div>
@@ -403,9 +403,9 @@ export default function LeaderboardPage() {
           <h2 style={sectionTitleStyle}>Top Universities</h2>
 
           {loading ? (
-            <div style={{ padding: "24px 0", textAlign: "center", color: "#4a5568", fontSize: 14 }}>Loading…</div>
+            <div style={{ padding: "24px 0", textAlign: "center", color: "#9B9B94", fontSize: 14 }}>Loading…</div>
           ) : universities.length === 0 ? (
-            <p style={{ color: "#4a5568", fontSize: 14 }}>No university data yet.</p>
+            <p style={{ color: "#9B9B94", fontSize: 14 }}>No university data yet.</p>
           ) : (
             <div style={{ display: "grid", gap: 14 }}>
               {universities.map((uni, idx) => {
@@ -414,7 +414,7 @@ export default function LeaderboardPage() {
                 return (
                   <div key={uni.name} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     {/* Rank + flag */}
-                    <div style={{ width: 28, textAlign: "center", flexShrink: 0, fontSize: 13, fontWeight: 700, color: "#4a5568" }}>
+                    <div style={{ width: 28, textAlign: "center", flexShrink: 0, fontSize: 13, fontWeight: 700, color: "#9B9B94" }}>
                       {idx + 1}
                     </div>
                     <div style={{ fontSize: 24, flexShrink: 0 }}>{uni.flag}</div>
@@ -422,19 +422,19 @@ export default function LeaderboardPage() {
                     {/* Name + bar */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                        <span style={{ fontSize: 14, fontWeight: 600, color: "#f0f4f8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: "#1A1A18", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {uni.name}
                         </span>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#a5b4fc", flexShrink: 0, marginLeft: 12 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#6B6B66", flexShrink: 0, marginLeft: 12 }}>
                           {uni.count} {uni.count === 1 ? "builder" : "builders"}
                         </span>
                       </div>
-                      <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.05)", overflow: "hidden" }}>
+                      <div style={{ height: 5, borderRadius: 3, background: "#F7F7F5", overflow: "hidden" }}>
                         <div style={{
                           height: "100%",
                           width: `${barPct}%`,
                           borderRadius: 3,
-                          background: "linear-gradient(90deg, #6366f1, #818cf8)",
+                          background: "linear-gradient(90deg, #6366f1, #6B6B66)",
                           transition: "width 0.5s ease",
                         }} />
                       </div>
@@ -448,7 +448,7 @@ export default function LeaderboardPage() {
 
         {/* CTA */}
         <div className="animate-fade-up animate-delay-3" style={{ textAlign: "center", marginTop: 32 }}>
-          <p style={{ color: "#4a5568", fontSize: 14, marginBottom: 16 }}>
+          <p style={{ color: "#9B9B94", fontSize: 14, marginBottom: 16 }}>
             Earn points by building projects, growing your network, and getting skill endorsements.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -466,44 +466,44 @@ export default function LeaderboardPage() {
 const pageStyle: React.CSSProperties = {
   minHeight: "100vh",
   background: "var(--background)",
-  color: "white",
+  color: "var(--text-primary)",
   padding: "0 24px",
   position: "relative",
 };
 
 const pageTitleStyle: React.CSSProperties = {
   fontSize: "clamp(28px, 4vw, 42px)",
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
-  color: "#f0f4f8",
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
+  color: "#1A1A18",
   letterSpacing: "-0.03em",
   marginBottom: 8,
 };
 
 const pageSubtitleStyle: React.CSSProperties = {
-  color: "#6b7280",
+  color: "#9B9B94",
   fontSize: 15,
 };
 
 const pointPillStyle: React.CSSProperties = {
   fontSize: 13,
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "#F7F7F5",
+  border: "1px solid #EFEFEC",
   borderRadius: 20,
   padding: "5px 14px",
 };
 
 const cardStyle: React.CSSProperties = {
-  background: "linear-gradient(145deg, #0d1117 0%, #111820 100%)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "linear-gradient(145deg, #FFFFFF 0%, #111820 100%)",
+  border: "1px solid #EFEFEC",
   borderRadius: 16,
   padding: "24px 28px",
 };
 
 const sectionTitleStyle: React.CSSProperties = {
   fontSize: 17,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
-  color: "#f0f4f8",
+  color: "#1A1A18",
   marginBottom: 20,
 };

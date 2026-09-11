@@ -13,9 +13,10 @@ export default function Footer() {
   return (
     <footer
       style={{
-        borderTop: "1px solid rgba(255,255,255,0.05)",
+        borderTop: "1px solid var(--border)",
         padding: "40px 24px",
         marginTop: "auto",
+        background: "var(--background)",
       }}
     >
       <div
@@ -30,23 +31,22 @@ export default function Footer() {
         }}
       >
         <Logo size="sm" />
-        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-          © {new Date().getFullYear()} ProjectHub · yigitalpyazici53@gmail.com
+        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+          © {new Date().getFullYear()} ProjectHub
         </div>
-        <div style={{ display: "flex", gap: "20px" }}>
+        <div style={{ display: "flex", gap: 20 }}>
           {[
             { label: "Terms", href: "/terms" },
             { label: "Privacy", href: "/privacy" },
-            { label: "Contact", href: "mailto:yigitalpyazici53@gmail.com" },
+            { label: "GitHub", href: "https://github.com" },
           ].map((item) => (
             <Link
               key={item.label}
               href={item.href}
+              className="u-link"
               style={{
-                fontSize: "12px",
+                fontSize: 12,
                 color: "var(--text-muted)",
-                textDecoration: "none",
-                transition: "color 0.15s",
               }}
             >
               {item.label}

@@ -11,7 +11,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getAvatarColor(id: string): string {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6"];
   return colors[id.charCodeAt(0) % colors.length];
 }
 
@@ -39,7 +39,7 @@ interface Conversation {
 
 export default function MessagesPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", color: "#8b9ab0", fontSize: 14 }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B6B66", fontSize: 14 }}>Loading…</div>}>
       <MessagesInner />
     </Suspense>
   );
@@ -297,7 +297,7 @@ function MessagesInner() {
     return (
       <main style={pageStyle}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-          <div style={{ color: "#8b9ab0", fontSize: 14 }}>Loading conversations…</div>
+          <div style={{ color: "#6B6B66", fontSize: 14 }}>Loading conversations…</div>
         </div>
       </main>
     );
@@ -320,14 +320,14 @@ function MessagesInner() {
           {conversations.length === 0 ? (
             <div style={emptyConvStyle}>
               <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style={{ marginBottom: 18 }}>
-                <rect x="6" y="12" width="32" height="24" rx="6" fill="rgba(99,102,241,0.1)" stroke="rgba(99,102,241,0.5)" strokeWidth="1.5"/>
-                <rect x="18" y="22" width="32" height="24" rx="6" fill="rgba(99,102,241,0.06)" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5"/>
-                <circle cx="16" cy="24" r="2" fill="rgba(165,180,252,0.55)"/>
-                <circle cx="23" cy="24" r="2" fill="rgba(165,180,252,0.55)"/>
-                <circle cx="30" cy="24" r="2" fill="rgba(165,180,252,0.55)"/>
+                <rect x="6" y="12" width="32" height="24" rx="6" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5"/>
+                <rect x="18" y="22" width="32" height="24" rx="6" fill="#F5F5F3" stroke="#E8E8E4" strokeWidth="1.5"/>
+                <circle cx="16" cy="24" r="2" fill="#9B9B94"/>
+                <circle cx="23" cy="24" r="2" fill="#9B9B94"/>
+                <circle cx="30" cy="24" r="2" fill="#9B9B94"/>
               </svg>
-              <p style={{ color: "var(--text-primary, #e2e8f0)", fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 14, marginBottom: 6 }}>No conversations yet</p>
-              <p style={{ color: "var(--text-secondary, #94a3b8)", fontSize: 12, lineHeight: 1.6, marginBottom: 18 }}>
+              <p style={{ color: "var(--text-primary, #1A1A18)", fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 14, marginBottom: 6 }}>No conversations yet</p>
+              <p style={{ color: "var(--text-secondary, #6B6B66)", fontSize: 12, lineHeight: 1.6, marginBottom: 18 }}>
                 Connect with builders to start messaging.
               </p>
               <a href="/connections" style={{ fontSize: 13, color: "var(--accent-bright)", textDecoration: "none", fontWeight: 600 }}>
@@ -392,17 +392,17 @@ function MessagesInner() {
           {!activePartnerId ? (
             <div style={noChatStyle}>
               <svg width="88" height="88" viewBox="0 0 88 88" fill="none" style={{ marginBottom: 24 }}>
-                <circle cx="44" cy="44" r="42" stroke="rgba(99,102,241,0.12)" strokeWidth="1.5" strokeDasharray="6 3"/>
-                <rect x="18" y="28" width="34" height="26" rx="7" fill="rgba(99,102,241,0.1)" stroke="rgba(99,102,241,0.4)" strokeWidth="1.5"/>
-                <rect x="36" y="38" width="34" height="26" rx="7" fill="rgba(99,102,241,0.06)" stroke="rgba(99,102,241,0.25)" strokeWidth="1.5"/>
-                <circle cx="28" cy="41" r="2" fill="rgba(165,180,252,0.6)"/>
-                <circle cx="35" cy="41" r="2" fill="rgba(165,180,252,0.6)"/>
-                <circle cx="42" cy="41" r="2" fill="rgba(165,180,252,0.6)"/>
+                <circle cx="44" cy="44" r="42" stroke="#F5F5F3" strokeWidth="1.5" strokeDasharray="6 3"/>
+                <rect x="18" y="28" width="34" height="26" rx="7" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5"/>
+                <rect x="36" y="38" width="34" height="26" rx="7" fill="#F5F5F3" stroke="#E8E8E4" strokeWidth="1.5"/>
+                <circle cx="28" cy="41" r="2" fill="#9B9B94"/>
+                <circle cx="35" cy="41" r="2" fill="#9B9B94"/>
+                <circle cx="42" cy="41" r="2" fill="#9B9B94"/>
               </svg>
-              <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--text-primary, #e2e8f0)", marginBottom: 8 }}>
+              <h2 style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 18, color: "var(--text-primary, #1A1A18)", marginBottom: 8 }}>
                 Your messages
               </h2>
-              <p style={{ color: "var(--text-secondary, #94a3b8)", fontSize: 14, maxWidth: 260, lineHeight: 1.65 }}>
+              <p style={{ color: "var(--text-secondary, #6B6B66)", fontSize: 14, maxWidth: 260, lineHeight: 1.65 }}>
                 Select a conversation on the left to read and send messages.
               </p>
             </div>
@@ -419,7 +419,7 @@ function MessagesInner() {
                     )}
                   </div>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", fontFamily: "Syne, sans-serif" }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-sans)" }}>
                       {activeConv.partner.full_name || activeConv.partner.username}
                     </div>
                     {activeConv.partner.role && (
@@ -439,12 +439,12 @@ function MessagesInner() {
                   <div style={{ textAlign: "center", paddingTop: 64 }}>
                     <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style={{ marginBottom: 14, opacity: 0.65 }}>
                       <path d="M26 6C15.507 6 7 13.611 7 23c0 4.587 1.935 8.756 5.088 11.79L9 43l9.26-2.94A20.01 20.01 0 0026 41c10.493 0 19-7.611 19-18S36.493 6 26 6z"
-                        fill="rgba(99,102,241,0.1)" stroke="rgba(99,102,241,0.5)" strokeWidth="1.5" strokeLinejoin="round"/>
-                      <circle cx="19" cy="23" r="2" fill="rgba(165,180,252,0.6)"/>
-                      <circle cx="26" cy="23" r="2" fill="rgba(165,180,252,0.6)"/>
-                      <circle cx="33" cy="23" r="2" fill="rgba(165,180,252,0.6)"/>
+                        fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" strokeLinejoin="round"/>
+                      <circle cx="19" cy="23" r="2" fill="#9B9B94"/>
+                      <circle cx="26" cy="23" r="2" fill="#9B9B94"/>
+                      <circle cx="33" cy="23" r="2" fill="#9B9B94"/>
                     </svg>
-                    <p style={{ color: "var(--text-secondary, #94a3b8)", fontSize: 13 }}>No messages yet — say hello!</p>
+                    <p style={{ color: "var(--text-secondary, #6B6B66)", fontSize: 13 }}>No messages yet — say hello!</p>
                   </div>
                 ) : (
                   <>
@@ -458,11 +458,11 @@ function MessagesInner() {
                         <div key={msg.id}>
                           {showDate && (
                             <div style={dateDividerStyle}>
-                              <span style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
+                              <span style={{ flex: 1, height: 1, background: "#EFEFEC" }} />
                               <span style={{ padding: "0 12px", fontSize: 11, color: "var(--text-muted)", whiteSpace: "nowrap" }}>
                                 {new Date(msg.created_at).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
                               </span>
-                              <span style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
+                              <span style={{ flex: 1, height: 1, background: "#EFEFEC" }} />
                             </div>
                           )}
                           <div style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start", marginBottom: 6 }}>
@@ -472,17 +472,17 @@ function MessagesInner() {
                                 padding: "10px 14px",
                                 borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
                                 background: isMe
-                                  ? "linear-gradient(135deg, var(--accent), var(--accent-hover))"
+                                  ? "#1A1A18"
                                   : "var(--surface-raised)",
                                 color: isMe ? "white" : "var(--text-primary)",
                                 fontSize: 14,
                                 lineHeight: 1.55,
-                                border: isMe ? "none" : "1px solid rgba(255,255,255,0.1)",
-                                boxShadow: isMe ? "0 2px 12px var(--accent-glow)" : "0 1px 4px rgba(0,0,0,0.3)",
+                                border: isMe ? "none" : "1px solid #E8E8E4",
+                                boxShadow: isMe ? "0 2px 12px transparent" : "0 1px 4px rgba(26,26,24,0.08)",
                               }}
                             >
                               <div>{msg.content}</div>
-                              <div style={{ fontSize: 10, color: isMe ? "rgba(255,255,255,0.6)" : "var(--text-muted)", marginTop: 4, textAlign: "right" }}>
+                              <div style={{ fontSize: 10, color: isMe ? "#E8E8E4" : "var(--text-muted)", marginTop: 4, textAlign: "right" }}>
                                 {formatTime(msg.created_at)}
                               </div>
                             </div>
@@ -498,7 +498,7 @@ function MessagesInner() {
               {/* Input bar */}
               <div style={inputBarStyle}>
                 {sendError && (
-                  <p style={{ color: "#f87171", fontSize: 12, marginBottom: 6, paddingLeft: 4 }}>{sendError}</p>
+                  <p style={{ color: "#B91C1C", fontSize: 12, marginBottom: 6, paddingLeft: 4 }}>{sendError}</p>
                 )}
                 <div style={inputContainerStyle}>
                   <textarea
@@ -539,7 +539,7 @@ function MessagesInner() {
 const pageStyle: React.CSSProperties = {
   minHeight: "100vh",
   background: "var(--background)",
-  color: "white",
+  color: "var(--text-primary)",
   paddingTop: 68,
 };
 
@@ -552,7 +552,7 @@ const layoutStyle: React.CSSProperties = {
 const sidebarStyle: React.CSSProperties = {
   width: 300,
   minWidth: 240,
-  borderRight: "1px solid rgba(255,255,255,0.08)",
+  borderRight: "1px solid #EFEFEC",
   display: "flex",
   flexDirection: "column",
   background: "var(--surface)",
@@ -560,17 +560,17 @@ const sidebarStyle: React.CSSProperties = {
 
 const sidebarHeaderStyle: React.CSSProperties = {
   padding: "22px 18px 16px",
-  borderBottom: "1px solid rgba(255,255,255,0.07)",
+  borderBottom: "1px solid #EFEFEC",
   display: "flex",
   alignItems: "center",
   gap: 8,
 };
 
 const sidebarTitleStyle: React.CSSProperties = {
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   fontSize: 18,
-  color: "var(--text-primary, #f0f4f8)",
+  color: "var(--text-primary, #1A1A18)",
   letterSpacing: "-0.02em",
 };
 
@@ -597,6 +597,9 @@ const emptyConvStyle: React.CSSProperties = {
   justifyContent: "center",
   padding: "32px 24px",
   textAlign: "center",
+  background: "#F7F7F5",
+  borderRadius: 16,
+  margin: 12,
 };
 
 const convItemStyle: React.CSSProperties = {
@@ -664,10 +667,10 @@ const chatHeaderStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 12,
   padding: "14px 24px",
-  borderBottom: "1px solid rgba(255,255,255,0.07)",
+  borderBottom: "1px solid #EFEFEC",
   background: "var(--surface)",
   flexShrink: 0,
-  boxShadow: "0 1px 0 rgba(255,255,255,0.04)",
+  boxShadow: "0 1px 0 #F7F7F5",
 };
 
 const messagesAreaStyle: React.CSSProperties = {
@@ -686,7 +689,7 @@ const dateDividerStyle: React.CSSProperties = {
 
 const inputBarStyle: React.CSSProperties = {
   padding: "12px 20px 18px",
-  borderTop: "1px solid rgba(255,255,255,0.07)",
+  borderTop: "1px solid #EFEFEC",
   background: "var(--surface)",
   flexShrink: 0,
 };
@@ -695,8 +698,8 @@ const inputContainerStyle: React.CSSProperties = {
   display: "flex",
   gap: 10,
   alignItems: "flex-end",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "#F7F7F5",
+  border: "1px solid #E8E8E4",
   borderRadius: 14,
   padding: "6px 6px 6px 16px",
 };
@@ -706,12 +709,12 @@ const textareaStyle: React.CSSProperties = {
   padding: "8px 0",
   background: "transparent",
   border: "none",
-  color: "var(--text-primary, #f0f4f8)",
+  color: "var(--text-primary, #1A1A18)",
   fontSize: 14,
   outline: "none",
   resize: "none",
   lineHeight: 1.5,
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   minHeight: 36,
   maxHeight: 120,
 };
@@ -720,7 +723,7 @@ const sendBtnStyle: React.CSSProperties = {
   width: 38,
   height: 38,
   borderRadius: 10,
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+  background: "#1A1A18",
   border: "none",
   color: "white",
   display: "flex",
@@ -728,5 +731,5 @@ const sendBtnStyle: React.CSSProperties = {
   justifyContent: "center",
   flexShrink: 0,
   transition: "opacity 0.15s ease",
-  boxShadow: "0 2px 10px var(--accent-glow)",
+  boxShadow: "0 2px 10px transparent",
 };

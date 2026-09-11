@@ -5,67 +5,13 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import { getInitials } from "@/utils/getInitials";
+import { avatarTint } from "@/utils/category";
+import { Reveal } from "@/components/motion/Reveal";
 import type { Profile } from "@/types";
 
 export const dynamic = "force-dynamic";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function getRoleColor(role?: string | null) {
-  const r = (role ?? "").toLowerCase();
-  if (r.includes("design") || r.includes("ui") || r.includes("ux")) {
-    return { accent: "#ec4899", badgeBg: "rgba(236,72,153,0.1)", badgeText: "#f9a8d4", badgeBorder: "rgba(236,72,153,0.25)", avatarBg: "rgba(236,72,153,0.12)", avatarText: "#f9a8d4" };
-  }
-  if (r.includes("health") || r.includes("medical") || r.includes("bio")) {
-    return { accent: "#10b981", badgeBg: "rgba(16,185,129,0.1)", badgeText: "#6ee7b7", badgeBorder: "rgba(16,185,129,0.25)", avatarBg: "rgba(16,185,129,0.12)", avatarText: "#6ee7b7" };
-  }
-  if (r.includes("market") || r.includes("growth") || r.includes("sales")) {
-    return { accent: "#f59e0b", badgeBg: "rgba(245,158,11,0.1)", badgeText: "#fcd34d", badgeBorder: "rgba(245,158,11,0.25)", avatarBg: "rgba(245,158,11,0.12)", avatarText: "#fcd34d" };
-  }
-  return { accent: "#a855f7", badgeBg: "rgba(168,85,247,0.1)", badgeText: "#d8b4fe", badgeBorder: "rgba(168,85,247,0.25)", avatarBg: "rgba(168,85,247,0.12)", avatarText: "#d8b4fe" };
-}
-
-function timeAgo(dateString?: string) {
-  if (!dateString) return "";
-  const diff = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
-  if (diff < 60) return "just now";
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
-  return `${Math.floor(diff / 2592000)}mo ago`;
-}
-
-const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-function isNew(dateString?: string) {
-  if (!dateString) return false;
-  return Date.now() - new Date(dateString).getTime() < SEVEN_DAYS;
-}
-
 // ── Sub-components ────────────────────────────────────────────────────────────
-
-function StatPill({ label, value, live, accent }: { label: string; value: number; live?: boolean; accent?: boolean }) {
-  const color = accent ? "#4ade80" : "var(--accent-bright)";
-  const bg = accent ? "rgba(74,222,128,0.08)" : "color-mix(in srgb, var(--accent) 8%, transparent)";
-  const border = accent ? "rgba(74,222,128,0.22)" : "color-mix(in srgb, var(--accent) 22%, transparent)";
-  return (
-    <div style={{
-      display: "inline-flex", alignItems: "center", gap: 8,
-      padding: "8px 14px", borderRadius: 999,
-      background: bg, border: `1px solid ${border}`,
-      fontSize: 13, color: "#e2e8f0", fontWeight: 500,
-    }}>
-      {live && (
-        <span style={{
-          width: 7, height: 7, borderRadius: "50%",
-          background: "#4ade80", boxShadow: "0 0 0 3px rgba(74,222,128,0.18)",
-          flexShrink: 0,
-        }} />
-      )}
-      <span style={{ color, fontWeight: 700, fontFamily: "Syne, sans-serif" }}>{value}</span>
-      <span style={{ color: "#8b9ab0" }}>{label}</span>
-    </div>
-  );
-}
 
 function EmptyState({
   filtered,
@@ -78,63 +24,24 @@ function EmptyState({
 }) {
   return (
     <div style={{ display: "flex", justifyContent: "center", padding: "52px 24px" }}>
-      <div style={{
-        maxWidth: 460,
-        width: "100%",
-        textAlign: "center",
-        background: "rgba(255,255,255,0.025)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 20,
-        padding: "52px 40px 44px",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        <div style={{
-          position: "absolute", top: 0, left: "50%",
-          transform: "translateX(-50%)",
-          width: 320, height: 180,
-          background: "radial-gradient(ellipse at top, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
-
-        <div style={{
-          width: 64, height: 64, borderRadius: "50%",
-          background: "color-mix(in srgb, var(--accent) 10%, transparent)",
-          border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 28px",
-        }}>
-          {filtered ? (
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="7" stroke="rgba(165,180,252,0.85)" strokeWidth="1.5" />
-              <path d="M16.5 16.5L21 21" stroke="rgba(165,180,252,0.85)" strokeWidth="1.5" strokeLinecap="round" />
-              <path d="M8 11h6M11 8v6" stroke="rgba(165,180,252,0.55)" strokeWidth="1.3" strokeLinecap="round" />
-            </svg>
-          ) : (
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="4" stroke="rgba(165,180,252,0.85)" strokeWidth="1.5" />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-                stroke="rgba(165,180,252,0.85)" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          )}
-        </div>
-
-        <h3 style={{
-          fontFamily: "Syne, sans-serif", fontSize: 20, fontWeight: 700,
-          color: "#eef2ff", marginBottom: 10, lineHeight: 1.35,
+      <div className="empty-state-panel" style={{ maxWidth: 460, width: "100%" }}>
+        <div aria-hidden="true" style={{ fontSize: 48, lineHeight: 1, marginBottom: 20 }}>🧭</div>
+        <h3 className="font-serif" style={{
+          fontSize: 22, fontWeight: 500,
+          color: "var(--text-primary)", marginBottom: 10, lineHeight: 1.35,
         }}>
           {filtered
             ? "No builders match those filters."
-            : "No builders yet. Complete your profile to be listed."}
+            : "No builders listed yet."}
         </h3>
 
         <p style={{
-          fontSize: 14, color: "#6b7280",
+          fontSize: 14, color: "var(--text-secondary)",
           maxWidth: 340, margin: "0 auto 30px", lineHeight: 1.65,
         }}>
           {filtered
             ? "Try adjusting the search or role filter — or complete your own profile to show up here."
-            : "Founders are actively looking for collaborators. Add your skills and you'll appear in their searches."}
+            : "Complete your profile and document what you've built to be listed in the directory."}
         </p>
 
         {filtered ? (
@@ -145,7 +52,7 @@ function EmptyState({
               </button>
             )}
             <Link href={authed ? "/profile/edit" : "/login?next=/profile/edit"} className="btn-primary">
-              Complete Profile
+              Complete profile
             </Link>
           </div>
         ) : (
@@ -155,9 +62,9 @@ function EmptyState({
               className="btn-primary"
               style={{ padding: "11px 32px", fontSize: 15 }}
             >
-              Complete Profile →
+              Complete profile →
             </Link>
-            <Link href="/projects" style={{ fontSize: 13, color: "#4b5563", textDecoration: "none" }}>
+            <Link href="/projects" className="u-link" style={{ fontSize: 13, color: "var(--text-muted)" }}>
               Browse projects instead
             </Link>
           </div>
@@ -171,6 +78,7 @@ function EmptyState({
 
 export default function BuildersPage() {
   const [builders, setBuilders] = useState<Profile[]>([]);
+  const [shippedByOwner, setShippedByOwner] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -200,6 +108,19 @@ export default function BuildersPage() {
         } else {
           setBuilders((data ?? []) as Profile[]);
         }
+
+        // Shipped-project counts per builder (client-side aggregation)
+        const { data: shippedRows } = await supabase
+          .from("projects")
+          .select("owner_id, stage")
+          .eq("stage", "launched");
+        if (shippedRows) {
+          const counts: Record<string, number> = {};
+          (shippedRows as { owner_id: string | null }[]).forEach((r) => {
+            if (r.owner_id) counts[r.owner_id] = (counts[r.owner_id] ?? 0) + 1;
+          });
+          setShippedByOwner(counts);
+        }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Unexpected error loading builders.");
       } finally {
@@ -215,19 +136,6 @@ export default function BuildersPage() {
   }, []);
 
   const roles = ["All", ...Array.from(new Set(builders.map((b) => b.role).filter(Boolean) as string[]))];
-
-  const totalBuilders = builders.length;
-  const universities = new Set(
-    builders.map((b) => (b.university ?? "").trim()).filter(Boolean)
-  ).size;
-  const skillSet = new Set<string>();
-  builders.forEach((b) => {
-    (b.skills ?? "").split(",").forEach((s) => {
-      const t = s.trim();
-      if (t) skillSet.add(t.toLowerCase());
-    });
-  });
-  const joinedThisWeek = builders.filter((b) => isNew(b.created_at)).length;
 
   const filtered = builders
     .filter((b) => {
@@ -246,43 +154,36 @@ export default function BuildersPage() {
 
   return (
     <main style={pageStyle}>
-      <div className="page-grid-bg" />
-      <div className="page-radial-glow" />
-      <div className="page-z" style={{ maxWidth: 1200, margin: "0 auto", paddingTop: "80px" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto", paddingTop: 80 }}>
 
-        <div className="animate-fade-up" style={{ marginBottom: 20 }}>
-          <h1 style={titleStyle}>Serious Builders</h1>
-          <p style={mutedStyle}>Real builders shipping real projects. Find the teammate your project needs.</p>
-        </div>
-
-        {!loading && totalBuilders > 0 && (
-          <div className="animate-fade-up animate-delay-1" style={statsRowStyle}>
-            <StatPill label="Builders" value={totalBuilders} live />
-            {universities > 0 && <StatPill label={universities === 1 ? "University" : "Universities"} value={universities} />}
-            {skillSet.size > 0 && <StatPill label={skillSet.size === 1 ? "Skill" : "Skills"} value={skillSet.size} />}
-            {joinedThisWeek > 0 && <StatPill label="Joined this week" value={joinedThisWeek} accent />}
+        <Reveal>
+          <div style={{ marginBottom: 32 }}>
+            <h1 className="font-serif" style={titleStyle}>Builders</h1>
+            <p style={mutedStyle}>Student builders with a track record you can verify.</p>
           </div>
-        )}
+        </Reveal>
 
         {!loading && (
-          <div className="animate-fade-up animate-delay-1" style={searchRowStyle}>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, role, university…"
-              style={searchInputStyle}
-            />
-            <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={selectStyle} className="role-filter-select">
-              {roles.map((r) => (
-                <option key={r} value={r}>{r === "All" ? "All Roles" : r}</option>
-              ))}
-            </select>
-          </div>
+          <Reveal delay={0.08}>
+            <div style={searchRowStyle}>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name, role, university…"
+                style={searchInputStyle}
+              />
+              <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={selectStyle} className="role-filter-select" aria-label="Filter by role">
+                {roles.map((r) => (
+                  <option key={r} value={r}>{r === "All" ? "All roles" : r}</option>
+                ))}
+              </select>
+            </div>
+          </Reveal>
         )}
 
         {loading && <SkeletonLoader count={6} />}
-        {error && <p className="animate-fade-up animate-delay-1" style={errorStyle}>{error}</p>}
+        {error && <p style={errorStyle}>{error}</p>}
         {!loading && !error && filtered.length === 0 && (
           <EmptyState
             filtered={builders.length > 0}
@@ -292,44 +193,38 @@ export default function BuildersPage() {
         )}
 
         {!loading && filtered.length > 0 && (
-          <div className="animate-fade-up animate-delay-2" style={gridStyle}>
-            {filtered.map((builder) => {
-              const color = getRoleColor(builder.role);
-              const skills = (builder.skills ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-              const featuredSkills = skills.slice(0, 2);
-              const extraSkills = skills.slice(2, 4);
+          <Reveal delay={0.16}>
+            <div style={gridStyle} className="builders-grid">
+              {filtered.map((builder) => {
+                const skills = (builder.skills ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+                const shipped = shippedByOwner[builder.id] ?? 0;
+                const href = `/builders/${builder.username || builder.id}`;
 
-              return (
-                <article
-                  key={builder.id}
-                  style={cardBase}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.setProperty("border-color", "var(--border-highlight)");
-                    el.style.transform = "translateY(-2px)";
-                    el.style.boxShadow = "0 12px 32px rgba(0,0,0,0.45)";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.setProperty("border-color", "var(--border)");
-                    el.style.transform = "translateY(0)";
-                    el.style.boxShadow = "none";
-                  }}
-                >
-                  {/* Colored top accent line */}
-                  <div style={{ height: 2, background: color.accent, borderRadius: "14px 14px 0 0" }} />
+                return (
+                  <article
+                    key={builder.id}
+                    className="card-hover"
+                    style={cardBase}
+                  >
+                    {/* Stretched link — whole card opens the profile */}
+                    <Link
+                      href={href}
+                      aria-label={`Open ${builder.full_name || builder.username || "builder"}'s profile`}
+                      style={{ position: "absolute", inset: 0, zIndex: 1, borderRadius: 12 }}
+                    />
 
-                  <div style={{ padding: "18px 20px 20px" }}>
-                    {/* Header: avatar + name + handle */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+                    {/* Header: avatar + name */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                        background: color.avatarBg, border: `1px solid ${color.badgeBorder}`,
+                        background: avatarTint(builder.full_name || builder.username),
+                        border: "1px solid var(--border)",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 13, fontFamily: "Syne, sans-serif", fontWeight: 700, color: color.avatarText,
-                        letterSpacing: "0.04em", overflow: "hidden",
+                        fontSize: 15, fontWeight: 600, color: "var(--text-primary)",
+                        overflow: "hidden",
                       }}>
                         {builder.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={builder.avatar_url}
                             alt={builder.full_name || builder.username || "builder"}
@@ -341,162 +236,118 @@ export default function BuildersPage() {
                         )}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                          <h2 style={{ fontSize: 16, fontFamily: "Syne, sans-serif", fontWeight: 700, color: "#f0f4f8", marginBottom: 2, lineHeight: 1.2, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                        <div style={{ display: "flex", alignItems: "baseline", gap: 10, minWidth: 0 }}>
+                          <h2 className="font-serif" style={{
+                            fontSize: 18, fontWeight: 500, color: "var(--text-primary)",
+                            lineHeight: 1.25, marginBottom: 2,
+                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          }}>
                             {builder.full_name || builder.username || "Unnamed Builder"}
-                            {isNew(builder.created_at) && !builder.is_ai_generated && (
-                              <span style={{
-                                fontSize: 9, fontWeight: 700, letterSpacing: "0.08em",
-                                color: "#4ade80", background: "rgba(74,222,128,0.12)",
-                                border: "1px solid rgba(74,222,128,0.28)",
-                                borderRadius: 4, padding: "2px 6px", textTransform: "uppercase",
-                              }}>
-                                New
-                              </span>
-                            )}
-                            {builder.is_ai_generated && (
-                              <span style={{
-                                fontSize: 9, fontWeight: 700, letterSpacing: "0.06em",
-                                color: "#64748b", background: "rgba(139,154,176,0.07)",
-                                border: "1px solid rgba(139,154,176,0.18)",
-                                borderRadius: 4, padding: "2px 6px", textTransform: "uppercase",
-                              }}>
-                                Example
-                              </span>
-                            )}
                           </h2>
-                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
-                            {builder.role && (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700, color: color.badgeText,
-                                background: color.badgeBg, border: `1px solid ${color.badgeBorder}`,
-                                borderRadius: 6, padding: "2px 7px", whiteSpace: "nowrap",
-                              }}>
-                                {builder.role}
-                              </span>
-                            )}
-                          </div>
+                          {shipped > 0 && (
+                            <span style={{
+                              fontSize: 11, fontWeight: 500, color: "#0F6E56",
+                              whiteSpace: "nowrap", flexShrink: 0,
+                            }}>
+                              ✓ {shipped} shipped
+                            </span>
+                          )}
                         </div>
-                        <p style={{ fontSize: 12, color: "var(--accent)", fontWeight: 500 }}>
-                          @{builder.username || "no-username"}
-                        </p>
+                        <div className="label-caps" style={{
+                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                        }}>
+                          {[builder.university, builder.role].filter(Boolean).join(" · ") || `@${builder.username}`}
+                        </div>
                       </div>
+                      {builder.is_ai_generated && (
+                        <span style={{
+                          fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
+                          color: "var(--text-muted)", background: "#F5F5F3",
+                          whiteSpace: "nowrap", flexShrink: 0,
+                        }}>
+                          example
+                        </span>
+                      )}
                     </div>
 
-                    {/* Bio */}
-                    {builder.bio && (
-                      <p style={{ fontSize: 13, color: "#8b9ab0", lineHeight: 1.55, marginBottom: 14 }}>
-                        {builder.bio.length > 110 ? builder.bio.slice(0, 110) + "…" : builder.bio}
-                      </p>
-                    )}
+                    {/* Bio — first line only, truncated */}
+                    {builder.bio && (() => {
+                      const firstLine = builder.bio.split("\n")[0].trim();
+                      if (!firstLine) return null;
+                      return (
+                        <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.55, marginBottom: 14 }}>
+                          {firstLine.length > 80 ? firstLine.slice(0, 80) + "…" : firstLine}
+                        </p>
+                      );
+                    })()}
 
                     {/* Skills pills */}
                     {skills.length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
-                        {featuredSkills.map((s) => (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 4 }}>
+                        {skills.slice(0, 4).map((s) => (
                           <span key={s} style={{
-                            fontSize: 11, fontWeight: 600, color: "var(--accent-bright)",
-                            background: "color-mix(in srgb, var(--accent) 10%, transparent)",
-                            border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
-                            borderRadius: 6, padding: "3px 9px",
-                          }}>
-                            {s}
-                          </span>
-                        ))}
-                        {extraSkills.map((s) => (
-                          <span key={s} style={{
-                            fontSize: 11, fontWeight: 500, color: "#6b7280",
-                            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                            borderRadius: 6, padding: "3px 9px",
+                            fontSize: 11, fontWeight: 400, color: "var(--text-secondary)",
+                            background: "#F5F5F3",
+                            borderRadius: 999, padding: "3px 10px",
                           }}>
                             {s}
                           </span>
                         ))}
                         {skills.length > 4 && (
-                          <span style={{ fontSize: 11, color: "#4b5563", padding: "3px 4px" }}>+{skills.length - 4}</span>
+                          <span style={{ fontSize: 11, color: "var(--text-muted)", padding: "3px 4px" }}>+{skills.length - 4}</span>
                         )}
                       </div>
                     )}
 
-                    {/* Footer: university + action buttons */}
+                    {/* Footer: view link */}
                     <div style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
-                      paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.05)",
+                      paddingTop: 14, marginTop: "auto", borderTop: "1px solid var(--border-subtle)",
                     }}>
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        {builder.university && (
-                          <div style={{ fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            🎓 {builder.university}
-                          </div>
-                        )}
-                        {builder.created_at && (
-                          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: builder.university ? 2 : 0 }}>
-                            Joined {timeAgo(builder.created_at)}
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                        <Link
-                          href={`/builders/${builder.username || builder.id}`}
-                          className="builder-action-btn"
-                          style={{
-                            fontSize: 12, fontWeight: 600, color: "var(--accent-bright)",
-                            background: "color-mix(in srgb, var(--accent) 8%, transparent)",
-                            border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
-                            borderRadius: 8, padding: "6px 11px", textDecoration: "none",
-                            transition: "all 0.15s ease", whiteSpace: "nowrap",
-                          }}
-                        >
-                          View
-                        </Link>
-                        {currentUserId !== builder.id && (
-                          <Link
-                            href={
-                              authed
-                                ? `/builders/${builder.username || builder.id}#connect`
-                                : `/login?next=${encodeURIComponent(`/builders/${builder.username || builder.id}`)}`
-                            }
-                            className="builder-action-btn"
-                            style={{
-                              fontSize: 12, fontWeight: 700, color: "#fff",
-                              background: "var(--gradient-brand)",
-                              border: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)",
-                              borderRadius: 8, padding: "6px 12px", textDecoration: "none",
-                              transition: "all 0.15s ease", whiteSpace: "nowrap",
-                              boxShadow: "0 2px 10px var(--accent-glow)",
-                            }}
-                          >
-                            Connect →
-                          </Link>
-                        )}
-                      </div>
+                      <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                        {currentUserId === builder.id ? "This is you" : ""}
+                      </span>
+                      <span className="u-link" style={{
+                        fontSize: 12, fontWeight: 500, color: "var(--text-primary)",
+                        position: "relative", zIndex: 2,
+                      }}>
+                        View profile →
+                      </span>
                     </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                  </article>
+                );
+              })}
+            </div>
+          </Reveal>
         )}
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .builders-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </main>
   );
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
-const pageStyle: React.CSSProperties = { minHeight: "100vh", background: "var(--background)", color: "white", padding: "40px 24px", position: "relative" };
-const titleStyle: React.CSSProperties = { fontSize: "clamp(28px, 4vw, 42px)", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.03em", marginBottom: 8 };
-const mutedStyle: React.CSSProperties = { color: "var(--text-secondary)", fontSize: 15, marginBottom: 8 };
-const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, marginBottom: 16, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#fca5a5", fontSize: 13 };
-const statsRowStyle: React.CSSProperties = { display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" };
-const searchRowStyle: React.CSSProperties = { display: "flex", gap: 12, marginBottom: 28, flexWrap: "wrap" };
-const searchInputStyle: React.CSSProperties = { flex: 1, minWidth: 200, padding: "11px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", color: "#f0f4f8", fontSize: 14, outline: "none" };
-const selectStyle: React.CSSProperties = { padding: "11px 14px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", color: "#f0f4f8", fontSize: 14, outline: "none", cursor: "pointer" };
-const gridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: 20 };
+const pageStyle: React.CSSProperties = { minHeight: "100vh", background: "var(--background)", color: "var(--text-primary)", padding: "40px 24px", position: "relative" };
+const titleStyle: React.CSSProperties = { fontSize: "clamp(30px, 4vw, 42px)", fontWeight: 500, color: "var(--text-primary)", letterSpacing: "-0.015em", marginBottom: 8 };
+const mutedStyle: React.CSSProperties = { color: "#6B6B66", fontSize: 18, marginBottom: 0 };
+const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, marginBottom: 16, background: "#FEF2F2", border: "1px solid #FECACA", color: "#B91C1C", fontSize: 13 };
+const searchRowStyle: React.CSSProperties = { display: "flex", gap: 12, marginBottom: 32, flexWrap: "wrap" };
+const searchInputStyle: React.CSSProperties = { flex: 1, minWidth: 200, padding: "11px 16px", borderRadius: 8, background: "#FFFFFF", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 14, outline: "none", fontFamily: "var(--font-sans)" };
+const selectStyle: React.CSSProperties = { padding: "11px 14px", borderRadius: 8, background: "#FFFFFF", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 14, outline: "none", cursor: "pointer", fontFamily: "var(--font-sans)" };
+const gridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 16 };
 const cardBase: React.CSSProperties = {
-  background: "var(--surface)",
+  position: "relative",
+  background: "#FFFFFF",
   border: "1px solid var(--border)",
-  borderRadius: 14,
-  overflow: "hidden",
-  transition: "border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease",
+  borderRadius: 12,
+  padding: 24,
+  transition: "border-color 0.18s ease",
+  display: "flex",
+  flexDirection: "column",
 };

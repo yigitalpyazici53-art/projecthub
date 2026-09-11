@@ -1,13 +1,12 @@
 import { Metadata } from "next";
+import { publicMetadata } from "@/utils/seo";
 
-export const metadata: Metadata = {
-  title: "Discover Builders | ProjectHub",
-  description: "Browse ambitious student builders, indie hackers, and young founders on ProjectHub. Find your cofounder or collaborator.",
-  openGraph: {
-    title: "Discover Builders | ProjectHub",
-    description: "Find the right teammate for your startup or side project.",
-  },
-};
+export const metadata: Metadata = publicMetadata({
+  title: "Builders",
+  description: "Browse student builders with verified proof-of-work profiles — shipped projects, endorsed skills, documented progress.",
+  path: "/builders",
+  ogDescription: "Student builders with a track record you can verify.",
+});
 
 export default function BuildersLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

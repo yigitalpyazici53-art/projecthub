@@ -16,7 +16,7 @@ export default function GlobalError({
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#0f1117",
+      background: "#FAFAF8",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -25,23 +25,23 @@ export default function GlobalError({
       <div style={{
         maxWidth: 480,
         width: "100%",
-        background: "#161b27",
-        border: "1px solid rgba(239,68,68,0.25)",
+        background: "#FFFFFF",
+        border: "1px solid #FECACA",
         borderRadius: 16,
         padding: 36,
         textAlign: "center",
       }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
         <h2 style={{
-          fontFamily: "Syne, sans-serif",
+          fontFamily: "var(--font-sans)",
           fontSize: 22,
           fontWeight: 700,
-          color: "#f0f4f8",
+          color: "#1A1A18",
           marginBottom: 10,
         }}>
           Something went wrong
         </h2>
-        <p style={{ color: "#8b9ab0", fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
+        <p style={{ color: "#6B6B66", fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
           An unexpected error occurred. Try again or go back to the dashboard.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -51,7 +51,7 @@ export default function GlobalError({
             style={{
               padding: "10px 20px",
               borderRadius: 10,
-              background: "#6366f1",
+              background: "#1A1A18",
               border: "none",
               color: "white",
               fontWeight: 700,
@@ -66,9 +66,9 @@ export default function GlobalError({
             style={{
               padding: "10px 20px",
               borderRadius: 10,
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: "#d1d5db",
+              background: "#EFEFEC",
+              border: "1px solid #E8E8E4",
+              color: "#9B9B94",
               fontWeight: 600,
               fontSize: 14,
               textDecoration: "none",

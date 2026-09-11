@@ -21,7 +21,7 @@ const AVAILABILITY_OPTIONS = [
 ];
 
 function getAvatarColor(id: string) {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6"];
   return colors[id.charCodeAt(0) % colors.length];
 }
 
@@ -184,7 +184,7 @@ export default function ProfileEditPage() {
               {completionPercent}%
             </span>
           </div>
-          <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: 6, background: "#EFEFEC", borderRadius: 99, overflow: "hidden" }}>
             <div style={{
               height: "100%",
               width: `${completionPercent}%`,
@@ -307,12 +307,12 @@ export default function ProfileEditPage() {
                         borderRadius: 8,
                         fontSize: 13,
                         fontWeight: 600,
-                        fontFamily: "DM Sans, sans-serif",
+                        fontFamily: "var(--font-sans)",
                         cursor: "pointer",
                         transition: "all 0.15s ease",
                         background: active
                           ? "color-mix(in srgb, var(--accent) 18%, transparent)"
-                          : "rgba(255,255,255,0.04)",
+                          : "#F7F7F5",
                         border: active
                           ? "1px solid color-mix(in srgb, var(--accent) 50%, transparent)"
                           : "1px solid var(--border)",
@@ -344,10 +344,10 @@ export default function ProfileEditPage() {
                   width: 84, height: 84, borderRadius: "50%",
                   background: avatarBg,
                   border: "3px solid var(--surface)",
-                  boxShadow: "0 0 0 1px var(--border-highlight), 0 8px 24px color-mix(in srgb, var(--accent) 20%, transparent)",
+                  boxShadow: "0 0 0 1px var(--border-highlight)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0, overflow: "hidden",
-                  fontSize: 26, fontFamily: "Syne, sans-serif", fontWeight: 700, color: "white",
+                  fontSize: 26, fontFamily: "var(--font-sans)", fontWeight: 700, color: "white",
                 }}>
                   {avatarPreview ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -399,7 +399,7 @@ export default function ProfileEditPage() {
                         transition: "all 0.15s ease",
                         background: active
                           ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                          : "rgba(255,255,255,0.02)",
+                          : "#FAFAF8",
                         border: active
                           ? "1px solid color-mix(in srgb, var(--accent) 45%, transparent)"
                           : "1px solid var(--border)",
@@ -411,7 +411,7 @@ export default function ProfileEditPage() {
                         <div style={{
                           fontSize: 13, fontWeight: 700,
                           color: active ? "var(--accent-bright)" : "var(--text-secondary)",
-                          fontFamily: "Syne, sans-serif",
+                          fontFamily: "var(--font-sans)",
                         }}>
                           {opt.value}
                         </div>
@@ -455,7 +455,7 @@ export default function ProfileEditPage() {
           </button>
           {saveMsg && (
             <p style={{
-              color: saveMsg.startsWith("Error") ? "#fca5a5" : "var(--accent-green)",
+              color: saveMsg.startsWith("Error") ? "#B91C1C" : "var(--accent-green)",
               fontSize: 14, fontWeight: 600, marginLeft: 4,
             }}>
               {saveMsg}
@@ -479,8 +479,8 @@ const pageStyle: React.CSSProperties = {
 
 const pageTitleStyle: React.CSSProperties = {
   fontSize: "clamp(26px, 4vw, 34px)",
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   color: "var(--text-primary)",
   letterSpacing: "-0.03em",
   marginBottom: 28,
@@ -495,7 +495,7 @@ const cardStyle: React.CSSProperties = {
 
 const sectionTitleStyle: React.CSSProperties = {
   fontSize: 15,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   color: "var(--text-primary)",
   marginBottom: 18,
@@ -510,7 +510,7 @@ const uploadBtnStyle: React.CSSProperties = {
   fontWeight: 600,
   fontSize: 13,
   cursor: "pointer",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
 };
 
 const labelStyle: React.CSSProperties = {
@@ -527,11 +527,11 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "11px 14px",
   borderRadius: 10,
-  background: "rgba(255,255,255,0.04)",
+  background: "#F7F7F5",
   border: "1px solid var(--border)",
   color: "var(--text-primary)",
   fontSize: 14,
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   outline: "none",
   boxSizing: "border-box",
 };

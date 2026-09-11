@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import type { Project, Profile } from "@/types";
+import { stageBadge } from "@/utils/stage";
+import { categoryBadge } from "@/utils/category";
 
 // Variants are mostly for the parent grid + intent (owner vs visitor); the
 // card body is identical across all three call sites by design.
@@ -11,32 +13,12 @@ interface Props {
   project: Project;
   variant?: Variant;
   ownerProfile?: Profile | null;
-  /** When true, shows "Manage →" instead of "Join project →" (used in dashboard "Your projects"). */
+  /** When true, shows "Manage →" instead of "View project →" (used in dashboard "Your projects"). */
   isOwner?: boolean;
   /** When provided, hides the join button if the viewer owns the project — defensive default. */
   currentUserId?: string | null;
   /** Latest project_update created_at — when present shows "Updated X ago" instead of "Posted X ago". */
   latestUpdateAt?: string | null;
-}
-
-// ── Category buckets — exact values from the design spec ───────────────────
-const CAT_BUCKETS = {
-  tech:    { bg: "rgba(99,102,241,0.15)",  color: "#818cf8" },
-  design:  { bg: "rgba(236,72,153,0.12)",  color: "#f472b6" },
-  health:  { bg: "rgba(34,197,94,0.10)",   color: "#4ade80" },
-  finance: { bg: "rgba(245,158,11,0.12)",  color: "#fbbf24" },
-  other:   { bg: "rgba(148,163,184,0.12)", color: "#94a3b8" },
-} as const;
-
-type Bucket = keyof typeof CAT_BUCKETS;
-
-function bucketFor(category: string): Bucket {
-  const c = category.toLowerCase();
-  if (/(tech|software|saas|ai|ml|data|dev|edtech|web|mobile|api|infra|platform|sec|cloud)/.test(c)) return "tech";
-  if (/(design|ui|ux|creative|brand|art|content)/.test(c)) return "design";
-  if (/(health|med|bio|wellness|fitness|mental)/.test(c)) return "health";
-  if (/(finance|fintech|crypto|invest|bank|defi|payments?|commerce|retail|market)/.test(c)) return "finance";
-  return "other";
 }
 
 function timeAgo(iso: string | null | undefined): string {
@@ -49,45 +31,12 @@ function timeAgo(iso: string | null | undefined): string {
   return `${Math.floor(s / 2592000)}mo ago`;
 }
 
-function stagePalette(stage: string | null | undefined): { color: string; bg: string; border: string; label: string } {
-  switch ((stage ?? "").toLowerCase()) {
-    case "idea":     return { color: "#fbbf24", bg: "rgba(251,191,36,0.12)",  border: "rgba(251,191,36,0.28)",  label: "Idea" };
-    case "mvp":      return { color: "#60a5fa", bg: "rgba(96,165,250,0.12)",  border: "rgba(96,165,250,0.28)",  label: "MVP" };
-    case "building": return { color: "#a78bfa", bg: "rgba(167,139,250,0.12)", border: "rgba(167,139,250,0.28)", label: "Building" };
-    case "launched": return { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.28)",  label: "Launched" };
-    case "paused":   return { color: "#8b9ab0", bg: "rgba(139,154,176,0.10)", border: "rgba(139,154,176,0.20)", label: "Paused" };
-    default:         return { color: "#8b9ab0", bg: "rgba(139,154,176,0.10)", border: "rgba(139,154,176,0.20)", label: stage ? stage.charAt(0).toUpperCase() + stage.slice(1) : "—" };
-  }
-}
-
-/**
- * "Boğaziçi University" → "BU", "Stanford University" → "SU", "MIT" → "MIT".
- * If the input is already short and uppercase (an acronym), keep it as-is up
- * to 4 chars; otherwise, take the first letter of each word.
- */
-function uniInitials(uni: string | null | undefined): string {
-  if (!uni) return "";
-  const s = uni.trim();
-  if (!s) return "";
-  if (s.length <= 4 && s === s.toUpperCase()) return s.slice(0, 4);
-  const parts = s.split(/\s+/).filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 4).toUpperCase();
-  return parts.map((w) => w[0] ?? "").join("").toUpperCase().slice(0, 4);
-}
-
 function personInitials(name: string | null | undefined, fallback: string): string {
   const n = (name ?? "").trim();
   if (!n) return fallback.slice(0, 2).toUpperCase();
   const parts = n.split(/\s+/).filter(Boolean);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return ((parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "")).toUpperCase();
-}
-
-// Stable, deterministic avatar tint — non-themed by design (matches existing app).
-const AVATAR_PALETTE = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
-function avatarTint(seed: string | null | undefined): string {
-  const s = seed ?? "x";
-  return AVATAR_PALETTE[s.charCodeAt(0) % AVATAR_PALETTE.length];
 }
 
 export default function ProjectCard({
@@ -99,50 +48,37 @@ export default function ProjectCard({
   latestUpdateAt,
 }: Props) {
   const categories = (project.category ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-  const catText = (categories.length ? categories : ["Other"]).map((c) => c.toUpperCase()).join(" · ");
-  const bucket = CAT_BUCKETS[bucketFor(categories[0] ?? "")];
-
   const lookingFor = (project.looking_for ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-  const rolesOpen = lookingFor.length;
-  const stage = stagePalette(project.stage);
+  const techStack = (project.tech_stack ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  const stage = stageBadge(project.stage);
 
   const ownerName = ownerProfile?.full_name ?? ownerProfile?.username ?? "";
-  const firstName = ownerName.split(/\s+/)[0] || ownerProfile?.username || "—";
-  const ownerInitials = personInitials(ownerProfile?.full_name ?? ownerProfile?.username, firstName);
-  const uni = uniInitials(ownerProfile?.university);
-  const avatarBg = avatarTint(ownerProfile?.id ?? project.owner_id);
+  const displayName = ownerName || "—";
+  const ownerInitials = personInitials(ownerProfile?.full_name ?? ownerProfile?.username, displayName);
 
-  // Owner's own card → "Manage →" goes to detail page (where they can edit/manage).
-  // Visitor's card → "Join project →" anchors to the apply modal on the detail page.
-  // Defensive: if currentUserId matches owner_id, treat as owner even if prop wasn't set.
   const projectHref = `/projects/${project.id}`;
   const effectiveIsOwner = isOwner || (currentUserId != null && currentUserId === project.owner_id);
   const ctaHref = effectiveIsOwner ? projectHref : `${projectHref}#join`;
-  const ctaLabel = effectiveIsOwner ? "Manage →" : "Join project →";
+  const ctaLabel = effectiveIsOwner ? "Manage →" : "View project →";
 
   return (
     <article
       data-variant={variant}
+      className="card-lift"
       style={{
         position: "relative",
-        // Card background follows the active theme's card gradient.
-        background: "var(--gradient-card)",
-        // Default border is the subtle theme-aware border; on hover we ramp
-        // up to ~40% of the active accent.
-        border: "1px solid var(--border-subtle)",
-        borderRadius: 16,
-        padding: 22,
+        background: "#FFFFFF",
+        border: "1px solid var(--border)",
+        borderRadius: 12,
+        padding: 24,
         cursor: "pointer",
-        transition: "border-color 0.18s ease",
         display: "flex",
         flexDirection: "column",
         gap: 14,
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--accent) 40%, transparent)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
     >
       {/* Stretched-link overlay — makes the entire card clickable.
-          Sits BENEATH the join button (z-index 2) but ABOVE static content. */}
+          Sits BENEATH the CTA link (z-index 2) but ABOVE static content. */}
       <Link
         href={projectHref}
         aria-label={`Open ${project.title || "project"}`}
@@ -150,36 +86,47 @@ export default function ProjectCard({
           position: "absolute",
           inset: 0,
           zIndex: 1,
-          borderRadius: 16,
+          borderRadius: 12,
         }}
       />
 
-      {/* Category badge */}
-      <div>
+      {/* Category + stage */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        {categories.slice(0, 2).map((cat) => {
+          const tint = categoryBadge(cat);
+          return (
+            <span key={cat} style={{
+              fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
+              color: tint.color, background: tint.bg,
+              letterSpacing: "0.04em", textTransform: "uppercase",
+            }}>
+              {cat}
+            </span>
+          );
+        })}
         <span style={{
-          display: "inline-block",
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: bucket.color,
-          background: bucket.bg,
-          borderRadius: 6,
-          padding: "4px 9px",
+          fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
+          color: stage.color, background: stage.bg, letterSpacing: "0.02em",
         }}>
-          {catText}
+          {stage.label}
         </span>
+        {project.is_ai_generated && (
+          <span style={{
+            fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
+            color: "var(--text-muted)", background: "#F5F5F3",
+          }}>
+            demo
+          </span>
+        )}
       </div>
 
-      {/* Headline */}
-      <h3 style={{
+      {/* Headline — Fraunces */}
+      <h3 className="font-serif" style={{
         fontSize: 20,
-        fontWeight: 900,
+        fontWeight: 500,
         color: "var(--text-primary)",
-        letterSpacing: "-0.6px",
-        lineHeight: 1.15,
+        lineHeight: 1.25,
         margin: 0,
-        // Allow up to 2 lines, then ellipsis
         display: "-webkit-box",
         WebkitLineClamp: 2,
         WebkitBoxOrient: "vertical",
@@ -188,13 +135,12 @@ export default function ProjectCard({
         {project.title || "Untitled Project"}
       </h3>
 
-      {/* Sub-headline — italic muted tagline */}
+      {/* Tagline */}
       {project.tagline && (
         <p style={{
-          fontSize: 13,
-          fontStyle: "italic",
+          fontSize: 14,
           color: "var(--text-secondary)",
-          lineHeight: 1.5,
+          lineHeight: 1.55,
           margin: 0,
           display: "-webkit-box",
           WebkitLineClamp: 2,
@@ -205,47 +151,14 @@ export default function ProjectCard({
         </p>
       )}
 
-      {/* Stage badge + open spots + trust badges */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-        <span style={{
-          fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
-          letterSpacing: "0.04em",
-          color: stage.color, background: stage.bg, border: `1px solid ${stage.border}`,
-        }}>
-          {stage.label}
-        </span>
-        {rolesOpen > 0 && (
-          <span style={{
-            fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
-            color: "#4ade80",
-            background: "rgba(74,222,128,0.08)",
-            border: "1px solid rgba(74,222,128,0.22)",
-          }}>
-            Actively Looking
-          </span>
-        )}
-        {project.is_ai_generated && (
-          <span style={{
-            fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
-            color: "#8b9ab0",
-            background: "rgba(139,154,176,0.07)",
-            border: "1px solid rgba(139,154,176,0.18)",
-            letterSpacing: "0.03em",
-          }}>
-            Demo Project
-          </span>
-        )}
-      </div>
-
-      {/* Role pills */}
+      {/* Looking-for pills — the quiet green family */}
       {lookingFor.length > 0 && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
           {lookingFor.slice(0, 3).map((role) => (
             <span key={role} style={{
-              fontSize: 11, fontWeight: 500, padding: "3px 9px", borderRadius: 6,
-              color: "#94a3b8",
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              fontSize: 11, fontWeight: 500, padding: "3px 9px", borderRadius: 999,
+              color: "#0F6E56",
+              background: "#ECFDF5",
             }}>
               {role}
             </span>
@@ -258,23 +171,46 @@ export default function ProjectCard({
         </div>
       )}
 
+      {/* Tech stack pills */}
+      {techStack.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+          {techStack.slice(0, 4).map((tech) => (
+            <span key={tech} style={{
+              fontSize: 11, fontWeight: 400, padding: "3px 9px", borderRadius: 6,
+              color: "var(--text-secondary)",
+              background: "#F5F5F3",
+            }}>
+              {tech}
+            </span>
+          ))}
+          {techStack.length > 4 && (
+            <span style={{ fontSize: 11, color: "var(--text-muted)", padding: "3px 4px" }}>
+              +{techStack.length - 4}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Bottom row — owner identity + CTA */}
       <div style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         gap: 10,
-        marginTop: 2,
+        marginTop: "auto",
+        paddingTop: 12,
+        borderTop: "1px solid var(--border-subtle)",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
           <div style={{
             width: 24,
             height: 24,
             borderRadius: "50%",
-            background: avatarBg,
-            color: "white",
+            background: "#F5F5F3",
+            border: "1px solid var(--border)",
+            color: "var(--text-secondary)",
             fontSize: 10,
-            fontWeight: 700,
+            fontWeight: 600,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -294,61 +230,40 @@ export default function ProjectCard({
             )}
           </div>
           <div style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--text-secondary)",
-            fontWeight: 500,
+            fontWeight: 400,
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
             minWidth: 0,
           }}>
-            {firstName}
-            {uni && <span style={{ color: "var(--text-muted)" }}> · {uni}</span>}
+            {displayName}
             {latestUpdateAt
               ? <span style={{ color: "var(--text-muted)" }}> · Updated {timeAgo(latestUpdateAt)}</span>
               : project.created_at
-                ? <span style={{ color: "var(--text-muted)" }}> · Posted {timeAgo(project.created_at)}</span>
+                ? <span style={{ color: "var(--text-muted)" }}> · {timeAgo(project.created_at)}</span>
                 : null}
           </div>
         </div>
 
         <Link
-            href={ctaHref}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: "relative",
-              zIndex: 2,
-              fontSize: 11,
-              fontWeight: 700,
-              color: "white",
-              // Primary CTA: tracks the active theme accent.
-              background: "var(--accent)",
-              border: "none",
-              padding: "7px 14px",
-              borderRadius: 8,
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-              transition: "transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease",
-              boxShadow: "0 2px 8px var(--accent-glow)",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.transform = "scale(1.04)";
-              el.style.boxShadow = "0 6px 18px color-mix(in srgb, var(--accent) 45%, transparent)";
-              el.style.background = "var(--accent-bright)";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.transform = "scale(1)";
-              el.style.boxShadow = "0 2px 8px var(--accent-glow)";
-              el.style.background = "var(--accent)";
-            }}
-          >
-            {ctaLabel}
-          </Link>
+          href={ctaHref}
+          onClick={(e) => e.stopPropagation()}
+          className="u-link"
+          style={{
+            position: "relative",
+            zIndex: 2,
+            fontSize: 12,
+            fontWeight: 500,
+            color: "var(--text-primary)",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+        >
+          {ctaLabel}
+        </Link>
       </div>
     </article>
   );
 }
-

@@ -103,11 +103,11 @@ export default function ApplyPage() {
               width: "100%",
               textAlign: "center",
               background:
-                "linear-gradient(145deg, rgba(9,14,26,0.98), rgba(14,22,40,0.95))",
-              border: "1px solid rgba(76,142,255,0.2)",
+                "linear-gradient(145deg, #FFFFFF, #FFFFFF)",
+              border: "1px solid #E8E8E4",
               borderRadius: 20,
               padding: "56px 40px",
-              boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
+              boxShadow: "0 24px 64px rgba(26,26,24,0.4)",
             }}
           >
             <div
@@ -115,8 +115,8 @@ export default function ApplyPage() {
                 width: 60,
                 height: 60,
                 borderRadius: "50%",
-                background: "rgba(74,222,128,0.12)",
-                border: "1px solid rgba(74,222,128,0.28)",
+                background: "#ECFDF5",
+                border: "1px solid #D1FAE5",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -128,7 +128,7 @@ export default function ApplyPage() {
                 height="28"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#4ade80"
+                stroke="#0F6E56"
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -138,10 +138,10 @@ export default function ApplyPage() {
             </div>
             <h1
               style={{
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "var(--font-serif)",
                 fontSize: 26,
-                fontWeight: 800,
-                color: "#f0f4f8",
+                fontWeight: 500,
+                color: "#1A1A18",
                 marginBottom: 12,
                 lineHeight: 1.1,
               }}
@@ -151,10 +151,10 @@ export default function ApplyPage() {
             <p
               style={{
                 fontSize: 15,
-                color: "#8b9ab0",
+                color: "#6B6B66",
                 lineHeight: 1.65,
                 marginBottom: 28,
-                fontFamily: "DM Sans, sans-serif",
+                fontFamily: "var(--font-sans)",
               }}
             >
               Thanks for applying. We review every application manually to keep
@@ -202,10 +202,10 @@ export default function ApplyPage() {
           right: 0,
           zIndex: 100,
           padding: "0 24px",
-          background: "rgba(8,12,24,0.85)",
+          background: "#FFFFFF",
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(80,120,220,0.1)",
+          borderBottom: "1px solid #F5F5F3",
         }}
       >
         <div
@@ -226,7 +226,7 @@ export default function ApplyPage() {
               fontSize: 13,
               color: "var(--text-muted)",
               textDecoration: "none",
-              fontFamily: "DM Sans, sans-serif",
+              fontFamily: "var(--font-sans)",
             }}
           >
             Already a member? Sign in →
@@ -247,8 +247,8 @@ export default function ApplyPage() {
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "var(--accent)",
-                background: "rgba(76,142,255,0.08)",
-                border: "1px solid rgba(76,142,255,0.18)",
+                background: "#F5F5F3",
+                border: "1px solid #E8E8E4",
                 borderRadius: 999,
                 padding: "4px 14px",
                 marginBottom: 20,
@@ -259,8 +259,8 @@ export default function ApplyPage() {
             <h1
               style={{
                 fontSize: "clamp(28px, 4vw, 44px)",
-                fontFamily: "Syne, sans-serif",
-                fontWeight: 800,
+                fontFamily: "var(--font-serif)",
+                fontWeight: 500,
                 lineHeight: 1.1,
                 letterSpacing: "-0.03em",
                 color: "var(--text-primary)",
@@ -276,7 +276,7 @@ export default function ApplyPage() {
                 lineHeight: 1.65,
                 maxWidth: 520,
                 margin: "0 auto",
-                fontFamily: "DM Sans, sans-serif",
+                fontFamily: "var(--font-sans)",
               }}
             >
               ProjectHub is currently curated manually to keep the network
@@ -292,8 +292,8 @@ export default function ApplyPage() {
               alignItems: "center",
               gap: 10,
               padding: "12px 18px",
-              background: "rgba(74,222,128,0.05)",
-              border: "1px solid rgba(74,222,128,0.15)",
+              background: "#ECFDF5",
+              border: "1px solid #D1FAE5",
               borderRadius: 10,
               marginBottom: 32,
             }}
@@ -303,8 +303,8 @@ export default function ApplyPage() {
                 width: 7,
                 height: 7,
                 borderRadius: "50%",
-                background: "#4ade80",
-                boxShadow: "0 0 0 3px rgba(74,222,128,0.18)",
+                background: "#0F6E56",
+                boxShadow: "0 0 0 3px #D1FAE5",
                 flexShrink: 0,
                 display: "inline-block",
               }}
@@ -312,8 +312,8 @@ export default function ApplyPage() {
             <p
               style={{
                 fontSize: 13,
-                color: "#8b9ab0",
-                fontFamily: "DM Sans, sans-serif",
+                color: "#6B6B66",
+                fontFamily: "var(--font-sans)",
                 margin: 0,
                 lineHeight: 1.5,
               }}
@@ -327,11 +327,11 @@ export default function ApplyPage() {
           <div
             style={{
               background:
-                "linear-gradient(145deg, rgba(9,14,26,0.98), rgba(14,22,40,0.95))",
-              border: "1px solid rgba(80,120,220,0.18)",
+                "linear-gradient(145deg, #FFFFFF, #FFFFFF)",
+              border: "1px solid #E8E8E4",
               borderRadius: 20,
               padding: "40px",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+              boxShadow: "0 20px 60px rgba(26,26,24,0.4)",
             }}
           >
             <form
@@ -448,12 +448,12 @@ export default function ApplyPage() {
                           border: "1px solid",
                           background:
                             form.looking_for_teammates === opt
-                              ? "linear-gradient(135deg, var(--accent), #8b5cf6)"
-                              : "rgba(255,255,255,0.04)",
+                              ? "#1A1A18"
+                              : "#F7F7F5",
                           borderColor:
                             form.looking_for_teammates === opt
                               ? "transparent"
-                              : "rgba(255,255,255,0.12)",
+                              : "#E8E8E4",
                           color:
                             form.looking_for_teammates === opt
                               ? "white"
@@ -542,11 +542,11 @@ export default function ApplyPage() {
                       marginBottom: 12,
                       padding: "11px 16px",
                       borderRadius: 9,
-                      background: "rgba(239,68,68,0.08)",
-                      border: "1px solid rgba(239,68,68,0.25)",
-                      color: "#f87171",
+                      background: "#FEF2F2",
+                      border: "1px solid #FECACA",
+                      color: "#B91C1C",
                       fontSize: 13,
-                      fontFamily: "DM Sans, sans-serif",
+                      fontFamily: "var(--font-sans)",
                       lineHeight: 1.5,
                     }}
                   >
@@ -573,7 +573,7 @@ export default function ApplyPage() {
                     fontSize: 12,
                     color: "var(--text-muted)",
                     textAlign: "center",
-                    fontFamily: "DM Sans, sans-serif",
+                    fontFamily: "var(--font-sans)",
                     lineHeight: 1.5,
                   }}
                 >
@@ -608,8 +608,8 @@ function BgGrid() {
           position: "absolute",
           inset: 0,
           backgroundImage: `
-            linear-gradient(rgba(80,120,220,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(80,120,220,0.04) 1px, transparent 1px)
+            linear-gradient(#F5F5F3 1px, transparent 1px),
+            linear-gradient(90deg, #F5F5F3 1px, transparent 1px)
           `,
           backgroundSize: "64px 64px",
           maskImage:
@@ -624,7 +624,7 @@ function BgGrid() {
           width: 500,
           height: 500,
           background:
-            "radial-gradient(circle, rgba(76,142,255,0.07) 0%, transparent 60%)",
+            "radial-gradient(circle, #F5F5F3 0%, transparent 60%)",
         }}
       />
       <div
@@ -635,7 +635,7 @@ function BgGrid() {
           width: 400,
           height: 400,
           background:
-            "radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 60%)",
+            "radial-gradient(circle, #F5F5F3 0%, transparent 60%)",
         }}
       />
     </div>
@@ -660,7 +660,7 @@ function FormSection({
           color: "var(--accent)",
           paddingBottom: 12,
           marginBottom: 20,
-          borderBottom: "1px solid rgba(80,120,220,0.12)",
+          borderBottom: "1px solid #F5F5F3",
         }}
       >
         {label}
@@ -690,7 +690,7 @@ function Field({
           fontSize: 13,
           fontWeight: 600,
           color: "var(--text-secondary)",
-          fontFamily: "DM Sans, sans-serif",
+          fontFamily: "var(--font-sans)",
         }}
       >
         {label}
@@ -704,7 +704,7 @@ function Field({
           style={{
             fontSize: 11,
             color: "var(--text-muted)",
-            fontFamily: "DM Sans, sans-serif",
+            fontFamily: "var(--font-sans)",
             margin: 0,
             lineHeight: 1.5,
           }}
@@ -722,12 +722,12 @@ const inp: React.CSSProperties = {
   width: "100%",
   padding: "10px 14px",
   borderRadius: 9,
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "#F7F7F5",
+  border: "1px solid #E8E8E4",
   color: "var(--text-primary)",
   fontSize: 14,
   outline: "none",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   boxSizing: "border-box",
   transition: "border-color 0.15s ease",
 };

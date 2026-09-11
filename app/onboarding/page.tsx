@@ -161,8 +161,8 @@ export default function OnboardingPage() {
             <div style={stepStyle}>
               <div style={iconCircleStyle}>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="10" fill="rgba(139,92,246,0.15)" stroke="#8b5cf6" strokeWidth="1.5" />
-                  <path d="M14 9v5l3 3" stroke="#c4b5fd" strokeWidth="1.5" strokeLinecap="round" />
+                  <circle cx="14" cy="14" r="10" fill="#E8E8E4" stroke="#8b5cf6" strokeWidth="1.5" />
+                  <path d="M14 9v5l3 3" stroke="#6B6B66" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </div>
               <h1 style={titleStyle}>What are you here for?</h1>
@@ -180,7 +180,7 @@ export default function OnboardingPage() {
                     }}
                   >
                     <span style={{ fontSize: 28, marginBottom: 8 }}>{opt.icon}</span>
-                    <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 15, color: "var(--text-primary)", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 15, color: "var(--text-primary)", marginBottom: 4 }}>
                       {opt.label}
                     </span>
                     <span style={{ fontSize: 12, color: "var(--text-secondary)", textAlign: "center", lineHeight: 1.4 }}>
@@ -210,9 +210,9 @@ export default function OnboardingPage() {
             <div style={stepStyle}>
               <div style={iconCircleStyle}>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <rect x="4" y="10" width="7" height="7" rx="2" fill="rgba(76,142,255,0.2)" stroke="#4c8eff" strokeWidth="1.5" />
-                  <rect x="14" y="6" width="7" height="7" rx="2" fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" strokeWidth="1.5" />
-                  <rect x="9" y="17" width="7" height="7" rx="2" fill="rgba(16,185,129,0.2)" stroke="#10b981" strokeWidth="1.5" />
+                  <rect x="4" y="10" width="7" height="7" rx="2" fill="#E8E8E4" stroke="#4c8eff" strokeWidth="1.5" />
+                  <rect x="14" y="6" width="7" height="7" rx="2" fill="#E8E8E4" stroke="#8b5cf6" strokeWidth="1.5" />
+                  <rect x="9" y="17" width="7" height="7" rx="2" fill="#D1FAE5" stroke="#0F6E56" strokeWidth="1.5" />
                 </svg>
               </div>
               <h1 style={titleStyle}>What are your skills?</h1>
@@ -230,13 +230,13 @@ export default function OnboardingPage() {
                         padding: "7px 14px",
                         borderRadius: 20,
                         border: active ? "1px solid color-mix(in srgb, var(--accent) 60%, transparent)" : "1px solid var(--border)",
-                        background: active ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "rgba(255,255,255,0.03)",
+                        background: active ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "#FAFAF8",
                         color: active ? "var(--accent-bright)" : "var(--text-secondary)",
                         fontSize: 13,
                         fontWeight: active ? 600 : 500,
                         cursor: "pointer",
                         transition: "all 0.15s ease",
-                        fontFamily: "DM Sans, sans-serif",
+                        fontFamily: "var(--font-sans)",
                         whiteSpace: "nowrap",
                       }}
                     >
@@ -264,10 +264,10 @@ export default function OnboardingPage() {
           {/* ── Step 4 ── */}
           {step === 4 && (
             <div style={stepStyle}>
-              <div style={{ ...iconCircleStyle, background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}>
+              <div style={{ ...iconCircleStyle, background: "#D1FAE5", border: "1px solid #D1FAE5" }}>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="10" fill="rgba(74,222,128,0.15)" stroke="#4ade80" strokeWidth="1.5" />
-                  <path d="M9 14l4 4 6-6" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="14" cy="14" r="10" fill="#D1FAE5" stroke="#0F6E56" strokeWidth="1.5" />
+                  <path d="M9 14l4 4 6-6" stroke="#0F6E56" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <h1 style={titleStyle}>You&apos;re all set!</h1>
@@ -393,7 +393,7 @@ const dotDone: React.CSSProperties = {
 
 const dotIdle: React.CSSProperties = {
   width: 8,
-  background: "rgba(255,255,255,0.1)",
+  background: "#E8E8E4",
 };
 
 const cardStyle: React.CSSProperties = {
@@ -402,7 +402,7 @@ const cardStyle: React.CSSProperties = {
   borderRadius: 20,
   padding: "36px 36px 32px",
   position: "relative",
-  boxShadow: "0 32px 80px rgba(0,0,0,0.5)",
+  boxShadow: "0 32px 80px rgba(26,26,24,0.4)",
 };
 
 const stepStyle: React.CSSProperties = {
@@ -420,7 +420,7 @@ const skipBtnStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 500,
   cursor: "pointer",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   padding: "4px 8px",
   borderRadius: 6,
   transition: "color 0.15s",
@@ -439,8 +439,8 @@ const iconCircleStyle: React.CSSProperties = {
 };
 
 const titleStyle: React.CSSProperties = {
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   fontSize: 26,
   color: "var(--text-primary)",
   letterSpacing: "-0.02em",
@@ -465,17 +465,17 @@ const labelStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 600,
   color: "var(--text-secondary)",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
 };
 
 const inputStyle: React.CSSProperties = {
   padding: "11px 14px",
   borderRadius: 10,
   border: "1px solid var(--border)",
-  background: "rgba(255,255,255,0.03)",
+  background: "#FAFAF8",
   color: "var(--text-primary)",
   fontSize: 15,
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   outline: "none",
   transition: "border-color 0.15s",
 };
@@ -494,11 +494,11 @@ const optionCardBase: React.CSSProperties = {
   borderRadius: 14,
   cursor: "pointer",
   transition: "all 0.15s ease",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
 };
 
 const optionCardIdle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.02)",
+  background: "#FAFAF8",
   border: "1px solid var(--border)",
 };
 
@@ -521,17 +521,17 @@ const backBtnStyle: React.CSSProperties = {
   padding: "10px 18px",
   borderRadius: 10,
   border: "1px solid var(--border)",
-  background: "rgba(255,255,255,0.03)",
+  background: "#FAFAF8",
   color: "var(--text-secondary)",
   fontSize: 14,
   fontWeight: 500,
   cursor: "pointer",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   whiteSpace: "nowrap",
 };
 
 const summaryCardStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.02)",
+  background: "#FAFAF8",
   border: "1px solid var(--border)",
   borderRadius: 14,
   padding: "16px 18px",
@@ -577,7 +577,7 @@ const secondarySkipStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 500,
   cursor: "pointer",
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   textDecoration: "underline",
   textUnderlineOffset: 3,
 };

@@ -163,10 +163,10 @@ export default function NewProjectPage() {
         {/* ── Page header ── */}
         <div style={headerSectionStyle}>
           <div style={headerBadgeStyle}>New Project</div>
-          <h1 style={titleStyle}>Launch your idea into the world</h1>
+          <h1 style={titleStyle}>Add a project to your record</h1>
           <p style={subtitleStyle}>
-            Tell the ProjectHub community what you&apos;re building. Find the co-founders,
-            contributors, and early users who believe in your vision.
+            Document what you&apos;re building. It becomes part of your proof-of-work
+            profile — post updates as you ship and mark it shipped when it&apos;s live.
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export default function NewProjectPage() {
                   <div style={{
                     width: 42, height: 42, borderRadius: "50%", display: "flex",
                     alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800,
-                    background: done || active ? "var(--accent)" : "rgba(255,255,255,0.04)",
+                    background: done || active ? "var(--accent)" : "#F7F7F5",
                     border: done || active ? "none" : "1px solid var(--border)",
                     color: done || active ? "white" : "var(--text-muted)",
                     boxShadow: active ? "0 0 0 6px color-mix(in srgb, var(--accent) 18%, transparent)" : "none",
@@ -432,13 +432,13 @@ export default function NewProjectPage() {
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLElement;
                   el.style.transform = "translateY(-2px)";
-                  el.style.boxShadow = "0 14px 32px var(--accent-glow)";
+                  el.style.boxShadow = "0 14px 32px transparent";
                   el.style.filter = "brightness(1.08)";
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLElement;
                   el.style.transform = "translateY(0)";
-                  el.style.boxShadow = "0 8px 22px var(--accent-glow)";
+                  el.style.boxShadow = "0 8px 22px transparent";
                   el.style.filter = "brightness(1)";
                 }}
               >
@@ -458,20 +458,20 @@ export default function NewProjectPage() {
                   if (submitting) return;
                   const el = e.currentTarget as HTMLElement;
                   el.style.transform = "translateY(-2px)";
-                  el.style.boxShadow = "0 14px 32px var(--accent-glow)";
+                  el.style.boxShadow = "0 14px 32px transparent";
                   el.style.filter = "brightness(1.08)";
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLElement;
                   el.style.transform = "translateY(0)";
-                  el.style.boxShadow = "0 8px 24px var(--accent-glow)";
+                  el.style.boxShadow = "0 8px 24px transparent";
                   el.style.filter = "brightness(1)";
                 }}
               >
                 {submitting && (
                   <span style={{
                     width: 16, height: 16, borderRadius: "50%",
-                    border: "2px solid rgba(255,255,255,0.35)",
+                    border: "2px solid #E8E8E4",
                     borderTopColor: "white",
                     animation: "spin-slow 0.7s linear infinite",
                     display: "inline-block",
@@ -536,8 +536,8 @@ const headerBadgeStyle: React.CSSProperties = {
 
 const titleStyle: React.CSSProperties = {
   fontSize: "clamp(32px, 5vw, 52px)",
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   color: "var(--text-primary)",
   letterSpacing: "-0.03em",
   marginBottom: 16,
@@ -568,7 +568,7 @@ const cardStyle: React.CSSProperties = {
   border: "1px solid var(--border)",
   borderRadius: 22,
   padding: "44px 44px",
-  boxShadow: "0 28px 72px rgba(0,0,0,0.4), 0 0 0 1px color-mix(in srgb, var(--accent) 5%, transparent) inset",
+  boxShadow: "0 28px 72px rgba(26,26,24,0.4), 0 0 0 1px color-mix(in srgb, var(--accent) 5%, transparent) inset",
 };
 
 const stepStyle: React.CSSProperties = {
@@ -602,7 +602,7 @@ const stepNumStyle: React.CSSProperties = {
 
 const stepTitleStyle: React.CSSProperties = {
   fontSize: 20,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   color: "var(--text-primary)",
   letterSpacing: "-0.01em",
@@ -623,7 +623,7 @@ const sectionBlockStyle: React.CSSProperties = {
   gap: 16,
   padding: "24px",
   borderRadius: 14,
-  background: "rgba(255,255,255,0.02)",
+  background: "#FAFAF8",
   border: "1px solid var(--border-subtle)",
 };
 
@@ -653,7 +653,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const reqStyle: React.CSSProperties = {
-  color: "#f87171",
+  color: "#B91C1C",
   fontWeight: 700,
   marginLeft: 2,
 };
@@ -669,7 +669,7 @@ const inputStyle: React.CSSProperties = {
   padding: "14px 16px",
   borderRadius: 12,
   border: "1px solid var(--border)",
-  background: "rgba(255,255,255,0.03)",
+  background: "#FAFAF8",
   color: "var(--text-primary)",
   fontSize: 15,
   outline: "none",
@@ -744,7 +744,7 @@ const chipBtnActive: React.CSSProperties = {
 };
 
 const chipBtnInactive: React.CSSProperties = {
-  background: "rgba(255,255,255,0.02)",
+  background: "#FAFAF8",
   borderColor: "var(--border)",
   color: "var(--text-secondary)",
 };
@@ -820,14 +820,14 @@ const continueBtnStyle: React.CSSProperties = {
   padding: "14px 36px",
   borderRadius: 12,
   border: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)",
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+  background: "#1A1A18",
   color: "white",
   fontSize: 15,
   fontWeight: 700,
   cursor: "pointer",
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   letterSpacing: "0.01em",
-  boxShadow: "0 8px 22px var(--accent-glow)",
+  boxShadow: "0 8px 22px transparent",
   transition: "transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease",
 };
 
@@ -837,14 +837,14 @@ const submitBtnStyle: React.CSSProperties = {
   padding: "18px 40px",
   borderRadius: 14,
   border: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)",
-  background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+  background: "#1A1A18",
   color: "white",
   fontSize: 17,
   fontWeight: 800,
   cursor: "pointer",
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   letterSpacing: "0.01em",
-  boxShadow: "0 8px 24px var(--accent-glow)",
+  boxShadow: "0 8px 24px transparent",
   transition: "transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease",
   display: "flex",
   alignItems: "center",
@@ -855,9 +855,9 @@ const submitBtnStyle: React.CSSProperties = {
 const errorStyle: React.CSSProperties = {
   padding: "12px 16px",
   borderRadius: 10,
-  background: "rgba(239,68,68,0.1)",
-  border: "1px solid rgba(239,68,68,0.3)",
-  color: "#fca5a5",
+  background: "#FEF2F2",
+  border: "1px solid #FECACA",
+  color: "#B91C1C",
   fontSize: 13,
   marginTop: 8,
 };

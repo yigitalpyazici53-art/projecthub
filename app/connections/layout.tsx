@@ -1,9 +1,10 @@
 import { Metadata } from "next";
+import { privateMetadata } from "@/utils/seo";
 
-export const metadata: Metadata = {
-  title: "My Connections | ProjectHub",
-  description: "View and manage your builder connections on ProjectHub.",
-};
+export const metadata: Metadata = privateMetadata(
+  "My Connections",
+  "View and manage your builder connections on ProjectHub.",
+);
 
 export default function ConnectionsLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

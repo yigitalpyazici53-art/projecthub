@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
-import ThemePicker from "@/components/ThemePicker";
 import Logo from "@/components/Logo";
 
 const navItems = [
@@ -40,15 +39,14 @@ function NavLink({ href, label, pathname, mobile = false }: { href: string; labe
         style={{
           display: "block",
           padding: "12px 16px",
-          borderRadius: 12,
-          fontFamily: "DM Sans, sans-serif",
+          borderRadius: 8,
+          fontFamily: "var(--font-sans)",
           fontSize: 15,
-          fontWeight: isActive ? 700 : 500,
+          fontWeight: isActive ? 600 : 400,
           color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-          background: isActive ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent",
+          background: isActive ? "#F5F5F3" : "transparent",
           textDecoration: "none",
-          transition: "all 0.15s ease",
-          borderLeft: isActive ? "2px solid var(--accent)" : "2px solid transparent",
+          transition: "background 0.15s ease, color 0.15s ease",
         }}
       >
         {label}
@@ -58,40 +56,18 @@ function NavLink({ href, label, pathname, mobile = false }: { href: string; labe
   return (
     <Link
       href={href}
+      className="u-link"
       style={{
-        fontFamily: "DM Sans, sans-serif",
-        fontSize: "14px",
-        fontWeight: isActive ? 700 : 500,
+        fontFamily: "var(--font-sans)",
+        fontSize: 14,
+        fontWeight: isActive ? 600 : 400,
         color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-        background: isActive
-          ? "color-mix(in srgb, var(--accent) 15%, transparent)"
-          : "rgba(255,255,255,0.03)",
-        border: isActive
-          ? "1px solid color-mix(in srgb, var(--accent) 28%, transparent)"
-          : "1px solid var(--border)",
-        textDecoration: "none",
-        padding: "9px 14px",
-        borderRadius: "10px",
-        transition: "all 0.15s ease",
-        boxShadow: isActive ? "0 4px 16px color-mix(in srgb, var(--accent) 12%, transparent)" : "none",
+        padding: "6px 10px",
+        transition: "color 0.15s ease",
         whiteSpace: "nowrap",
       }}
-      onMouseEnter={e => {
-        if (!isActive) {
-          const el = e.currentTarget;
-          el.style.color = "var(--text-primary)";
-          el.style.background = "color-mix(in srgb, var(--accent) 7%, transparent)";
-          el.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)";
-        }
-      }}
-      onMouseLeave={e => {
-        if (!isActive) {
-          const el = e.currentTarget;
-          el.style.color = "var(--text-secondary)";
-          el.style.background = "rgba(255,255,255,0.03)";
-          el.style.borderColor = "var(--border)";
-        }
-      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
+      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; }}
     >
       {label}
     </Link>
@@ -217,28 +193,18 @@ function NotificationBell({ userId }: { userId: string | null }) {
           justifyContent: "center",
           width: 36,
           height: 36,
-          borderRadius: 10,
-          border: open
-            ? "1px solid color-mix(in srgb, var(--accent) 30%, transparent)"
-            : "1px solid var(--border)",
-          background: open
-            ? "color-mix(in srgb, var(--accent) 10%, transparent)"
-            : "rgba(255,255,255,0.03)",
+          borderRadius: 8,
+          border: "1px solid var(--border)",
+          background: open ? "#F5F5F3" : "transparent",
           cursor: "pointer",
-          color: open ? "var(--accent-bright)" : "var(--text-secondary)",
-          transition: "all 0.15s ease",
+          color: open ? "var(--text-primary)" : "var(--text-secondary)",
+          transition: "background 0.15s ease, color 0.15s ease",
         }}
         onMouseEnter={(e) => {
-          if (!open) {
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
-            (e.currentTarget as HTMLButtonElement).style.background = "color-mix(in srgb, var(--accent) 8%, transparent)";
-          }
+          (e.currentTarget as HTMLButtonElement).style.background = "#F5F5F3";
         }}
         onMouseLeave={(e) => {
-          if (!open) {
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
-            (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.03)";
-          }
+          if (!open) (e.currentTarget as HTMLButtonElement).style.background = "transparent";
         }}
       >
         <BellSVG />
@@ -246,8 +212,8 @@ function NotificationBell({ userId }: { userId: string | null }) {
           <span style={{
             position: "absolute", top: -4, right: -4,
             minWidth: 16, height: 16, borderRadius: 8,
-            background: "var(--accent)", color: "white",
-            fontSize: 9, fontWeight: 700,
+            background: "#1A1A18", color: "#FFFFFF",
+            fontSize: 9, fontWeight: 600,
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: "0 3px", border: "1.5px solid var(--background)",
           }}>
@@ -261,13 +227,13 @@ function NotificationBell({ userId }: { userId: string | null }) {
           {/* Header */}
           <div style={{
             padding: "12px 14px 10px",
-            borderBottom: "1px solid rgba(255,255,255,0.07)",
+            borderBottom: "1px solid var(--border)",
             display: "flex", alignItems: "center", justifyContent: "space-between",
           }}>
-            <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 13, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontWeight: 600, fontSize: 13, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
               Notifications
               {unreadCount > 0 && (
-                <span style={{ fontSize: 10, fontWeight: 700, background: "var(--accent)", color: "white", borderRadius: 10, padding: "1px 7px" }}>
+                <span style={{ fontSize: 10, fontWeight: 600, background: "#1A1A18", color: "#FFFFFF", borderRadius: 10, padding: "1px 7px" }}>
                   {unreadCount} new
                 </span>
               )}
@@ -276,7 +242,7 @@ function NotificationBell({ userId }: { userId: string | null }) {
               <button
                 type="button"
                 onClick={markAllRead}
-                style={{ background: "none", border: "none", padding: 0, color: "var(--accent-bright)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ background: "none", border: "none", padding: 0, color: "var(--text-secondary)", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}
               >
                 Mark all read
               </button>
@@ -288,7 +254,7 @@ function NotificationBell({ userId }: { userId: string | null }) {
             <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>Loading…</div>
           ) : notifs.length === 0 ? (
             <div style={{ padding: "32px 16px", textAlign: "center" }}>
-              <div style={{ width: 44, height: 44, background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.18)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "#6366f1" }}>
+              <div style={{ width: 44, height: 44, background: "#F5F5F3", border: "1px solid var(--border)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "var(--text-muted)" }}>
                 <BellSVG />
               </div>
               <p style={{ color: "var(--text-secondary)", fontSize: 13, fontWeight: 500, margin: 0 }}>No notifications yet</p>
@@ -301,11 +267,11 @@ function NotificationBell({ userId }: { userId: string | null }) {
                   key={n.id}
                   href="/connections"
                   onClick={() => setOpen(false)}
-                  style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "11px 14px", borderBottom: "1px solid rgba(255,255,255,0.04)", textDecoration: "none" }}
-                  onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.06)"}
+                  style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "11px 14px", borderBottom: "1px solid var(--border-subtle)", textDecoration: "none" }}
+                  onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "#F7F7F5"}
                   onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.background = "transparent"}
                 >
-                  <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#a5b4fc" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, background: "#F5F5F3", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: "var(--text-secondary)" }}>
                     {(n.senderName ?? n.senderUsername ?? "?").slice(0, 2).toUpperCase()}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -314,15 +280,15 @@ function NotificationBell({ userId }: { userId: string | null }) {
                     </p>
                     <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "3px 0 0" }}>{timeAgoShort(n.created_at)}</p>
                   </div>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", flexShrink: 0, marginTop: 5 }} />
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#1A1A18", flexShrink: 0, marginTop: 5 }} />
                 </Link>
               ))}
             </div>
           )}
 
           {/* Footer */}
-          <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            <Link href="/connections" onClick={() => setOpen(false)} style={{ fontSize: 12, color: "var(--accent-bright)", textDecoration: "none", fontWeight: 600 }}>
+          <div style={{ padding: "10px 14px", borderTop: "1px solid var(--border-subtle)" }}>
+            <Link href="/connections" onClick={() => setOpen(false)} className="u-link" style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>
               View all connection requests →
             </Link>
           </div>
@@ -334,19 +300,12 @@ function NotificationBell({ userId }: { userId: string | null }) {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [fullName, setFullName] = useState<string | null>(null);
   const [university, setUniversity] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handler);
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
 
   // Close mobile menu on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -405,41 +364,36 @@ export default function Navbar() {
           top: 0, left: 0, right: 0,
           zIndex: 100,
           padding: "0 24px",
-          height: "68px",
+          height: 68,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          transition: "all 0.2s ease",
-          borderBottom: scrolled
-            ? "1px solid var(--border)"
-            : "1px solid transparent",
-          background: scrolled
-            ? "color-mix(in srgb, var(--background) 95%, transparent)"
-            : "color-mix(in srgb, var(--background) 75%, transparent)",
-          backdropFilter: scrolled ? "blur(24px)" : "none",
+          borderBottom: "1px solid #E8E8E4",
+          background: "rgba(250,250,248,0.85)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
         }}
       >
         {/* Logo */}
         <Logo size="md" style={{ flexShrink: 0 }} />
 
         {/* Desktop nav items */}
-        <div className="nav-desktop-items" style={{ alignItems: "center", gap: "8px" }}>
+        <div className="nav-desktop-items" style={{ alignItems: "center", gap: 4 }}>
           {(userId ? navItems : publicNavItems).map(item => <NavLink key={item.href} href={item.href} label={item.label} pathname={pathname} />)}
         </div>
 
         {/* Right side */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <NotificationBell userId={userId} />
-          <ThemePicker />
 
-          <div className="nav-desktop-items" style={{ alignItems: "center", gap: "8px" }}>
+          <div className="nav-desktop-items" style={{ alignItems: "center", gap: 8 }}>
             {userId ? (
               <>
-                <Link href="/projects/new" className="btn-primary" style={{ padding: "8px 16px", fontSize: "13px" }}>
-                  + Start Building
+                <Link href="/projects/new" className="btn-primary" style={{ padding: "8px 16px", fontSize: 13 }}>
+                  + Add project
                 </Link>
                 {username && (
-                  <Link href={`/builders/${username}`} className="btn-ghost" style={{ fontSize: "13px" }}>
+                  <Link href={`/builders/${username}`} className="btn-ghost" style={{ fontSize: 13 }}>
                     My Profile
                   </Link>
                 )}
@@ -447,41 +401,19 @@ export default function Navbar() {
                   type="button"
                   onClick={handleLogout}
                   disabled={loggingOut}
-                  style={{
-                    padding: "8px 16px",
-                    fontSize: "13px",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "rgba(255,255,255,0.03)",
-                    color: "var(--text-secondary)",
-                    cursor: loggingOut ? "default" : "pointer",
-                    fontWeight: 500,
-                    transition: "all 0.15s ease",
-                    fontFamily: "DM Sans, sans-serif",
-                    whiteSpace: "nowrap",
-                    opacity: loggingOut ? 0.6 : 1,
-                  }}
-                  onMouseEnter={e => {
-                    if (!loggingOut) {
-                      (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
-                      (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-highlight)";
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
-                  }}
+                  className="btn-ghost"
+                  style={{ fontSize: 13, opacity: loggingOut ? 0.6 : 1, cursor: loggingOut ? "default" : "pointer" }}
                 >
                   {loggingOut ? "Signing out…" : "Log out"}
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="btn-ghost" style={{ fontSize: "13px" }}>
+                <Link href="/login" className="btn-ghost" style={{ fontSize: 13 }}>
                   Sign in
                 </Link>
-                <Link href="/signup" className="btn-primary" style={{ padding: "8px 18px", fontSize: "13px" }}>
-                  Start Building
+                <Link href="/signup" className="btn-primary" style={{ padding: "8px 18px", fontSize: 13 }}>
+                  Create your profile
                 </Link>
               </>
             )}
@@ -506,7 +438,7 @@ export default function Navbar() {
         <div
           style={{
             position: "fixed", inset: 0,
-            background: "rgba(0,0,0,0.55)",
+            background: "rgba(26,26,24,0.28)",
             zIndex: 98,
             animation: "fade-in 0.2s ease",
           }}
@@ -525,7 +457,7 @@ export default function Navbar() {
             position: "absolute", top: 16, right: 16,
             width: 32, height: 32, borderRadius: 8,
             border: "1px solid var(--border)",
-            background: "rgba(255,255,255,0.04)",
+            background: "transparent",
             color: "var(--text-secondary)",
             cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -545,14 +477,14 @@ export default function Navbar() {
           }}>
             <div style={{
               width: 42, height: 42, borderRadius: "50%", flexShrink: 0,
-              background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-purple) 100%)",
+              background: "#1A1A18",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 15, fontWeight: 700, color: "white",
+              fontSize: 15, fontWeight: 600, color: "#FFFFFF",
             }}>
               {(fullName ?? username ?? "?").slice(0, 2).toUpperCase()}
             </div>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 15, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div style={{ fontWeight: 600, fontSize: 15, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {fullName ?? username ?? "Builder"}
               </div>
               {university && (
@@ -575,12 +507,12 @@ export default function Navbar() {
           {userId ? (
             <>
               <Link href="/projects/new" className="btn-primary" style={{ justifyContent: "center" }}>
-                + Start Building
+                + Add project
               </Link>
               {username && (
                 <Link href={`/builders/${username}`} style={{
-                  display: "block", padding: "12px 16px", borderRadius: 12,
-                  fontFamily: "DM Sans, sans-serif", fontSize: 15, fontWeight: 500,
+                  display: "block", padding: "12px 16px", borderRadius: 8,
+                  fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 400,
                   color: "var(--text-secondary)", textDecoration: "none",
                 }}>
                   My Profile
@@ -592,9 +524,9 @@ export default function Navbar() {
                 disabled={loggingOut}
                 style={{
                   display: "block", width: "100%", textAlign: "left",
-                  padding: "12px 16px", borderRadius: 12, border: "none",
-                  background: "transparent", fontFamily: "DM Sans, sans-serif",
-                  fontSize: 15, fontWeight: 500, color: "#f87171", cursor: loggingOut ? "default" : "pointer",
+                  padding: "12px 16px", borderRadius: 8, border: "none",
+                  background: "transparent", fontFamily: "var(--font-sans)",
+                  fontSize: 15, fontWeight: 400, color: "#B91C1C", cursor: loggingOut ? "default" : "pointer",
                   opacity: loggingOut ? 0.6 : 1,
                 }}
               >
@@ -607,7 +539,7 @@ export default function Navbar() {
                 Sign in
               </Link>
               <Link href="/signup" className="btn-primary" style={{ flex: 1, justifyContent: "center" }}>
-                Start Building
+                Create profile
               </Link>
             </div>
           )}

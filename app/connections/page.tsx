@@ -30,7 +30,7 @@ interface PendingProfile extends Profile {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getAvatarColor(id: string): string {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#06b6d4"];
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6", "#06b6d4"];
   return colors[id.charCodeAt(0) % colors.length] ?? "#6366f1";
 }
 
@@ -254,7 +254,7 @@ export default function ConnectionsPage() {
       <div className="page-z" style={{ maxWidth: 1200, margin: "0 auto", paddingTop: "80px" }}>
 
         {/* Header */}
-        <div className="animate-fade-up" style={{ marginBottom: 28 }}>
+        <div className="animate-fade-up" style={{ marginBottom: 32 }}>
           <h1 style={titleStyle}>Connections</h1>
           <p style={subtitleStyle}>Manage your network of student builders</p>
         </div>
@@ -399,18 +399,7 @@ function SkillPills({ skills }: { skills: string | null }) {
 
 function ConnectedCard({ profile }: { profile: ConnectedProfile }) {
   return (
-    <article style={cardStyle}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "color-mix(in srgb, var(--accent) 35%, transparent)";
-        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "0 16px 40px rgba(0,0,0,0.45)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "none";
-      }}
-    >
+    <article className="card-hover" style={cardStyle}>
       {/* Connected badge */}
       <div style={connectedBadgeStyle}>
         <span style={connectedDotStyle} />
@@ -465,18 +454,7 @@ function PendingCard({
   onDecline: () => void;
 }) {
   return (
-    <article style={cardStyle}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "color-mix(in srgb, var(--warning) 30%, transparent)";
-        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "0 16px 40px rgba(0,0,0,0.45)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "none";
-      }}
-    >
+    <article className="card-hover" style={cardStyle}>
       {/* Pending badge */}
       <div style={pendingBadgeStyle}>
         <span style={pendingDotStyle} />
@@ -535,18 +513,7 @@ function SentCard({
   onCancel: () => void;
 }) {
   return (
-    <article style={cardStyle}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "color-mix(in srgb, var(--accent) 25%, transparent)";
-        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "0 16px 40px rgba(0,0,0,0.45)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "none";
-      }}
-    >
+    <article className="card-hover" style={cardStyle}>
       {/* Sent badge */}
       <div style={sentBadgeStyle}>
         <span style={sentDotStyle} />
@@ -599,41 +566,41 @@ function EmptyState({
   cta?: { label: string; href: string };
 }) {
   return (
-    <div style={{ textAlign: "center", padding: "64px 24px" }}>
+    <div className="empty-state-panel" style={{ maxWidth: 520, margin: "24px auto" }}>
       {svgType === "network" && (
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 20 }}>
-          <circle cx="50" cy="50" r="47" stroke="rgba(99,102,241,0.18)" strokeWidth="1.5" strokeDasharray="7 4" />
-          <circle cx="50" cy="50" r="10" fill="rgba(99,102,241,0.15)" stroke="rgba(99,102,241,0.5)" strokeWidth="1.5" />
-          <circle cx="20" cy="35" r="7" fill="rgba(76,142,255,0.1)" stroke="rgba(76,142,255,0.4)" strokeWidth="1.5" />
-          <circle cx="80" cy="35" r="7" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.4)" strokeWidth="1.5" />
-          <circle cx="20" cy="65" r="7" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.4)" strokeWidth="1.5" />
+          <circle cx="50" cy="50" r="47" stroke="#E8E8E4" strokeWidth="1.5" strokeDasharray="7 4" />
+          <circle cx="50" cy="50" r="10" fill="#E8E8E4" stroke="#D8D8D2" strokeWidth="1.5" />
+          <circle cx="20" cy="35" r="7" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
+          <circle cx="80" cy="35" r="7" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
+          <circle cx="20" cy="65" r="7" fill="#ECFDF5" stroke="#D1FAE5" strokeWidth="1.5" />
           <circle cx="80" cy="65" r="7" fill="rgba(236,72,153,0.1)" stroke="rgba(236,72,153,0.35)" strokeWidth="1.5" />
-          <circle cx="50" cy="18" r="6" fill="rgba(34,211,238,0.1)" stroke="rgba(34,211,238,0.4)" strokeWidth="1.5" />
-          <line x1="27" y1="38" x2="42" y2="46" stroke="rgba(99,102,241,0.3)" strokeWidth="1.2" />
-          <line x1="73" y1="38" x2="58" y2="46" stroke="rgba(99,102,241,0.3)" strokeWidth="1.2" />
-          <line x1="27" y1="62" x2="42" y2="54" stroke="rgba(99,102,241,0.3)" strokeWidth="1.2" />
-          <line x1="73" y1="62" x2="58" y2="54" stroke="rgba(99,102,241,0.3)" strokeWidth="1.2" />
-          <line x1="50" y1="24" x2="50" y2="40" stroke="rgba(99,102,241,0.3)" strokeWidth="1.2" />
+          <circle cx="50" cy="18" r="6" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
+          <line x1="27" y1="38" x2="42" y2="46" stroke="#E8E8E4" strokeWidth="1.2" />
+          <line x1="73" y1="38" x2="58" y2="46" stroke="#E8E8E4" strokeWidth="1.2" />
+          <line x1="27" y1="62" x2="42" y2="54" stroke="#E8E8E4" strokeWidth="1.2" />
+          <line x1="73" y1="62" x2="58" y2="54" stroke="#E8E8E4" strokeWidth="1.2" />
+          <line x1="50" y1="24" x2="50" y2="40" stroke="#E8E8E4" strokeWidth="1.2" />
         </svg>
       )}
       {svgType === "pending" && (
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 20 }}>
-          <circle cx="50" cy="50" r="47" stroke="rgba(251,191,36,0.18)" strokeWidth="1.5" strokeDasharray="7 4" />
-          <rect x="22" y="28" width="56" height="44" rx="10" fill="rgba(251,191,36,0.07)" stroke="rgba(251,191,36,0.35)" strokeWidth="1.5" />
-          <path d="M22 42l28 16 28-16" stroke="rgba(251,191,36,0.4)" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="50" cy="50" r="47" stroke="#FDE68A" strokeWidth="1.5" strokeDasharray="7 4" />
+          <rect x="22" y="28" width="56" height="44" rx="10" fill="#FFFBEB" stroke="#FDE68A" strokeWidth="1.5" />
+          <path d="M22 42l28 16 28-16" stroke="#FDE68A" strokeWidth="1.5" strokeLinecap="round" />
           <circle cx="72" cy="30" r="10" fill="rgba(251,146,60,0.2)" stroke="rgba(251,146,60,0.5)" strokeWidth="1.5" />
           <path d="M72 26v5l3 2.5" stroke="rgba(251,146,60,0.8)" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       )}
       {svgType === "sent" && (
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 20 }}>
-          <circle cx="50" cy="50" r="47" stroke="rgba(99,102,241,0.18)" strokeWidth="1.5" strokeDasharray="7 4" />
-          <path d="M18 50L82 50M60 34l22 16-22 16" fill="none" stroke="rgba(99,102,241,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="34" cy="50" r="8" fill="rgba(99,102,241,0.1)" stroke="rgba(99,102,241,0.35)" strokeWidth="1.5" />
+          <circle cx="50" cy="50" r="47" stroke="#E8E8E4" strokeWidth="1.5" strokeDasharray="7 4" />
+          <path d="M18 50L82 50M60 34l22 16-22 16" fill="none" stroke="#D8D8D2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="34" cy="50" r="8" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
         </svg>
       )}
       {!svgType && <div style={{ fontSize: 40, marginBottom: 16 }}>🔗</div>}
-      <h3 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "var(--text-primary)", marginBottom: 8 }}>
+      <h3 style={{ fontFamily: "var(--font-sans)", fontSize: 18, fontWeight: 700, color: "var(--text-primary)", marginBottom: 8 }}>
         {title}
       </h3>
       <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 320, margin: "0 auto 20px" }}>{body}</p>
@@ -656,16 +623,16 @@ const pageStyle: React.CSSProperties = {
 
 const titleStyle: React.CSSProperties = {
   fontSize: "clamp(26px, 4vw, 38px)",
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   color: "var(--text-primary)",
   letterSpacing: "-0.03em",
   marginBottom: 6,
 };
 
 const subtitleStyle: React.CSSProperties = {
-  color: "var(--text-muted)",
-  fontSize: 15,
+  color: "#6B6B66",
+  fontSize: 18,
 };
 
 const errorStyle: React.CSSProperties = {
@@ -725,12 +692,12 @@ const tabCountBase: React.CSSProperties = {
 };
 
 const tabCountActive: React.CSSProperties = {
-  background: "rgba(255,255,255,0.25)",
-  color: "white",
+  background: "#E8E8E4",
+  color: "var(--text-primary)",
 };
 
 const tabCountInactive: React.CSSProperties = {
-  background: "rgba(255,255,255,0.07)",
+  background: "#EFEFEC",
   color: "var(--text-muted)",
 };
 
@@ -786,7 +753,7 @@ const avatarStyle: React.CSSProperties = {
 
 const cardNameStyle: React.CSSProperties = {
   fontSize: 15,
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   color: "var(--text-primary)",
   marginBottom: 2,
@@ -817,7 +784,7 @@ const skillPillStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
   color: "var(--text-secondary)",
-  background: "rgba(255,255,255,0.06)",
+  background: "#EFEFEC",
   border: "1px solid var(--border)",
   borderRadius: 6,
   padding: "3px 9px",

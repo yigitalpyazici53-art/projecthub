@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { publicMetadata } from "@/utils/seo";
 
-export const metadata: Metadata = {
-  title: "Contact | ProjectHub",
+export const metadata: Metadata = publicMetadata({
+  title: "Contact",
   description:
     "Get in touch with ProjectHub — feedback, support, and collaboration inquiries welcome.",
-};
+  path: "/contact",
+});
 
 const pageStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -20,8 +22,8 @@ const wrapStyle: React.CSSProperties = {
 };
 
 const h1Style: React.CSSProperties = {
-  fontFamily: "Syne, sans-serif",
-  fontWeight: 800,
+  fontFamily: "var(--font-serif)",
+  fontWeight: 500,
   fontSize: "clamp(34px, 5vw, 48px)",
   letterSpacing: "-0.02em",
   color: "var(--text-primary)",
@@ -29,7 +31,7 @@ const h1Style: React.CSSProperties = {
 };
 
 const leadStyle: React.CSSProperties = {
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontSize: 16,
   color: "var(--text-secondary)",
   lineHeight: 1.7,
@@ -45,7 +47,7 @@ const cardStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "Syne, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
   fontSize: 11,
   letterSpacing: "0.1em",
@@ -55,7 +57,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const primaryLineStyle: React.CSSProperties = {
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontSize: 20,
   fontWeight: 600,
   color: "var(--text-primary)",
@@ -63,7 +65,7 @@ const primaryLineStyle: React.CSSProperties = {
 };
 
 const mutedStyle: React.CSSProperties = {
-  fontFamily: "DM Sans, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontSize: 14,
   color: "var(--text-secondary)",
   lineHeight: 1.7,
@@ -89,8 +91,8 @@ const pillStyle: React.CSSProperties = {
   padding: "6px 12px",
   borderRadius: 999,
   border: "1px solid var(--border)",
-  background: "rgba(255,255,255,0.03)",
-  fontFamily: "DM Sans, sans-serif",
+  background: "#FAFAF8",
+  fontFamily: "var(--font-sans)",
   fontSize: 12.5,
   fontWeight: 500,
   color: "var(--text-secondary)",
@@ -169,7 +171,7 @@ export default function ContactPage() {
           </ul>
         </div>
 
-        <div style={{ marginTop: 24, fontSize: 13, color: "var(--text-muted)", fontFamily: "DM Sans, sans-serif" }}>
+        <div style={{ marginTop: 24, fontSize: 13, color: "var(--text-muted)", fontFamily: "var(--font-sans)" }}>
           See also:{" "}
           <Link href="/privacy" style={linkStyle}>Privacy Policy</Link>
           {"  ·  "}

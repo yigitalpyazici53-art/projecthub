@@ -20,24 +20,24 @@ const ADMIN_EMAIL = "yigitalpyazici53@gmail.com";
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, React.CSSProperties> = {
     new: {
-      background: "rgba(96,165,250,0.12)",
+      background: "#F5F5F3",
       color: "#60a5fa",
-      border: "1px solid rgba(96,165,250,0.28)",
+      border: "1px solid #E8E8E4",
     },
     reviewed: {
-      background: "rgba(251,191,36,0.12)",
-      color: "#fbbf24",
-      border: "1px solid rgba(251,191,36,0.28)",
+      background: "#FFFBEB",
+      color: "#B45309",
+      border: "1px solid #FDE68A",
     },
     accepted: {
-      background: "rgba(74,222,128,0.12)",
-      color: "#4ade80",
-      border: "1px solid rgba(74,222,128,0.28)",
+      background: "#ECFDF5",
+      color: "#0F6E56",
+      border: "1px solid #D1FAE5",
     },
     rejected: {
-      background: "rgba(239,68,68,0.10)",
-      color: "#f87171",
-      border: "1px solid rgba(239,68,68,0.22)",
+      background: "#FEF2F2",
+      color: "#B91C1C",
+      border: "1px solid #FECACA",
     },
   };
 
@@ -51,7 +51,7 @@ function StatusBadge({ status }: { status: string }) {
         textTransform: "uppercase",
         padding: "3px 10px",
         borderRadius: 999,
-        fontFamily: "DM Sans, sans-serif",
+        fontFamily: "var(--font-sans)",
         ...(styles[status] ?? styles.new),
       }}
     >
@@ -78,11 +78,11 @@ function LinkChip({
         fontSize: 12,
         padding: "2px 10px",
         borderRadius: 6,
-        background: "rgba(76,142,255,0.08)",
-        border: "1px solid rgba(76,142,255,0.18)",
+        background: "#F5F5F3",
+        border: "1px solid #E8E8E4",
         color: "var(--accent)",
         textDecoration: "none",
-        fontFamily: "DM Sans, sans-serif",
+        fontFamily: "var(--font-sans)",
       }}
     >
       {label} ↗
@@ -137,8 +137,8 @@ export default async function AdminApplicationsPage() {
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--accent)",
-              background: "rgba(76,142,255,0.08)",
-              border: "1px solid rgba(76,142,255,0.18)",
+              background: "#F5F5F3",
+              border: "1px solid #E8E8E4",
               borderRadius: 999,
               padding: "3px 12px",
               marginBottom: 16,
@@ -148,9 +148,9 @@ export default async function AdminApplicationsPage() {
           </div>
           <h1
             style={{
-              fontFamily: "Syne, sans-serif",
+              fontFamily: "var(--font-serif)",
               fontSize: 28,
-              fontWeight: 800,
+              fontWeight: 500,
               color: "var(--text-primary)",
               marginBottom: 6,
               letterSpacing: "-0.02em",
@@ -162,12 +162,12 @@ export default async function AdminApplicationsPage() {
             style={{
               fontSize: 14,
               color: "var(--text-muted)",
-              fontFamily: "DM Sans, sans-serif",
+              fontFamily: "var(--font-sans)",
             }}
           >
             {rows.length} application{rows.length !== 1 ? "s" : ""} submitted
             {error && (
-              <span style={{ color: "#f87171", marginLeft: 8 }}>
+              <span style={{ color: "#B91C1C", marginLeft: 8 }}>
                 · fetch error: {error.message}
               </span>
             )}
@@ -180,11 +180,11 @@ export default async function AdminApplicationsPage() {
             style={{
               textAlign: "center",
               padding: "80px 24px",
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid rgba(80,120,220,0.12)",
+              background: "#FAFAF8",
+              border: "1px solid #F5F5F3",
               borderRadius: 16,
               color: "var(--text-muted)",
-              fontFamily: "DM Sans, sans-serif",
+              fontFamily: "var(--font-sans)",
               fontSize: 15,
             }}
           >
@@ -199,11 +199,11 @@ export default async function AdminApplicationsPage() {
               key={app.id}
               style={{
                 background:
-                  "linear-gradient(145deg, rgba(9,14,26,0.98), rgba(14,22,40,0.95))",
-                border: "1px solid rgba(80,120,220,0.15)",
+                  "linear-gradient(145deg, #FFFFFF, #FFFFFF)",
+                border: "1px solid #E8E8E4",
                 borderRadius: 16,
                 padding: "28px 32px",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+                boxShadow: "0 4px 24px rgba(26,26,24,0.08)",
               }}
             >
               {/* Row 1 — name / email / status / date */}
@@ -220,7 +220,7 @@ export default async function AdminApplicationsPage() {
                 <div>
                   <span
                     style={{
-                      fontFamily: "Syne, sans-serif",
+                      fontFamily: "var(--font-sans)",
                       fontWeight: 700,
                       fontSize: 17,
                       color: "var(--text-primary)",
@@ -235,7 +235,7 @@ export default async function AdminApplicationsPage() {
                       marginTop: 4,
                       fontSize: 13,
                       color: "var(--text-muted)",
-                      fontFamily: "DM Sans, sans-serif",
+                      fontFamily: "var(--font-sans)",
                     }}
                   >
                     {app.email}
@@ -245,7 +245,7 @@ export default async function AdminApplicationsPage() {
                   style={{
                     fontSize: 12,
                     color: "var(--text-muted)",
-                    fontFamily: "DM Sans, sans-serif",
+                    fontFamily: "var(--font-sans)",
                     textAlign: "right",
                     flexShrink: 0,
                   }}
@@ -303,7 +303,7 @@ export default async function AdminApplicationsPage() {
                   flexWrap: "wrap",
                   marginTop: 16,
                   paddingTop: 16,
-                  borderTop: "1px solid rgba(80,120,220,0.1)",
+                  borderTop: "1px solid #F5F5F3",
                 }}
               >
                 <LinkChip href={app.github_url} label="GitHub" />
@@ -337,13 +337,13 @@ function Chip({
         fontWeight: 500,
         padding: "4px 10px",
         borderRadius: 999,
-        fontFamily: "DM Sans, sans-serif",
+        fontFamily: "var(--font-sans)",
         background: accent
-          ? "rgba(76,142,255,0.1)"
-          : "rgba(255,255,255,0.05)",
+          ? "#F5F5F3"
+          : "#F7F7F5",
         border: accent
-          ? "1px solid rgba(76,142,255,0.22)"
-          : "1px solid rgba(255,255,255,0.1)",
+          ? "1px solid #E8E8E4"
+          : "1px solid #E8E8E4",
         color: accent ? "var(--accent)" : "var(--text-secondary)",
       }}
     >
@@ -364,7 +364,7 @@ function Detail({ label, value }: { label: string; value: string }) {
           textTransform: "uppercase",
           color: "var(--accent)",
           marginBottom: 4,
-          fontFamily: "DM Sans, sans-serif",
+          fontFamily: "var(--font-sans)",
         }}
       >
         {label}
@@ -373,7 +373,7 @@ function Detail({ label, value }: { label: string; value: string }) {
         style={{
           fontSize: 13,
           color: "var(--text-secondary)",
-          fontFamily: "DM Sans, sans-serif",
+          fontFamily: "var(--font-sans)",
           lineHeight: 1.6,
           margin: 0,
           whiteSpace: "pre-wrap",

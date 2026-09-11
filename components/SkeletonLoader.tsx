@@ -1,30 +1,12 @@
 "use client";
 
-const shimmerCSS = `
-@keyframes skeleton-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
-.skeleton-row {
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0.04) 25%,
-    rgba(255,255,255,0.09) 50%,
-    rgba(255,255,255,0.04) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.6s infinite;
-  border-radius: 8px;
-}
-`;
-
 function SkeletonCard() {
   return (
     <div
       style={{
-        background: "linear-gradient(145deg, #0d1117 0%, #111820 100%)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        borderRadius: 16,
+        background: "#FFFFFF",
+        border: "1px solid var(--border)",
+        borderRadius: 12,
         padding: 24,
         display: "flex",
         flexDirection: "column",
@@ -58,19 +40,16 @@ export default function SkeletonLoader({
   columns?: string;
 }) {
   return (
-    <>
-      <style>{shimmerCSS}</style>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: columns,
-          gap: 20,
-        }}
-      >
-        {Array.from({ length: count }).map((_, i) => (
-          <SkeletonCard key={i} />
-        ))}
-      </div>
-    </>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: columns,
+        gap: 20,
+      }}
+    >
+      {Array.from({ length: count }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
   );
 }

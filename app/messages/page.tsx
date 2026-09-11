@@ -65,8 +65,8 @@ function MessagesInner() {
 
   const activeConv = conversations.find((c) => c.partner.id === activePartnerId) ?? null;
 
-  // ── Load conversations (connected users + any existing messages) ───────────
-  const loadConversations = useCallback(async (uid: string) => {
+  // ── Fetch conversations (connected users + any existing messages) ──────────
+  const fetchConversations = useCallback(async (uid: string): Promise<Conversation[]> => {
     const supabase = createClient();
     // Get all accepted connections
     const { data: conns } = await supabase
@@ -75,11 +75,7 @@ function MessagesInner() {
       .eq("status", "accepted")
       .or(`sender_id.eq.${uid},receiver_id.eq.${uid}`);
 
-    if (!conns || conns.length === 0) {
-      setConversations([]);
-      setLoading(false);
-      return;
-    }
+    if (!conns || conns.length === 0) return [];
 
     const partnerIds = [...new Set(
       conns.map((c: { sender_id: string; receiver_id: string }) =>
@@ -92,7 +88,7 @@ function MessagesInner() {
       .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url")
       .in("id", partnerIds);
 
-    if (!profiles) { setLoading(false); return; }
+    if (!profiles) return [];
 
     // Get last message and unread count per conversation
     const convList: Conversation[] = await Promise.all(
@@ -133,8 +129,7 @@ function MessagesInner() {
       return new Date(b.lastTime).getTime() - new Date(a.lastTime).getTime();
     });
 
-    setConversations(convList);
-    setLoading(false);
+    return convList;
   }, []);
 
   // ── Auth + initial load ────────────────────────────────────────────────────
@@ -144,20 +139,24 @@ function MessagesInner() {
       router.replace("/login?next=/messages");
       return;
     }
-    loadConversations(user.id);
-  }, [authLoading, user, router, loadConversations]);
+    let cancelled = false;
+    fetchConversations(user.id).then((list) => {
+      if (cancelled) return;
+      setConversations(list);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [authLoading, user, router, fetchConversations]);
 
   // ── Open conversation from ?with= query param ──────────────────────────────
-  useEffect(() => {
-    const withId = searchParams.get("with");
-    if (withId && conversations.length > 0) {
-      // Ensure this partner exists in our conversations
-      const found = conversations.find((c) => c.partner.id === withId);
-      if (found) setActivePartnerId(withId);
-    } else if (withId) {
-      setActivePartnerId(withId);
-    }
-  }, [searchParams, conversations]);
+  // Applied once per distinct param value (during render, not in an effect), so
+  // later conversation-list updates don't yank the user back to that partner.
+  const withParam = searchParams.get("with");
+  const [appliedWith, setAppliedWith] = useState<string | null>(null);
+  if (withParam && withParam !== appliedWith) {
+    setAppliedWith(withParam);
+    setActivePartnerId(withParam);
+  }
 
   // ── Load messages for active conversation ─────────────────────────────────
   useEffect(() => {

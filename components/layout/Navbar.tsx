@@ -115,9 +115,10 @@ function NotificationBell({ userId }: { userId: string | null }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Fetch unread count on mount / when userId is available
+  // Fetch unread count on mount. The parent keys this component by userId, so
+  // a different user always starts from a fresh count of 0.
   useEffect(() => {
-    if (!userId) { setUnreadCount(0); return; }
+    if (!userId) return;
     const fetchCount = async () => {
       const lastRead = localStorage.getItem(`notif_read_${userId}`) ?? "1970-01-01T00:00:00Z";
       const supabase = createClient();
@@ -307,8 +308,12 @@ export default function Navbar() {
   const [university, setUniversity] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  // Close mobile menu on route change
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  // Close mobile menu on route change (adjusted during render, not in an effect).
+  const [menuPathname, setMenuPathname] = useState(pathname);
+  if (pathname !== menuPathname) {
+    setMenuPathname(pathname);
+    setMenuOpen(false);
+  }
 
   useEffect(() => {
     const supabase = createClient();
@@ -384,7 +389,7 @@ export default function Navbar() {
 
         {/* Right side */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <NotificationBell userId={userId} />
+          <NotificationBell key={userId ?? "anon"} userId={userId} />
 
           <div className="nav-desktop-items" style={{ alignItems: "center", gap: 8 }}>
             {userId ? (

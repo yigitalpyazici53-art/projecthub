@@ -36,13 +36,20 @@ export default function OnboardingPage() {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) { router.replace("/login"); return; }
+  // Prefill the name from auth metadata once per user. Adjusting state during
+  // render (not in an effect) avoids an extra render pass, and keying on the id
+  // stops a session refresh from overwriting what the user has typed.
+  const [prefilledFor, setPrefilledFor] = useState<string | null>(null);
+  if (user && prefilledFor !== user.id) {
+    setPrefilledFor(user.id);
     const name =
       user.user_metadata?.full_name ??
       user.user_metadata?.name ?? "";
     if (name) setFullName(name);
+  }
+
+  useEffect(() => {
+    if (!authLoading && !user) router.replace("/login");
   }, [authLoading, user, router]);
 
   const markSeen = () => {

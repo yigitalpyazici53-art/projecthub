@@ -255,7 +255,7 @@ export default function DashboardPage() {
               .map((n) => n.from_user_id)
               .filter(Boolean) as string[]
           )];
-          let fromProfileMap: Record<string, Profile> = {};
+          const fromProfileMap: Record<string, Profile> = {};
           if (fromIds.length > 0) {
             const { data: fromProfiles } = await supabase
               .from("profiles")

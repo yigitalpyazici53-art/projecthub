@@ -101,8 +101,7 @@ export function CountUp({ value, style }: { value: number; style?: React.CSSProp
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    if (!inView) return;
-    if (reduced) { setDisplay(value); return; }
+    if (!inView || reduced) return;
     const duration = 1000;
     const start = performance.now();
     let raf = 0;
@@ -116,5 +115,6 @@ export function CountUp({ value, style }: { value: number; style?: React.CSSProp
     return () => cancelAnimationFrame(raf);
   }, [inView, value, reduced]);
 
-  return <span ref={ref} style={style}>{display}</span>;
+  // Reduced motion skips the animation and shows the final number.
+  return <span ref={ref} style={style}>{reduced ? value : display}</span>;
 }

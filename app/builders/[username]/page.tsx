@@ -299,7 +299,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
               <div style={{ display: "flex", alignItems: "center", gap: 20, minWidth: 0 }}>
                 <div style={{
                   width: 72, height: 72, borderRadius: "50%", flexShrink: 0,
-                  background: "#F5F5F3", border: "1px solid var(--border)",
+                  background: "var(--surface-raised)", border: "1px solid var(--border)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 24, fontWeight: 600, color: "var(--text-secondary)",
                   overflow: "hidden",
@@ -350,8 +350,8 @@ export default function BuilderProfilePage({ params }: PageProps) {
                         opacity: connectStatus === "sending" ? 0.7 : 1,
                         cursor: canConnect ? "pointer" : "default",
                         color: connectStatus === "sent" || connectStatus === "already_connected"
-                          ? "#0F6E56"
-                          : connectStatus === "error" ? "#B91C1C" : "var(--text-primary)",
+                          ? "var(--accent-green)"
+                          : connectStatus === "error" ? "var(--danger)" : "var(--text-primary)",
                       }}
                     >
                       {connectLabels[connectStatus]}
@@ -391,19 +391,19 @@ export default function BuilderProfilePage({ params }: PageProps) {
             )}
 
             {/* Connection state notes */}
-            {connectError && <p style={{ color: "#B91C1C", fontSize: 12, marginTop: 14 }}>{connectError}</p>}
+            {connectError && <p style={{ color: "var(--danger)", fontSize: 12, marginTop: 14 }}>{connectError}</p>}
             {showSentToast && connectStatus === "sent" && (
               <div
                 role="status"
                 style={{
                   display: "flex", alignItems: "center", gap: 10,
-                  background: "#ECFDF5",
-                  border: "1px solid #D1FAE5",
+                  background: "var(--accent-green-glow)",
+                  border: "1px solid var(--accent-green-glow)",
                   borderRadius: 8, padding: "10px 14px",
                   marginTop: 16,
                 }}
               >
-                <span style={{ fontSize: 13, color: "#0F6E56", flex: 1, lineHeight: 1.5 }}>
+                <span style={{ fontSize: 13, color: "var(--accent-green)", flex: 1, lineHeight: 1.5 }}>
                   Connection request sent to <strong>{builderFirstName}</strong>. You&apos;ll get notified if they accept.
                 </span>
                 <button
@@ -411,7 +411,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
                   onClick={() => setShowSentToast(false)}
                   aria-label="Dismiss"
                   style={{
-                    background: "transparent", border: "none", color: "#0F6E56",
+                    background: "transparent", border: "none", color: "var(--accent-green)",
                     fontSize: 13, cursor: "pointer", padding: "2px 6px", fontWeight: 600,
                   }}
                 >
@@ -422,7 +422,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
             {connectStatus === "incoming" && (
               <div
                 style={{
-                  background: "#F7F7F5",
+                  background: "var(--surface-raised)",
                   border: "1px solid var(--border)",
                   borderRadius: 8, padding: "10px 14px",
                   marginTop: 16,
@@ -434,7 +434,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
               </div>
             )}
             {isOpenToCollaborate && availability && (
-              <div className="label-caps" style={{ marginTop: 16, color: "#0F6E56" }}>
+              <div className="label-caps" style={{ marginTop: 16, color: "var(--accent-green)" }}>
                 {availability}
               </div>
             )}
@@ -449,7 +449,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
               { label: "Endorsements received", value: endorsementsCount },
             ].map(({ label, value }) => (
               <div key={label} style={{
-                background: "#F7F7F5",
+                background: "var(--surface-raised)",
                 borderRadius: 12,
                 padding: "24px 24px",
               }}>
@@ -535,7 +535,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
                     <span key={skill} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                       <span style={{
                         fontSize: 13, fontWeight: 400, borderRadius: 999, padding: "5px 14px",
-                        background: "#F5F5F3",
+                        background: "var(--surface-raised)",
                         color: "var(--text-secondary)",
                       }}>
                         {skill}{count > 0 ? ` (${count})` : ""}
@@ -549,9 +549,9 @@ export default function BuilderProfilePage({ params }: PageProps) {
                           title={hasEndorsed ? "Remove endorsement" : `Endorse ${skill}`}
                           style={{
                             padding: "3px 9px", borderRadius: 999, fontSize: 11, fontWeight: 500, cursor: "pointer",
-                            background: hasEndorsed ? "#ECFDF5" : "transparent",
-                            border: `1px solid ${hasEndorsed ? "#D1FAE5" : "var(--border)"}`,
-                            color: hasEndorsed ? "#0F6E56" : "var(--text-muted)",
+                            background: hasEndorsed ? "var(--accent-green-glow)" : "transparent",
+                            border: `1px solid ${hasEndorsed ? "var(--accent-green-glow)" : "var(--border)"}`,
+                            color: hasEndorsed ? "var(--accent-green)" : "var(--text-muted)",
                             opacity: endorsing === skill ? 0.5 : 1,
                           }}
                         >
@@ -591,7 +591,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
           role="status"
           style={{
             position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
-            background: "#1A1A18", color: "#FFFFFF",
+            background: "var(--accent)", color: "var(--accent-contrast)",
             fontSize: 13, fontWeight: 500,
             padding: "10px 18px", borderRadius: 8,
             zIndex: 300,
@@ -618,7 +618,7 @@ const page: React.CSSProperties = {
 };
 
 const card: React.CSSProperties = {
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   borderRadius: 12,
   padding: 28,

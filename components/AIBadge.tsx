@@ -31,7 +31,7 @@ export default function AIBadge({
         fontWeight: 500,
         letterSpacing: "0.04em",
         color: "var(--text-muted)",
-        background: "#F5F5F3",
+        background: "var(--surface-raised)",
         border: "1px solid var(--border)",
         borderRadius: 6,
         padding: `${padY}px ${padX}px`,

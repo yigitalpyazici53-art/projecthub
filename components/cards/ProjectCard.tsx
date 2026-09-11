@@ -67,7 +67,7 @@ export default function ProjectCard({
       className="card-lift"
       style={{
         position: "relative",
-        background: "#FFFFFF",
+        background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: 12,
         padding: 24,
@@ -113,7 +113,7 @@ export default function ProjectCard({
         {project.is_ai_generated && (
           <span style={{
             fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
-            color: "var(--text-muted)", background: "#F5F5F3",
+            color: "var(--text-muted)", background: "var(--surface-raised)",
           }}>
             demo
           </span>
@@ -157,8 +157,8 @@ export default function ProjectCard({
           {lookingFor.slice(0, 3).map((role) => (
             <span key={role} style={{
               fontSize: 11, fontWeight: 500, padding: "3px 9px", borderRadius: 999,
-              color: "#0F6E56",
-              background: "#ECFDF5",
+              color: "var(--accent-green)",
+              background: "var(--accent-green-glow)",
             }}>
               {role}
             </span>
@@ -178,7 +178,7 @@ export default function ProjectCard({
             <span key={tech} style={{
               fontSize: 11, fontWeight: 400, padding: "3px 9px", borderRadius: 6,
               color: "var(--text-secondary)",
-              background: "#F5F5F3",
+              background: "var(--surface-raised)",
             }}>
               {tech}
             </span>
@@ -206,7 +206,7 @@ export default function ProjectCard({
             width: 24,
             height: 24,
             borderRadius: "50%",
-            background: "#F5F5F3",
+            background: "var(--surface-raised)",
             border: "1px solid var(--border)",
             color: "var(--text-secondary)",
             fontSize: 10,

@@ -30,7 +30,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div style={{
           minHeight: "100vh",
-          background: "#FAFAF8",
+          background: "var(--background)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -39,8 +39,8 @@ export default class ErrorBoundary extends React.Component<Props, State> {
           <div style={{
             maxWidth: 480,
             width: "100%",
-            background: "#FFFFFF",
-            border: "1px solid #FECACA",
+            background: "var(--surface)",
+            border: "1px solid var(--danger-border)",
             borderRadius: 16,
             padding: 36,
             textAlign: "center",
@@ -50,12 +50,12 @@ export default class ErrorBoundary extends React.Component<Props, State> {
               fontFamily: "var(--font-sans)",
               fontSize: 22,
               fontWeight: 700,
-              color: "#1A1A18",
+              color: "var(--text-primary)",
               marginBottom: 10,
             }}>
               Something went wrong
             </h2>
-            <p style={{ color: "#6B6B66", fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
+            <p style={{ color: "var(--text-secondary)", fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
               An unexpected error occurred. Try refreshing the page or going back to the dashboard.
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -65,7 +65,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
                 style={{
                   padding: "10px 20px",
                   borderRadius: 10,
-                  background: "#1A1A18",
+                  background: "var(--accent)",
                   border: "none",
                   color: "white",
                   fontWeight: 700,
@@ -80,9 +80,9 @@ export default class ErrorBoundary extends React.Component<Props, State> {
                 style={{
                   padding: "10px 20px",
                   borderRadius: 10,
-                  background: "#EFEFEC",
-                  border: "1px solid #E8E8E4",
-                  color: "#9B9B94",
+                  background: "var(--surface-raised)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-secondary)",
                   fontWeight: 600,
                   fontSize: 14,
                   textDecoration: "none",

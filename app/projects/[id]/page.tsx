@@ -28,21 +28,21 @@ function formatDate(iso: string | null): string {
 
 function getStageColor(stage: string | null): string {
   switch (stage) {
-    case "idea": return "#6B6B66";
-    case "mvp": return "#B45309";
-    case "building": return "#B45309";
-    case "launched": return "#0F6E56";
-    default: return "#6B6B66";
+    case "idea": return "var(--badge-idea-text)";
+    case "mvp": return "var(--badge-building-text)";
+    case "building": return "var(--badge-building-text)";
+    case "launched": return "var(--badge-shipped-text)";
+    default: return "var(--badge-idea-text)";
   }
 }
 
 function getStageBg(stage: string | null): string {
   switch (stage) {
-    case "idea": return "#F5F5F3";
-    case "mvp": return "#FFFBEB";
-    case "building": return "#FFFBEB";
-    case "launched": return "#ECFDF5";
-    default: return "#F5F5F3";
+    case "idea": return "var(--badge-idea-bg)";
+    case "mvp": return "var(--badge-building-bg)";
+    case "building": return "var(--badge-building-bg)";
+    case "launched": return "var(--badge-shipped-bg)";
+    default: return "var(--badge-idea-bg)";
   }
 }
 
@@ -117,7 +117,7 @@ function WeeklyUpdateComposer({
       <div style={{
         padding: "14px 16px",
         borderRadius: 10,
-        background: "#F7F7F5",
+        background: "var(--surface-raised)",
         border: "1px solid var(--border)",
         marginBottom: 16,
         fontSize: 12,
@@ -144,7 +144,7 @@ function WeeklyUpdateComposer({
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
         {updateError ? (
-          <p style={{ fontSize: 12, color: "#B91C1C", margin: 0 }}>{updateError}</p>
+          <p style={{ fontSize: 12, color: "var(--danger)", margin: 0 }}>{updateError}</p>
         ) : (
           <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
             Fill in any fields you want to share
@@ -308,7 +308,7 @@ function ApplyModal({
 
           {/* Why join */}
           <div>
-            <label style={fieldLabelStyle}>Why do you want to join? <span style={{ color: "#B91C1C" }}>*</span></label>
+            <label style={fieldLabelStyle}>Why do you want to join? <span style={{ color: "var(--danger)" }}>*</span></label>
             <textarea
               value={whyJoin}
               onChange={(e) => setWhyJoin(e.target.value.slice(0, MAX_FIELD))}
@@ -318,7 +318,7 @@ function ApplyModal({
               autoFocus
               style={{ ...inputStyle, resize: "none", marginTop: 8 }}
             />
-            <div style={{ textAlign: "right", marginTop: 4, fontSize: 11, color: MAX_FIELD - whyJoin.length <= 20 ? "#B45309" : "var(--text-muted)" }}>
+            <div style={{ textAlign: "right", marginTop: 4, fontSize: 11, color: MAX_FIELD - whyJoin.length <= 20 ? "var(--tint-amber-text)" : "var(--text-muted)" }}>
               {MAX_FIELD - whyJoin.length} left
             </div>
           </div>
@@ -362,7 +362,7 @@ function ApplyModal({
         </div>
 
         {error && (
-          <p style={{ fontSize: 13, color: "#B91C1C", marginTop: 14, marginBottom: 0 }}>{error}</p>
+          <p style={{ fontSize: 13, color: "var(--danger)", marginTop: 14, marginBottom: 0 }}>{error}</p>
         )}
 
         {/* Actions */}
@@ -417,12 +417,12 @@ function DeleteConfirmModal({
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
-              background: "#FEF2F2",
-              border: "1px solid #FECACA",
+              background: "var(--danger-bg)",
+              border: "1px solid var(--danger-border)",
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0,
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                 <path d="M10 11v6M14 11v6" />
@@ -442,13 +442,13 @@ function DeleteConfirmModal({
         <div style={{
           padding: "14px 16px",
           borderRadius: 10,
-          background: "#FEF2F2",
-          border: "1px solid #FECACA",
+          background: "var(--danger-bg)",
+          border: "1px solid var(--danger-border)",
           marginBottom: 24,
         }}>
-          <p style={{ fontSize: 14, color: "#B91C1C", lineHeight: 1.65, margin: 0 }}>
+          <p style={{ fontSize: 14, color: "var(--danger)", lineHeight: 1.65, margin: 0 }}>
             This will permanently delete{" "}
-            <strong style={{ color: "#B91C1C" }}>{projectTitle || "this project"}</strong>,
+            <strong style={{ color: "var(--danger)" }}>{projectTitle || "this project"}</strong>,
             its updates, applications, and related data. This action cannot be undone.
           </p>
         </div>
@@ -457,7 +457,7 @@ function DeleteConfirmModal({
         <div style={{ marginBottom: error ? 12 : 22 }}>
           <label style={fieldLabelStyle}>
             Type{" "}
-            <span style={{ color: "#B91C1C", fontFamily: "monospace", fontWeight: 700, letterSpacing: "0.04em" }}>
+            <span style={{ color: "var(--danger)", fontFamily: "monospace", fontWeight: 700, letterSpacing: "0.04em" }}>
               delete
             </span>{" "}
             to confirm
@@ -472,14 +472,14 @@ function DeleteConfirmModal({
             autoFocus
             style={{
               ...inputStyle,
-              borderColor: confirm === "delete" ? "#B91C1C" : undefined,
+              borderColor: confirm === "delete" ? "var(--danger)" : undefined,
             }}
           />
         </div>
 
         {/* Error */}
         {error && (
-          <p style={{ fontSize: 13, color: "#B91C1C", marginBottom: 16, lineHeight: 1.5 }}>{error}</p>
+          <p style={{ fontSize: 13, color: "var(--danger)", marginBottom: 16, lineHeight: 1.5 }}>{error}</p>
         )}
 
         {/* Actions */}
@@ -500,9 +500,9 @@ function DeleteConfirmModal({
               flex: 2,
               padding: "12px 20px",
               borderRadius: 10,
-              background: canDelete ? "#B91C1C" : "#FEE2E2",
+              background: canDelete ? "var(--danger)" : "var(--danger-bg)",
               border: "none",
-              color: canDelete ? "white" : "#E5A3A3",
+              color: canDelete ? "white" : "var(--danger-border)",
               fontWeight: 700,
               fontSize: 14,
               cursor: canDelete ? "pointer" : "default",
@@ -750,7 +750,7 @@ export default function ProjectDetailPage({ params }: Props) {
               {project.is_ai_generated && (
                 <span style={{
                   fontSize: 11, fontWeight: 700, borderRadius: 20, padding: "4px 12px",
-                  color: "#8b9ab0", border: "1px solid rgba(139,154,176,0.22)",
+                  color: "var(--text-secondary)", border: "1px solid rgba(139,154,176,0.22)",
                   background: "rgba(139,154,176,0.07)", letterSpacing: "0.03em",
                 }}>
                   Demo Project
@@ -798,7 +798,7 @@ export default function ProjectDetailPage({ params }: Props) {
               {updatesLoading ? (
                 <div style={{ height: 40 }} />
               ) : updates.length === 0 ? (
-                <div style={{ background: "#F7F7F5", borderRadius: 16, padding: 48, textAlign: "center" }}>
+                <div style={{ background: "var(--surface-raised)", borderRadius: 16, padding: 48, textAlign: "center" }}>
                   <div aria-hidden="true" style={{ fontSize: 48, lineHeight: 1, marginBottom: 16 }}>📓</div>
                   <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
                     No updates yet — {appStatus !== "owner" ? "the builder hasn't posted progress on this project." : "post your first update to start the timeline."}
@@ -965,7 +965,7 @@ export default function ProjectDetailPage({ params }: Props) {
                     </div>
 
                     {/* Delete project */}
-                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #FECACA" }}>
+                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--danger-border)" }}>
                       <button
                         type="button"
                         onClick={() => { setDeleteError(""); setShowDeleteModal(true); }}
@@ -1032,13 +1032,13 @@ export default function ProjectDetailPage({ params }: Props) {
                   <div style={{
                     padding: "24px 20px",
                     borderRadius: 12,
-                    background: appStatus === "accepted" ? "#ECFDF5" : appStatus === "pending" ? "#FFFBEB" : "#FEF2F2",
-                    border: `1px solid ${appStatus === "accepted" ? "#D1FAE5" : appStatus === "pending" ? "#FDE68A" : "#FECACA"}`,
+                    background: appStatus === "accepted" ? "var(--badge-shipped-bg)" : appStatus === "pending" ? "var(--badge-building-bg)" : "var(--danger-bg)",
+                    border: `1px solid ${appStatus === "accepted" ? "var(--accent-green-glow)" : appStatus === "pending" ? "var(--tint-amber-bg)" : "var(--danger-border)"}`,
                     textAlign: "center",
                   }}>
                     <div style={{ fontSize: 32, marginBottom: 12 }}>
                       {appStatus === "accepted" ? "✅" : appStatus === "pending" ? (
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--tint-amber-text)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="12" cy="12" r="10"/>
                           <polyline points="12 6 12 12 16 14"/>
                         </svg>
@@ -1046,7 +1046,7 @@ export default function ProjectDetailPage({ params }: Props) {
                     </div>
                     <div style={{
                       fontSize: 15, fontWeight: 800, fontFamily: "var(--font-sans)", marginBottom: 8, letterSpacing: "-0.01em",
-                      color: appStatus === "accepted" ? "#0F6E56" : appStatus === "pending" ? "#B45309" : "#B91C1C",
+                      color: appStatus === "accepted" ? "var(--accent-green)" : appStatus === "pending" ? "var(--tint-amber-text)" : "var(--danger)",
                     }}>
                       {appStatus === "accepted" ? "You're in!" : appStatus === "pending" ? "Application pending" : "Not selected"}
                     </div>
@@ -1192,7 +1192,7 @@ const categoryBadgeStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 500,
   color: "var(--text-secondary)",
-  background: "#F5F5F3",
+  background: "var(--surface-raised)",
   borderRadius: 999,
   padding: "4px 12px",
   letterSpacing: "0.02em",
@@ -1261,7 +1261,7 @@ const rightColStyle: React.CSSProperties = {
 // ── Left column section cards
 
 const sectionCardStyle: React.CSSProperties = {
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   borderRadius: 12,
   padding: "28px",
@@ -1307,19 +1307,19 @@ const roleCardStyle: React.CSSProperties = {
   gap: 10,
   padding: "12px 16px",
   borderRadius: 8,
-  background: "#ECFDF5",
+  background: "var(--accent-green-glow)",
 };
 
 const roleIconStyle: React.CSSProperties = {
   fontSize: 9,
-  color: "#0F6E56",
+  color: "var(--accent-green)",
   flexShrink: 0,
 };
 
 const roleLabelStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 500,
-  color: "#0F6E56",
+  color: "var(--accent-green)",
   lineHeight: 1.2,
 };
 
@@ -1329,7 +1329,7 @@ const techPillStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 400,
   color: "var(--text-secondary)",
-  background: "#F5F5F3",
+  background: "var(--surface-raised)",
   borderRadius: 8,
   padding: "7px 14px",
 };
@@ -1342,7 +1342,7 @@ const similarRowStyle: React.CSSProperties = {
   gap: 12,
   padding: "13px 14px",
   borderRadius: 8,
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border-subtle)",
   textDecoration: "none",
 };
@@ -1351,7 +1351,7 @@ const similarIconStyle: React.CSSProperties = {
   width: 36,
   height: 36,
   borderRadius: 8,
-  background: "#F5F5F3",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border)",
   display: "flex",
   alignItems: "center",
@@ -1383,7 +1383,7 @@ const similarTaglineStyle: React.CSSProperties = {
 // ── Action panel (right sidebar — primary card)
 
 const actionPanelStyle: React.CSSProperties = {
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   borderRadius: 12,
   overflow: "hidden",
@@ -1419,8 +1419,8 @@ const actionPanelSubStyle: React.CSSProperties = {
 const actionRolePillStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 500,
-  color: "#0F6E56",
-  background: "#ECFDF5",
+  color: "var(--accent-green)",
+  background: "var(--accent-green-glow)",
   borderRadius: 999,
   padding: "4px 12px",
 };
@@ -1451,7 +1451,7 @@ const ownerBadgeStyle: React.CSSProperties = {
   gap: 6,
   padding: "10px 22px",
   borderRadius: 8,
-  background: "#F5F5F3",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border)",
   color: "var(--text-secondary)",
   fontWeight: 500,
@@ -1462,7 +1462,7 @@ const ownerBadgeStyle: React.CSSProperties = {
 // ── Sidebar cards (builder + details)
 
 const sideCardStyle: React.CSSProperties = {
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   borderRadius: 12,
   padding: "22px 24px",
@@ -1517,7 +1517,7 @@ const ownerRoleStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 500,
   color: "var(--text-secondary)",
-  background: "#F5F5F3",
+  background: "var(--surface-raised)",
   borderRadius: 999,
   padding: "2px 9px",
   display: "inline-block",
@@ -1562,7 +1562,7 @@ const notFoundStyle: React.CSSProperties = {
   marginTop: 60,
   textAlign: "center",
   padding: "60px 40px",
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   borderRadius: 12,
 };
@@ -1594,7 +1594,7 @@ const overlayStyle: React.CSSProperties = {
 };
 
 const modalStyle: React.CSSProperties = {
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   borderRadius: 12,
   padding: "32px",
@@ -1659,9 +1659,9 @@ const submitBtnStyle: React.CSSProperties = {
   flex: 2,
   padding: "12px 20px",
   borderRadius: 8,
-  background: "#1A1A18",
-  border: "1px solid #1A1A18",
-  color: "#FFFFFF",
+  background: "var(--accent)",
+  border: "1px solid var(--accent)",
+  color: "var(--accent-contrast)",
   fontWeight: 500,
   fontSize: 14,
   cursor: "pointer",
@@ -1676,7 +1676,7 @@ const ownerControlBadgeStyle: React.CSSProperties = {
   gap: 5,
   padding: "4px 12px",
   borderRadius: 999,
-  background: "#F5F5F3",
+  background: "var(--surface-raised)",
   color: "var(--text-secondary)",
   fontWeight: 500,
   fontSize: 11,
@@ -1687,7 +1687,7 @@ const ownerControlBadgeStyle: React.CSSProperties = {
 const ownerStatsRowStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  background: "#F7F7F5",
+  background: "var(--surface-raised)",
   borderRadius: 12,
   padding: "14px 0",
   marginTop: 20,
@@ -1733,8 +1733,8 @@ const ownerActionPrimaryStyle: React.CSSProperties = {
   width: "100%",
   padding: "13px 20px",
   borderRadius: 8,
-  background: "#1A1A18",
-  color: "#FFFFFF",
+  background: "var(--accent)",
+  color: "var(--accent-contrast)",
   fontWeight: 500,
   fontSize: 14,
   fontFamily: "var(--font-sans)",
@@ -1763,7 +1763,7 @@ const ownerActionSecondaryStyle: React.CSSProperties = {
 
 const ownerShareStripStyle: React.CSSProperties = {
   marginTop: 18,
-  background: "#F7F7F5",
+  background: "var(--surface-raised)",
   borderRadius: 8,
   padding: "10px 14px",
 };
@@ -1776,9 +1776,9 @@ const deleteProjectBtnStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 14px",
   borderRadius: 8,
-  background: "#FEF2F2",
-  border: "1px solid #FECACA",
-  color: "#B91C1C",
+  background: "var(--danger-bg)",
+  border: "1px solid var(--danger-border)",
+  color: "var(--danger)",
   fontWeight: 500,
   fontSize: 13,
   cursor: "pointer",
@@ -1800,7 +1800,7 @@ const updateInputStyle: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
   borderRadius: 8,
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   color: "var(--text-primary)",
   fontSize: 14,
@@ -1815,9 +1815,9 @@ const updateInputStyle: React.CSSProperties = {
 const postUpdateBtnStyle: React.CSSProperties = {
   padding: "8px 18px",
   borderRadius: 8,
-  background: "#1A1A18",
-  border: "1px solid #1A1A18",
-  color: "#FFFFFF",
+  background: "var(--accent)",
+  border: "1px solid var(--accent)",
+  color: "var(--accent-contrast)",
   fontWeight: 500,
   fontSize: 13,
   fontFamily: "var(--font-sans)",
@@ -1828,7 +1828,7 @@ const postUpdateBtnStyle: React.CSSProperties = {
 const updateRowStyle: React.CSSProperties = {
   padding: "16px 18px",
   borderRadius: 8,
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border-subtle)",
 };
 

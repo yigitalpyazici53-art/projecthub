@@ -11,44 +11,53 @@ body {
   max-width: 100%;
 }
 
-/* ── Editorial Premium — single light theme ──────────────────────
-   Warm white ground, pure white cards, hairline borders, one accent.
-   The variable NAMES are kept from the previous system so existing
-   inline styles resolve to the new palette automatically. */
+/* ── Dark theme (default) ────────────────────────────────────────
+   Public pages and the global nav/footer run dark, matching the
+   landing page. The variable NAMES are unchanged, so every inline
+   style that reads var(--…) follows the theme automatically.
+
+   Signed-in surfaces (dashboard, messages, connections, profile/edit,
+   onboarding, admin, project new/edit) stay light: their layouts wrap
+   children in .theme-light, which restores the light values below. */
 :root {
-  --background: #F2F0EB;
-  --surface: #FFFFFF;
-  --surface-raised: #F7F7F5;
-  --surface-overlay: #F5F5F3;
+  color-scheme: dark;
 
-  --border: #E8E8E4;
-  --border-subtle: #EFEFEC;
-  --border-highlight: #C8C8C2;
+  --background: #0A0A0F;
+  /* Glass surfaces — translucent over the dark ground. */
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-raised: rgba(255, 255, 255, 0.08);
+  /* Opaque, for dropdowns/drawers/modals that must not leak. */
+  --surface-overlay: #16131F;
 
-  /* --accent is the INK interaction color. The green #0F6E56 is reserved
-     for the "shipped" badge and the landing-page CTA (hardcoded there). */
-  --accent: #1A1A18;
-  --accent-hover: #2A2A27;
-  --accent-bright: #1A1A18;
-  --accent-glow: transparent;
-  --accent-purple: #6B6B66;
-  --accent-purple-glow: rgba(107, 107, 102, 0.08);
-  --accent-cyan: #0F6E56;
-  --accent-green: #0F6E56;
-  --accent-green-glow: rgba(15, 110, 86, 0.08);
+  --border: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-highlight: rgba(168, 85, 247, 0.45);
 
-  --text-primary: #1A1A18;
-  --text-secondary: #6B6B66;
-  --text-muted: #9B9B94;
+  --accent: #8B5CF6;
+  --accent-hover: #A855F7;
+  --accent-bright: #A855F7;
+  --accent-glow: rgba(139, 92, 246, 0.35);
+  --accent-purple: #C4B5FD;
+  --accent-purple-glow: rgba(139, 92, 246, 0.18);
+  --accent-cyan: #6EE7B7;
+  --accent-green: #6EE7B7;
+  --accent-green-glow: rgba(16, 185, 129, 0.16);
+  /* Readable text on top of an --accent fill. */
+  --accent-contrast: #FFFFFF;
 
-  --success: #0F6E56;
-  --warning: #B45309;
-  --danger: #B91C1C;
+  --text-primary: #FAFAFA;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
 
-  /* Flat fills — gradients retired, names kept for compatibility */
-  --gradient-brand: linear-gradient(135deg, #1A1A18 0%, #1A1A18 100%);
-  --gradient-blue: linear-gradient(135deg, #1A1A18 0%, #1A1A18 100%);
-  --gradient-card: #FFFFFF;
+  --success: #6EE7B7;
+  --warning: #FCD34D;
+  --danger: #FCA5A5;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-border: rgba(252, 165, 165, 0.32);
+
+  --gradient-brand: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
+  --gradient-blue: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
+  --gradient-card: var(--surface);
 
   --orb1: transparent;
   --orb2: transparent;
@@ -60,12 +69,103 @@ body {
   --font-sans: var(--font-inter), -apple-system, "Segoe UI", sans-serif;
 
   /* Stage badge palette */
+  --badge-shipped-bg: rgba(16, 185, 129, 0.14);
+  --badge-shipped-text: #6EE7B7;
+  --badge-building-bg: rgba(245, 158, 11, 0.14);
+  --badge-building-text: #FCD34D;
+  --badge-idea-bg: rgba(255, 255, 255, 0.07);
+  --badge-idea-text: #CBD5E1;
+
+  /* Category tints — consumed by utils/category.ts */
+  --tint-blue-bg: rgba(59, 130, 246, 0.14);      --tint-blue-text: #93C5FD;
+  --tint-violet-bg: rgba(139, 92, 246, 0.16);    --tint-violet-text: #C4B5FD;
+  --tint-green-bg: rgba(16, 185, 129, 0.14);     --tint-green-text: #6EE7B7;
+  --tint-rose-bg: rgba(244, 63, 94, 0.14);       --tint-rose-text: #FDA4AF;
+  --tint-amber-bg: rgba(245, 158, 11, 0.14);     --tint-amber-text: #FCD34D;
+  --tint-sky-bg: rgba(14, 165, 233, 0.14);       --tint-sky-text: #7DD3FC;
+  --tint-slate-bg: rgba(255, 255, 255, 0.07);    --tint-slate-text: #CBD5E1;
+
+  /* Deterministic avatar tints (utils/category.ts) */
+  --avatar-1: rgba(59, 130, 246, 0.22);
+  --avatar-2: rgba(236, 72, 153, 0.22);
+  --avatar-3: rgba(16, 185, 129, 0.22);
+  --avatar-4: rgba(245, 158, 11, 0.22);
+  --avatar-5: rgba(139, 92, 246, 0.22);
+  --avatar-0: rgba(255, 255, 255, 0.08);
+
+  --skeleton-base: rgba(255, 255, 255, 0.05);
+  --skeleton-sheen: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Editorial Premium light theme — signed-in surfaces only ─────
+   Scoped so the same components render light inside these routes
+   without a second set of light-specific styles. */
+.theme-light {
+  color-scheme: light;
+
+  --background: #F2F0EB;
+  --surface: #FFFFFF;
+  --surface-raised: #F7F7F5;
+  --surface-overlay: #F5F5F3;
+
+  --border: #E8E8E4;
+  --border-subtle: #EFEFEC;
+  --border-highlight: #C8C8C2;
+
+  --accent: #1A1A18;
+  --accent-hover: #2A2A27;
+  --accent-bright: #1A1A18;
+  --accent-glow: transparent;
+  --accent-purple: #6B6B66;
+  --accent-purple-glow: rgba(107, 107, 102, 0.08);
+  --accent-cyan: #0F6E56;
+  --accent-green: #0F6E56;
+  --accent-green-glow: rgba(15, 110, 86, 0.08);
+  --accent-contrast: #FFFFFF;
+
+  --text-primary: #1A1A18;
+  --text-secondary: #6B6B66;
+  --text-muted: #9B9B94;
+
+  --success: #0F6E56;
+  --warning: #B45309;
+  --danger: #B91C1C;
+  --danger-bg: #FEF2F2;
+  --danger-border: #FECACA;
+
+  --gradient-brand: linear-gradient(135deg, #1A1A18 0%, #1A1A18 100%);
+  --gradient-blue: linear-gradient(135deg, #1A1A18 0%, #1A1A18 100%);
+  --gradient-card: #FFFFFF;
+
   --badge-shipped-bg: #ECFDF5;
   --badge-shipped-text: #0F6E56;
   --badge-building-bg: #FFFBEB;
   --badge-building-text: #B45309;
   --badge-idea-bg: #F5F5F3;
   --badge-idea-text: #6B6B66;
+
+  --tint-blue-bg: #EFF6FF;    --tint-blue-text: #1D4ED8;
+  --tint-violet-bg: #F5F3FF;  --tint-violet-text: #6D28D9;
+  --tint-green-bg: #ECFDF5;   --tint-green-text: #047857;
+  --tint-rose-bg: #FFF1F2;    --tint-rose-text: #BE123C;
+  --tint-amber-bg: #FFFBEB;   --tint-amber-text: #B45309;
+  --tint-sky-bg: #F0F9FF;     --tint-sky-text: #0369A1;
+  --tint-slate-bg: #F1F5F9;   --tint-slate-text: #334155;
+
+  --avatar-1: #DBEAFE;
+  --avatar-2: #FCE7F3;
+  --avatar-3: #D1FAE5;
+  --avatar-4: #FEF3C7;
+  --avatar-5: #E0E7FF;
+  --avatar-0: #F5F5F3;
+
+  --skeleton-base: #F0F0EC;
+  --skeleton-sheen: #E8E8E4;
+
+  /* Paint over the dark body ground for the whole signed-in subtree. */
+  background: var(--background);
+  color: var(--text-primary);
+  flex: 1 1 auto;
 }
 
 /* ── Reset ──────────────────────────────────────────────────────── */
@@ -113,7 +213,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid #1A1A18;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -121,8 +221,8 @@ textarea:focus-visible,
 /* ── Scrollbar ──────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--background); }
-::-webkit-scrollbar-thumb { background: #D8D8D2; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #C4C4BE; }
+::-webkit-scrollbar-thumb { background: var(--border-highlight); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 /* ── Keyframes — calm entries only ──────────────────────────────── */
 @keyframes fadeUp {
@@ -257,7 +357,7 @@ textarea:focus-visible,
 
 .btn-primary:hover,
 .btn-secondary:hover {
-  background: #F5F5F3;
+  background: var(--surface-raised);
   border-color: var(--border-highlight);
   transform: none;
   box-shadow: none;
@@ -265,28 +365,28 @@ textarea:focus-visible,
 }
 
 .btn-primary:active,
-.btn-secondary:active { background: #EFEFEC; }
+.btn-secondary:active { background: var(--surface-overlay); }
 
-/* The single green CTA — landing page only */
+/* Accent CTA — follows the theme accent (violet on dark, ink on light) */
 .btn-accent {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: #0F6E56;
-  color: #FFFFFF;
+  background: var(--accent);
+  color: var(--accent-contrast);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 15px;
   padding: 13px 28px;
   border-radius: 12px;
-  border: 1px solid #0F6E56;
+  border: 1px solid var(--accent);
   cursor: pointer;
   transition: background 0.15s ease;
   text-decoration: none;
   white-space: nowrap;
 }
-.btn-accent:hover { background: #0C5B47; }
+.btn-accent:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
 .btn-ghost {
   display: inline-flex;
@@ -311,13 +411,13 @@ textarea:focus-visible,
 
 .btn-ghost:hover {
   color: var(--text-primary);
-  background: #F5F5F3;
+  background: var(--surface-raised);
 }
 
 /* ── Form inputs ────────────────────────────────────────────────── */
 .input-base {
   width: 100%;
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text-primary);
   border-radius: 8px;
@@ -331,20 +431,20 @@ textarea:focus-visible,
 .input-base::placeholder { color: var(--text-muted); }
 
 .input-base:focus {
-  border-color: #1A1A18;
+  border-color: var(--accent);
   box-shadow: none;
-  background: #FFFFFF;
+  background: var(--surface);
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #1A1A18 !important;
+  border-color: var(--accent) !important;
   box-shadow: none !important;
 }
 
 /* ── Cards ──────────────────────────────────────────────────────── */
 .card-base {
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
@@ -371,7 +471,7 @@ input:focus, textarea:focus, select:focus {
 }
 @media (hover: hover) {
   .card-hover:hover {
-    border-color: #C8C8C2 !important;
+    border-color: var(--border-highlight) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   }
 }
@@ -382,7 +482,7 @@ input:focus, textarea:focus, select:focus {
 @media (hover: hover) {
   .card-lift:hover {
     transform: scale(1.008);
-    border-color: #C8C8C2 !important;
+    border-color: var(--border-highlight) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   }
 }
@@ -390,17 +490,12 @@ input:focus, textarea:focus, select:focus {
   .card-lift:hover { transform: none; }
 }
 
-/* ── Landing hero — warm gradient + faint dot grid texture ──────── */
-.hero-section {
-  background:
-    radial-gradient(circle, rgba(26, 26, 24, 0.045) 1px, transparent 1px),
-    linear-gradient(180deg, #FAFAF8 0%, #F0EDE6 100%);
-  background-size: 22px 22px, 100% 100%;
-}
+/* Legacy landing hero — the current landing paints its own background. */
+.hero-section { background: transparent; }
 
 /* ── Empty state — warm rounded panel ───────────────────────────── */
 .empty-state-panel {
-  background: #F7F7F5;
+  background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   padding: 48px;
@@ -422,11 +517,11 @@ input:focus, textarea:focus, select:focus {
   letter-spacing: 0.02em;
 }
 
-.pill-blue   { color: var(--text-secondary); background: #F5F5F3; border: 1px solid var(--border); }
-.pill-purple { color: var(--text-secondary); background: #F5F5F3; border: 1px solid var(--border); }
-.pill-green  { color: #0F6E56; background: #ECFDF5; border: 1px solid #D1FAE5; }
-.pill-grey   { color: var(--text-secondary); background: #F5F5F3; border: 1px solid var(--border); }
-.pill-amber  { color: #B45309; background: #FFFBEB; border: 1px solid #FDE68A; }
+.pill-blue   { color: var(--text-secondary); background: var(--surface-raised); border: 1px solid var(--border); }
+.pill-purple { color: var(--text-secondary); background: var(--surface-raised); border: 1px solid var(--border); }
+.pill-green  { color: var(--tint-green-text); background: var(--tint-green-bg); border: 1px solid var(--tint-green-bg); }
+.pill-grey   { color: var(--text-secondary); background: var(--surface-raised); border: 1px solid var(--border); }
+.pill-amber  { color: var(--tint-amber-text); background: var(--tint-amber-bg); border: 1px solid var(--tint-amber-bg); }
 
 /* Stage badges */
 .badge-stage {
@@ -449,7 +544,7 @@ input:focus, textarea:focus, select:focus {
   100% { background-position:  200% 0; }
 }
 .skeleton-row {
-  background: linear-gradient(90deg, #F0F0EC 25%, #E8E8E4 50%, #F0F0EC 75%);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-sheen) 50%, var(--skeleton-base) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.8s infinite;
   border-radius: 8px;
@@ -463,7 +558,7 @@ input:focus, textarea:focus, select:focus {
   position: fixed;
   top: 0; left: 0; bottom: 0;
   width: 280px;
-  background: #FFFFFF;
+  background: var(--surface-overlay);
   border-right: 1px solid var(--border);
   padding: 68px 16px 28px;
   z-index: 99;
@@ -530,7 +625,7 @@ input:focus, textarea:focus, select:focus {
 
 /* ── Nav (scrolled) ─────────────────────────────────────────────── */
 .nav-glass {
-  background: rgba(250, 250, 248, 0.92);
+  background: color-mix(in srgb, var(--background) 78%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
@@ -552,7 +647,7 @@ input:focus, textarea:focus, select:focus {
   top: calc(100% + 10px);
   right: 0;
   width: 300px;
-  background: #FFFFFF;
+  background: var(--surface-overlay);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 4px;
@@ -578,7 +673,7 @@ input:focus, textarea:focus, select:focus {
 .step-card,
 .polished-feature-card,
 .how-it-works-card {
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   transition: border-color 0.18s ease;
@@ -605,7 +700,7 @@ input:focus, textarea:focus, select:focus {
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1px solid var(--border);
 }
 .cta-card::before { content: none; }
@@ -617,7 +712,7 @@ input:focus, textarea:focus, select:focus {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: #F5F5F3;
+  background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 3px 8px;
@@ -628,7 +723,7 @@ input:focus, textarea:focus, select:focus {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: #F5F5F3;
+  background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 3px 9px;
@@ -846,7 +941,7 @@ body { overflow-x: hidden; }
     width: 100%;
     padding: 14px 24px;
     border-radius: 8px;
-    background: #FFFFFF;
+    background: var(--surface-overlay);
     color: var(--text-primary);
     font-weight: 500;
     font-size: 14px;

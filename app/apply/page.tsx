@@ -103,8 +103,8 @@ export default function ApplyPage() {
               width: "100%",
               textAlign: "center",
               background:
-                "linear-gradient(145deg, #FFFFFF, #FFFFFF)",
-              border: "1px solid #E8E8E4",
+                "var(--surface)",
+              border: "1px solid var(--border)",
               borderRadius: 20,
               padding: "56px 40px",
               boxShadow: "0 24px 64px rgba(26,26,24,0.4)",
@@ -115,8 +115,8 @@ export default function ApplyPage() {
                 width: 60,
                 height: 60,
                 borderRadius: "50%",
-                background: "#ECFDF5",
-                border: "1px solid #D1FAE5",
+                background: "var(--accent-green-glow)",
+                border: "1px solid var(--accent-green-glow)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -128,7 +128,7 @@ export default function ApplyPage() {
                 height="28"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#0F6E56"
+                stroke="var(--accent-green)"
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -141,7 +141,7 @@ export default function ApplyPage() {
                 fontFamily: "var(--font-serif)",
                 fontSize: 26,
                 fontWeight: 500,
-                color: "#1A1A18",
+                color: "var(--text-primary)",
                 marginBottom: 12,
                 lineHeight: 1.1,
               }}
@@ -151,7 +151,7 @@ export default function ApplyPage() {
             <p
               style={{
                 fontSize: 15,
-                color: "#6B6B66",
+                color: "var(--text-secondary)",
                 lineHeight: 1.65,
                 marginBottom: 28,
                 fontFamily: "var(--font-sans)",
@@ -202,10 +202,10 @@ export default function ApplyPage() {
           right: 0,
           zIndex: 100,
           padding: "0 24px",
-          background: "#FFFFFF",
+          background: "var(--surface)",
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid #F5F5F3",
+          borderBottom: "1px solid var(--border-subtle)",
         }}
       >
         <div
@@ -218,7 +218,7 @@ export default function ApplyPage() {
             gap: 16,
           }}
         >
-          <Logo size="md" gradient />
+          <Logo size="md" gradient tone="dark" />
           <div style={{ flex: 1 }} />
           <Link
             href="/login"
@@ -247,8 +247,8 @@ export default function ApplyPage() {
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "var(--accent)",
-                background: "#F5F5F3",
-                border: "1px solid #E8E8E4",
+                background: "var(--surface-raised)",
+                border: "1px solid var(--border)",
                 borderRadius: 999,
                 padding: "4px 14px",
                 marginBottom: 20,
@@ -292,8 +292,8 @@ export default function ApplyPage() {
               alignItems: "center",
               gap: 10,
               padding: "12px 18px",
-              background: "#ECFDF5",
-              border: "1px solid #D1FAE5",
+              background: "var(--accent-green-glow)",
+              border: "1px solid var(--accent-green-glow)",
               borderRadius: 10,
               marginBottom: 32,
             }}
@@ -303,8 +303,8 @@ export default function ApplyPage() {
                 width: 7,
                 height: 7,
                 borderRadius: "50%",
-                background: "#0F6E56",
-                boxShadow: "0 0 0 3px #D1FAE5",
+                background: "var(--accent-green)",
+                boxShadow: "0 0 0 3px var(--accent-green-glow)",
                 flexShrink: 0,
                 display: "inline-block",
               }}
@@ -312,7 +312,7 @@ export default function ApplyPage() {
             <p
               style={{
                 fontSize: 13,
-                color: "#6B6B66",
+                color: "var(--text-secondary)",
                 fontFamily: "var(--font-sans)",
                 margin: 0,
                 lineHeight: 1.5,
@@ -327,8 +327,8 @@ export default function ApplyPage() {
           <div
             style={{
               background:
-                "linear-gradient(145deg, #FFFFFF, #FFFFFF)",
-              border: "1px solid #E8E8E4",
+                "var(--surface)",
+              border: "1px solid var(--border)",
               borderRadius: 20,
               padding: "40px",
               boxShadow: "0 20px 60px rgba(26,26,24,0.4)",
@@ -448,12 +448,12 @@ export default function ApplyPage() {
                           border: "1px solid",
                           background:
                             form.looking_for_teammates === opt
-                              ? "#1A1A18"
-                              : "#F7F7F5",
+                              ? "var(--accent)"
+                              : "var(--surface-raised)",
                           borderColor:
                             form.looking_for_teammates === opt
                               ? "transparent"
-                              : "#E8E8E4",
+                              : "var(--border)",
                           color:
                             form.looking_for_teammates === opt
                               ? "white"
@@ -542,9 +542,9 @@ export default function ApplyPage() {
                       marginBottom: 12,
                       padding: "11px 16px",
                       borderRadius: 9,
-                      background: "#FEF2F2",
-                      border: "1px solid #FECACA",
-                      color: "#B91C1C",
+                      background: "var(--danger-bg)",
+                      border: "1px solid var(--danger-border)",
+                      color: "var(--danger)",
                       fontSize: 13,
                       fontFamily: "var(--font-sans)",
                       lineHeight: 1.5,
@@ -608,8 +608,8 @@ function BgGrid() {
           position: "absolute",
           inset: 0,
           backgroundImage: `
-            linear-gradient(#F5F5F3 1px, transparent 1px),
-            linear-gradient(90deg, #F5F5F3 1px, transparent 1px)
+            linear-gradient(var(--border-subtle) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px)
           `,
           backgroundSize: "64px 64px",
           maskImage:
@@ -624,7 +624,7 @@ function BgGrid() {
           width: 500,
           height: 500,
           background:
-            "radial-gradient(circle, #F5F5F3 0%, transparent 60%)",
+            "radial-gradient(circle, var(--surface-raised) 0%, transparent 60%)",
         }}
       />
       <div
@@ -635,7 +635,7 @@ function BgGrid() {
           width: 400,
           height: 400,
           background:
-            "radial-gradient(circle, #F5F5F3 0%, transparent 60%)",
+            "radial-gradient(circle, var(--surface-raised) 0%, transparent 60%)",
         }}
       />
     </div>
@@ -660,7 +660,7 @@ function FormSection({
           color: "var(--accent)",
           paddingBottom: 12,
           marginBottom: 20,
-          borderBottom: "1px solid #F5F5F3",
+          borderBottom: "1px solid var(--border-subtle)",
         }}
       >
         {label}
@@ -722,8 +722,8 @@ const inp: React.CSSProperties = {
   width: "100%",
   padding: "10px 14px",
   borderRadius: 9,
-  background: "#F7F7F5",
-  border: "1px solid #E8E8E4",
+  background: "var(--surface-raised)",
+  border: "1px solid var(--border)",
   color: "var(--text-primary)",
   fontSize: 14,
   outline: "none",

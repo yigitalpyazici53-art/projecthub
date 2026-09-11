@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
         <div style={cardStyle}>
           <div style={{ textAlign: "center", marginBottom: 28 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
-              <Logo size="lg" gradient />
+              <Logo size="lg" gradient tone="dark" />
             </div>
             <h1 style={titleStyle}>Set a new password</h1>
             <p style={subtitleStyle}>Choose a strong password for your account</p>
@@ -66,10 +66,10 @@ export default function ResetPasswordPage() {
 
           {done ? (
             <div style={successBoxStyle}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              <p style={{ color: "#0F6E56", fontSize: 14, lineHeight: 1.6 }}>
+              <p style={{ color: "var(--accent-green)", fontSize: 14, lineHeight: 1.6 }}>
                 Password updated! Redirecting to your dashboard…
               </p>
             </div>
@@ -143,23 +143,23 @@ const subtitleStyle: React.CSSProperties = { color: "var(--text-secondary)", fon
 const labelStyle: React.CSSProperties = { display: "block", marginBottom: 6, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" };
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "13px 16px", borderRadius: 10,
-  border: "1px solid var(--border)", background: "#FFFFFF",
+  border: "1px solid var(--border)", background: "var(--surface)",
   color: "var(--text-primary)", fontSize: 14, outline: "none", boxSizing: "border-box",
 };
 const errorStyle: React.CSSProperties = {
   padding: "10px 14px", borderRadius: 8,
-  background: "#FEF2F2", border: "1px solid #FECACA",
-  color: "#B91C1C", fontSize: 13,
+  background: "var(--danger-bg)", border: "1px solid var(--danger-border)",
+  color: "var(--danger)", fontSize: 13,
 };
 const buttonStyle: React.CSSProperties = {
   width: "100%", padding: "13px 16px", borderRadius: 10,
   border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)",
-  background: "#1A1A18",
+  background: "var(--accent)",
   color: "white", fontWeight: 700, fontSize: 14, fontFamily: "var(--font-sans)",
   transition: "all 0.18s ease", boxShadow: "0 4px 16px transparent",
 };
 const successBoxStyle: React.CSSProperties = {
   display: "flex", alignItems: "flex-start", gap: 12,
   padding: "14px 16px", borderRadius: 10,
-  background: "#ECFDF5", border: "1px solid #D1FAE5",
+  background: "var(--accent-green-glow)", border: "1px solid var(--accent-green-glow)",
 };

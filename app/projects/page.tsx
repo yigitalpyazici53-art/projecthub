@@ -213,8 +213,8 @@ export default function ProjectsPage() {
                   aria-hidden="true"
                   style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", opacity: 0.45 }}
                 >
-                  <circle cx="7" cy="7" r="4.5" stroke="#1A1A18" strokeWidth="1.5" />
-                  <path d="M10.5 10.5L13.5 13.5" stroke="#1A1A18" strokeWidth="1.5" strokeLinecap="round" />
+                  <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M10.5 10.5L13.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
                 <input
                   type="text"
@@ -316,7 +316,7 @@ const titleStyle: React.CSSProperties = {
 };
 
 const mutedStyle: React.CSSProperties = {
-  color: "#6B6B66",
+  color: "var(--text-secondary)",
   fontSize: 18,
 };
 
@@ -324,9 +324,9 @@ const errorStyle: React.CSSProperties = {
   padding: "10px 14px",
   borderRadius: 8,
   marginBottom: 16,
-  background: "#FEF2F2",
-  border: "1px solid #FECACA",
-  color: "#B91C1C",
+  background: "var(--danger-bg)",
+  border: "1px solid var(--danger-border)",
+  color: "var(--danger)",
   fontSize: 13,
 };
 
@@ -342,7 +342,7 @@ const searchInputStyle: React.CSSProperties = {
   width: "100%",
   padding: "11px 16px 11px 42px",
   borderRadius: 8,
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   color: "var(--text-primary)",
   fontSize: 14,
@@ -355,7 +355,7 @@ const selectStyle: React.CSSProperties = {
   width: "100%",
   padding: "11px 14px",
   borderRadius: 8,
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   color: "var(--text-primary)",
   fontSize: 14,

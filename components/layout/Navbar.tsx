@@ -44,7 +44,7 @@ function NavLink({ href, label, pathname, mobile = false }: { href: string; labe
           fontSize: 15,
           fontWeight: isActive ? 600 : 400,
           color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-          background: isActive ? "#F5F5F3" : "transparent",
+          background: isActive ? "var(--surface-raised)" : "transparent",
           textDecoration: "none",
           transition: "background 0.15s ease, color 0.15s ease",
         }}
@@ -196,13 +196,13 @@ function NotificationBell({ userId }: { userId: string | null }) {
           height: 36,
           borderRadius: 8,
           border: "1px solid var(--border)",
-          background: open ? "#F5F5F3" : "transparent",
+          background: open ? "var(--surface-raised)" : "transparent",
           cursor: "pointer",
           color: open ? "var(--text-primary)" : "var(--text-secondary)",
           transition: "background 0.15s ease, color 0.15s ease",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.background = "#F5F5F3";
+          (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-raised)";
         }}
         onMouseLeave={(e) => {
           if (!open) (e.currentTarget as HTMLButtonElement).style.background = "transparent";
@@ -213,7 +213,7 @@ function NotificationBell({ userId }: { userId: string | null }) {
           <span style={{
             position: "absolute", top: -4, right: -4,
             minWidth: 16, height: 16, borderRadius: 8,
-            background: "#1A1A18", color: "#FFFFFF",
+            background: "var(--accent)", color: "var(--accent-contrast)",
             fontSize: 9, fontWeight: 600,
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: "0 3px", border: "1.5px solid var(--background)",
@@ -234,7 +234,7 @@ function NotificationBell({ userId }: { userId: string | null }) {
             <span style={{ fontWeight: 600, fontSize: 13, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
               Notifications
               {unreadCount > 0 && (
-                <span style={{ fontSize: 10, fontWeight: 600, background: "#1A1A18", color: "#FFFFFF", borderRadius: 10, padding: "1px 7px" }}>
+                <span style={{ fontSize: 10, fontWeight: 600, background: "var(--accent)", color: "var(--accent-contrast)", borderRadius: 10, padding: "1px 7px" }}>
                   {unreadCount} new
                 </span>
               )}
@@ -255,7 +255,7 @@ function NotificationBell({ userId }: { userId: string | null }) {
             <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>Loading…</div>
           ) : notifs.length === 0 ? (
             <div style={{ padding: "32px 16px", textAlign: "center" }}>
-              <div style={{ width: 44, height: 44, background: "#F5F5F3", border: "1px solid var(--border)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "var(--text-muted)" }}>
+              <div style={{ width: 44, height: 44, background: "var(--surface-raised)", border: "1px solid var(--border)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "var(--text-muted)" }}>
                 <BellSVG />
               </div>
               <p style={{ color: "var(--text-secondary)", fontSize: 13, fontWeight: 500, margin: 0 }}>No notifications yet</p>
@@ -269,10 +269,10 @@ function NotificationBell({ userId }: { userId: string | null }) {
                   href="/connections"
                   onClick={() => setOpen(false)}
                   style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "11px 14px", borderBottom: "1px solid var(--border-subtle)", textDecoration: "none" }}
-                  onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "#F7F7F5"}
+                  onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "var(--surface-raised)"}
                   onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.background = "transparent"}
                 >
-                  <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, background: "#F5F5F3", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: "var(--text-secondary)" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, background: "var(--surface-raised)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: "var(--text-secondary)" }}>
                     {(n.senderName ?? n.senderUsername ?? "?").slice(0, 2).toUpperCase()}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -281,7 +281,7 @@ function NotificationBell({ userId }: { userId: string | null }) {
                     </p>
                     <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "3px 0 0" }}>{timeAgoShort(n.created_at)}</p>
                   </div>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#1A1A18", flexShrink: 0, marginTop: 5 }} />
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", flexShrink: 0, marginTop: 5 }} />
                 </Link>
               ))}
             </div>
@@ -373,14 +373,14 @@ export default function Navbar() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          borderBottom: "1px solid #E8E8E4",
+          borderBottom: "1px solid var(--border)",
           background: "rgba(250,250,248,0.85)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
         }}
       >
         {/* Logo */}
-        <Logo size="md" style={{ flexShrink: 0 }} />
+        <Logo size="md" tone="dark" style={{ flexShrink: 0 }} />
 
         {/* Desktop nav items */}
         <div className="nav-desktop-items" style={{ alignItems: "center", gap: 4 }}>
@@ -482,9 +482,9 @@ export default function Navbar() {
           }}>
             <div style={{
               width: 42, height: 42, borderRadius: "50%", flexShrink: 0,
-              background: "#1A1A18",
+              background: "var(--accent)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 15, fontWeight: 600, color: "#FFFFFF",
+              fontSize: 15, fontWeight: 600, color: "var(--accent-contrast)",
             }}>
               {(fullName ?? username ?? "?").slice(0, 2).toUpperCase()}
             </div>
@@ -531,7 +531,7 @@ export default function Navbar() {
                   display: "block", width: "100%", textAlign: "left",
                   padding: "12px 16px", borderRadius: 8, border: "none",
                   background: "transparent", fontFamily: "var(--font-sans)",
-                  fontSize: 15, fontWeight: 400, color: "#B91C1C", cursor: loggingOut ? "default" : "pointer",
+                  fontSize: 15, fontWeight: 400, color: "var(--danger)", cursor: loggingOut ? "default" : "pointer",
                   opacity: loggingOut ? 0.6 : 1,
                 }}
               >

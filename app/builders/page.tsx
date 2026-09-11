@@ -246,7 +246,7 @@ export default function BuildersPage() {
                           </h2>
                           {shipped > 0 && (
                             <span style={{
-                              fontSize: 11, fontWeight: 500, color: "#0F6E56",
+                              fontSize: 11, fontWeight: 500, color: "var(--accent-green)",
                               whiteSpace: "nowrap", flexShrink: 0,
                             }}>
                               ✓ {shipped} shipped
@@ -262,7 +262,7 @@ export default function BuildersPage() {
                       {builder.is_ai_generated && (
                         <span style={{
                           fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
-                          color: "var(--text-muted)", background: "#F5F5F3",
+                          color: "var(--text-muted)", background: "var(--surface-raised)",
                           whiteSpace: "nowrap", flexShrink: 0,
                         }}>
                           example
@@ -287,7 +287,7 @@ export default function BuildersPage() {
                         {skills.slice(0, 4).map((s) => (
                           <span key={s} style={{
                             fontSize: 11, fontWeight: 400, color: "var(--text-secondary)",
-                            background: "#F5F5F3",
+                            background: "var(--surface-raised)",
                             borderRadius: 999, padding: "3px 10px",
                           }}>
                             {s}
@@ -335,15 +335,15 @@ export default function BuildersPage() {
 
 const pageStyle: React.CSSProperties = { minHeight: "100vh", background: "var(--background)", color: "var(--text-primary)", padding: "40px 24px", position: "relative" };
 const titleStyle: React.CSSProperties = { fontSize: "clamp(30px, 4vw, 42px)", fontWeight: 500, color: "var(--text-primary)", letterSpacing: "-0.015em", marginBottom: 8 };
-const mutedStyle: React.CSSProperties = { color: "#6B6B66", fontSize: 18, marginBottom: 0 };
-const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, marginBottom: 16, background: "#FEF2F2", border: "1px solid #FECACA", color: "#B91C1C", fontSize: 13 };
+const mutedStyle: React.CSSProperties = { color: "var(--text-secondary)", fontSize: 18, marginBottom: 0 };
+const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, marginBottom: 16, background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", fontSize: 13 };
 const searchRowStyle: React.CSSProperties = { display: "flex", gap: 12, marginBottom: 32, flexWrap: "wrap" };
-const searchInputStyle: React.CSSProperties = { flex: 1, minWidth: 200, padding: "11px 16px", borderRadius: 8, background: "#FFFFFF", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 14, outline: "none", fontFamily: "var(--font-sans)" };
-const selectStyle: React.CSSProperties = { padding: "11px 14px", borderRadius: 8, background: "#FFFFFF", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 14, outline: "none", cursor: "pointer", fontFamily: "var(--font-sans)" };
+const searchInputStyle: React.CSSProperties = { flex: 1, minWidth: 200, padding: "11px 16px", borderRadius: 8, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 14, outline: "none", fontFamily: "var(--font-sans)" };
+const selectStyle: React.CSSProperties = { padding: "11px 14px", borderRadius: 8, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 14, outline: "none", cursor: "pointer", fontFamily: "var(--font-sans)" };
 const gridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 16 };
 const cardBase: React.CSSProperties = {
   position: "relative",
-  background: "#FFFFFF",
+  background: "var(--surface)",
   border: "1px solid var(--border)",
   borderRadius: 12,
   padding: 24,

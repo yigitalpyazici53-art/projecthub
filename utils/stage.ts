@@ -1,21 +1,23 @@
 /**
  * Maps a project stage (DB values: idea | mvp | building | launched | paused)
- * to the Editorial Premium badge palette. "launched" reads as "shipped" —
- * the only place the accent green appears outside the landing CTA.
+ * to the badge palette. "launched" reads as "shipped".
+ *
+ * Colors are CSS variables, so a badge renders dark on public pages and light
+ * inside .theme-light (signed-in surfaces) without a second code path.
  */
 export type StageBadge = { label: string; color: string; bg: string };
 
 export function stageBadge(stage: string | null | undefined): StageBadge {
   switch ((stage ?? "").toLowerCase()) {
     case "launched":
-      return { label: "shipped", color: "#0F6E56", bg: "#ECFDF5" };
+      return { label: "shipped", color: "var(--badge-shipped-text)", bg: "var(--badge-shipped-bg)" };
     case "building":
-      return { label: "building", color: "#B45309", bg: "#FFFBEB" };
+      return { label: "building", color: "var(--badge-building-text)", bg: "var(--badge-building-bg)" };
     case "mvp":
-      return { label: "mvp", color: "#B45309", bg: "#FFFBEB" };
+      return { label: "mvp", color: "var(--badge-building-text)", bg: "var(--badge-building-bg)" };
     case "idea":
-      return { label: "idea", color: "#6B6B66", bg: "#F5F5F3" };
+      return { label: "idea", color: "var(--badge-idea-text)", bg: "var(--badge-idea-bg)" };
     default:
-      return { label: (stage ?? "—").toLowerCase(), color: "#6B6B66", bg: "#F5F5F3" };
+      return { label: (stage ?? "—").toLowerCase(), color: "var(--badge-idea-text)", bg: "var(--badge-idea-bg)" };
   }
 }

@@ -7,5 +7,5 @@ export const metadata: Metadata = privateMetadata(
 );
 
 export default function ConnectionsLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <div className="theme-light">{children}</div>;
 }

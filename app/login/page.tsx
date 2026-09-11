@@ -194,7 +194,7 @@ export default function LoginPage() {
         <div style={cardStyle} className="auth-card">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-              <Logo size="lg" gradient />
+              <Logo size="lg" gradient tone="dark" />
             </div>
             <h1 style={titleStyle}>Welcome back</h1>
             <p style={subtitleStyle}>Sign in to your ProjectHub account</p>
@@ -219,7 +219,7 @@ export default function LoginPage() {
 }
 
 const pageStyle: React.CSSProperties = { minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" };
-const backLinkStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)", textDecoration: "none", marginBottom: 20, padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "#FAFAF8", transition: "all 0.15s ease", fontFamily: "var(--font-sans)" };
+const backLinkStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)", textDecoration: "none", marginBottom: 20, padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface-raised)", transition: "all 0.15s ease", fontFamily: "var(--font-sans)" };
 const cardStyle: React.CSSProperties = { width: "100%", background: "var(--gradient-card)", border: "1px solid var(--border-highlight)", borderRadius: 20, padding: 36, boxShadow: "0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 60px rgba(26,26,24,0.4), 0 0 40px color-mix(in srgb, var(--accent) 8%, transparent) inset" };
 const titleStyle: React.CSSProperties = { fontSize: 24, fontWeight: 500, color: "var(--text-primary)", marginBottom: 6, fontFamily: "var(--font-serif)" };
 const subtitleStyle: React.CSSProperties = { color: "var(--text-secondary)", fontSize: 14 };
@@ -230,8 +230,8 @@ const dividerTextStyle: React.CSSProperties = { fontSize: 12, color: "var(--text
 const formStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 16, marginBottom: 20 };
 const labelStyle: React.CSSProperties = { display: "block", marginBottom: 8, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" };
 const forgotStyle: React.CSSProperties = { fontSize: 12, color: "var(--accent-bright, #6B6B66)", textDecoration: "none", fontWeight: 500 };
-const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "#FFFFFF", color: "var(--text-primary)", fontSize: 14, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s ease, box-shadow 0.2s ease" };
-const buttonStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background: "#1A1A18", color: "white", fontWeight: 700, fontSize: 14, fontFamily: "var(--font-sans)", transition: "all 0.18s ease", boxShadow: "0 4px 16px transparent" };
-const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, background: "#FEF2F2", border: "1px solid #FECACA", color: "#B91C1C", fontSize: 13 };
+const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text-primary)", fontSize: 14, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s ease, box-shadow 0.2s ease" };
+const buttonStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background: "var(--accent)", color: "var(--accent-contrast)", fontWeight: 700, fontSize: 14, fontFamily: "var(--font-sans)", transition: "all 0.18s ease", boxShadow: "0 4px 16px transparent" };
+const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", fontSize: 13 };
 const footerStyle: React.CSSProperties = { marginTop: 20, textAlign: "center", fontSize: 13, color: "var(--text-muted)" };
 const linkStyle: React.CSSProperties = { color: "var(--accent-bright, #6B6B66)", textDecoration: "none", fontWeight: 600 };

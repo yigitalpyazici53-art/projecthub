@@ -30,7 +30,7 @@ export default function Footer() {
           gap: 16,
         }}
       >
-        <Logo size="sm" />
+        <Logo size="sm" tone="dark" />
         <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
           © {new Date().getFullYear()} ProjectHub
         </div>

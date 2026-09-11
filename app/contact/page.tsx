@@ -91,7 +91,7 @@ const pillStyle: React.CSSProperties = {
   padding: "6px 12px",
   borderRadius: 999,
   border: "1px solid var(--border)",
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   fontFamily: "var(--font-sans)",
   fontSize: 12.5,
   fontWeight: 500,

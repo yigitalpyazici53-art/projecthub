@@ -231,7 +231,7 @@ export default function SignupPage() {
                   fontFamily: "var(--font-sans)",
                   borderRadius: 10,
                   border: `1.5px solid ${code ? "var(--accent, #4c8eff)" : "var(--border)"}`,
-                  background: "#FFFFFF", color: "var(--text-primary)",
+                  background: "var(--surface)", color: "var(--text-primary)",
                   outline: "none", boxSizing: "border-box",
                   transition: "border-color 0.15s ease",
                 }}
@@ -287,7 +287,7 @@ export default function SignupPage() {
         <div style={cardStyle} className="auth-card">
           <div style={{ textAlign: "center", marginBottom: 28 }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
-              <Logo size="lg" gradient />
+              <Logo size="lg" gradient tone="dark" />
             </div>
             <h1 style={titleStyle}>Create your account</h1>
             <p style={subtitleStyle}>Connect with builders at your university</p>
@@ -353,7 +353,7 @@ const bgWrapStyle: React.CSSProperties = { position: "fixed", inset: 0, pointerE
 const gridStyle: React.CSSProperties = { position: "absolute", inset: 0, backgroundImage: "linear-gradient(var(--grid-line, #F5F5F3) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line, #F5F5F3) 1px, transparent 1px)", backgroundSize: "64px 64px", maskImage: "radial-gradient(ellipse 100% 100% at 50% 0%, black 30%, transparent 100%)" };
 const orb1Style: React.CSSProperties = { position: "absolute", top: "10%", left: "20%", width: 500, height: 500, background: "radial-gradient(circle, var(--orb1, #F5F5F3) 0%, transparent 65%)", animation: "drift 18s ease-in-out infinite" };
 const orb2Style: React.CSSProperties = { position: "absolute", bottom: "10%", right: "15%", width: 400, height: 400, background: "radial-gradient(circle, var(--orb2, #F5F5F3) 0%, transparent 65%)", animation: "drift2 22s ease-in-out infinite" };
-const backLinkStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)", textDecoration: "none", marginBottom: 20, padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "#FAFAF8", transition: "all 0.15s ease", fontFamily: "var(--font-sans)", cursor: "pointer" };
+const backLinkStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)", textDecoration: "none", marginBottom: 20, padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface-raised)", transition: "all 0.15s ease", fontFamily: "var(--font-sans)", cursor: "pointer" };
 const cardStyle: React.CSSProperties = { width: "100%", background: "var(--gradient-card)", border: "1px solid var(--border-highlight)", borderRadius: 20, padding: 36, boxShadow: "0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent), 0 24px 60px rgba(26,26,24,0.4), 0 0 40px color-mix(in srgb, var(--accent) 8%, transparent) inset" };
 const titleStyle: React.CSSProperties = { fontSize: 24, fontWeight: 500, color: "var(--text-primary)", fontFamily: "var(--font-serif)", marginBottom: 6 };
 const subtitleStyle: React.CSSProperties = { color: "var(--text-secondary)", fontSize: 14 };
@@ -363,9 +363,9 @@ const dividerLineStyle: React.CSSProperties = { flex: 1, height: 1, background: 
 const dividerTextStyle: React.CSSProperties = { fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap" };
 const formStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 16 };
 const labelStyle: React.CSSProperties = { display: "block", marginBottom: 6, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" };
-const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "#FFFFFF", color: "var(--text-primary)", fontSize: 14, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s ease, box-shadow 0.2s ease" };
+const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text-primary)", fontSize: 14, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s ease, box-shadow 0.2s ease" };
 const hintStyle: React.CSSProperties = { marginTop: 6, fontSize: 12, color: "var(--text-muted)" };
-const buttonStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background: "#1A1A18", color: "white", fontWeight: 700, fontSize: 14, fontFamily: "var(--font-sans)", transition: "all 0.18s ease", boxShadow: "0 4px 16px transparent" };
-const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, background: "#FEF2F2", border: "1px solid #FECACA", color: "#B91C1C", fontSize: 13 };
+const buttonStyle: React.CSSProperties = { width: "100%", padding: "13px 16px", borderRadius: 10, border: "1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background: "var(--accent)", color: "var(--accent-contrast)", fontWeight: 700, fontSize: 14, fontFamily: "var(--font-sans)", transition: "all 0.18s ease", boxShadow: "0 4px 16px transparent" };
+const errorStyle: React.CSSProperties = { padding: "10px 14px", borderRadius: 8, background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", fontSize: 13 };
 const footerStyle: React.CSSProperties = { marginTop: 20, textAlign: "center", fontSize: 13, color: "var(--text-muted)" };
 const linkStyle: React.CSSProperties = { color: "var(--accent-bright, #6B6B66)", textDecoration: "none", fontWeight: 600 };

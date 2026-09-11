@@ -4,7 +4,7 @@ function SkeletonCard() {
   return (
     <div
       style={{
-        background: "#FFFFFF",
+        background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: 12,
         padding: 24,

@@ -607,7 +607,7 @@ async function seedProfiles(authCache: Map<string, string>): Promise<string[]> {
           ...fields,
           linkedin_url: null,
           portfolio_url: null,
-          avatar_url: null,
+          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(fields.full_name)}`,
           is_ai_generated: true,
           created_at: withinLastDays(i, SEED_PROFILES.length),
         },

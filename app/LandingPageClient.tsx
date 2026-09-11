@@ -2,14 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import Logo from "@/components/Logo";
-import { Reveal, RevealGroup, RevealItem, CountUp } from "@/components/motion/Reveal";
+import ProjectCard from "@/components/cards/ProjectCard";
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
+import type { Profile, Project } from "@/types";
 
 export type PublicStats = {
   builders: number;
   projects: number;
-  connections: number;
+  shipped: number;
+};
+
+export type FeaturedProject = {
+  project: Project;
+  owner: Profile | null;
 };
 
 // ─── Navbar ────────────────────────────────────────────────────────────────────
@@ -157,65 +163,73 @@ function ProfilePreview() {
   );
 }
 
-// ─── Stats (real counts, count-up on scroll) ───────────────────────────────────
+// ─── Social proof (server-rendered counts, visible in the first viewport) ─────
 
-type LiveStats = {
-  shipped: number;
-  builders: number;
-  endorsements: number;
-};
-
-function StatsSection({ fallback }: { fallback: PublicStats | null }) {
-  const [stats, setStats] = useState<LiveStats>({
-    shipped: 0,
-    builders: fallback?.builders ?? 0,
-    endorsements: 0,
-  });
-
-  useEffect(() => {
-    const supabase = createClient();
-    Promise.all([
-      supabase.from("projects").select("id", { count: "exact", head: true }).eq("stage", "launched"),
-      supabase.from("profiles").select("id", { count: "exact", head: true }),
-      supabase.from("endorsements").select("id", { count: "exact", head: true }),
-    ]).then(([shippedRes, buildersRes, endorseRes]) => {
-      setStats({
-        shipped: shippedRes.count ?? 0,
-        builders: buildersRes.count ?? fallback?.builders ?? 0,
-        endorsements: endorseRes.count ?? 0,
-      });
-    });
-  }, [fallback]);
-
-  const cells = [
-    { label: "Projects shipped", value: stats.shipped },
-    { label: "Builders joined", value: stats.builders },
-    { label: "Endorsements given", value: stats.endorsements },
-  ];
+function ProofLine({ stats }: { stats: PublicStats }) {
+  // Zero counts read as anti-proof, so they're left out rather than shown.
+  const items = [
+    { value: stats.builders, label: "builders" },
+    { value: stats.projects, label: "projects" },
+    { value: stats.shipped, label: "shipped" },
+  ].filter((item) => item.value > 0);
+  if (items.length === 0) return null;
 
   return (
-    <RevealGroup style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(3, 1fr)",
-      gap: 16,
-    }} className="landing-stats-grid">
-      {cells.map((c) => (
-        <RevealItem key={c.label}>
-          <div style={{
-            background: "#FFFFFF",
-            border: "1px solid var(--border)",
-            borderRadius: 12,
-            padding: "28px 24px",
-            textAlign: "center",
-          }}>
-            <div className="font-serif" style={{ fontSize: 36, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1 }}>
-              <CountUp value={c.value} />
-            </div>
-            <div className="label-caps" style={{ marginTop: 10 }}>{c.label}</div>
-          </div>
-        </RevealItem>
+    <p style={{ marginTop: 24, fontSize: 14, color: "var(--text-muted)" }}>
+      {items.map((item, i) => (
+        <span key={item.label}>
+          {i > 0 && <span aria-hidden style={{ margin: "0 10px", opacity: 0.6 }}>·</span>}
+          <strong style={{ fontWeight: 600, color: "var(--text-primary)" }}>{item.value}</strong> {item.label}
+        </span>
       ))}
-    </RevealGroup>
+    </p>
+  );
+}
+
+// ─── Featured projects ─────────────────────────────────────────────────────────
+
+function FeaturedProjects({ items }: { items: FeaturedProject[] }) {
+  if (items.length === 0) return null;
+
+  return (
+    <section style={{ padding: "0 24px 120px" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{
+            display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+            gap: 16, flexWrap: "wrap", marginBottom: 32,
+          }}>
+            <div>
+              <div className="label-caps" style={{ marginBottom: 12 }}>Featured projects</div>
+              <h2 className="font-serif" style={{
+                fontSize: "clamp(28px, 4vw, 40px)",
+                fontWeight: 500,
+                letterSpacing: "-0.015em",
+                color: "var(--text-primary)",
+                margin: 0,
+              }}>
+                What students are building now.
+              </h2>
+            </div>
+            <Link href="/projects" className="u-link" style={{ fontSize: 14, color: "var(--text-secondary)" }}>
+              View all projects →
+            </Link>
+          </div>
+        </Reveal>
+
+        <RevealGroup className="landing-featured-grid" style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 16,
+        }}>
+          {items.map(({ project, owner }) => (
+            <RevealItem key={project.id} style={{ display: "grid" }}>
+              <ProjectCard project={project} ownerProfile={owner} variant="index" />
+            </RevealItem>
+          ))}
+        </RevealGroup>
+      </div>
+    </section>
   );
 }
 
@@ -239,7 +253,13 @@ const HOW_IT_WORKS = [
   },
 ];
 
-export default function LandingPage({ stats }: { stats: PublicStats | null }) {
+export default function LandingPage({
+  stats,
+  featured,
+}: {
+  stats: PublicStats | null;
+  featured: FeaturedProject[];
+}) {
   return (
     <>
       <Navbar />
@@ -277,9 +297,15 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
             </Reveal>
 
             <Reveal delay={0.16}>
-              <Link href="/signup" className="btn-accent">
-                Create your profile
-              </Link>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
+                <Link href="/signup" className="btn-accent">
+                  Create your profile
+                </Link>
+                <Link href="/projects" className="u-link" style={{ fontSize: 15, color: "var(--text-secondary)" }}>
+                  Browse projects →
+                </Link>
+              </div>
+              {stats && <ProofLine stats={stats} />}
             </Reveal>
           </div>
 
@@ -290,12 +316,8 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
           </Reveal>
         </section>
 
-        {/* ── STATS ─────────────────────────────────────────────────── */}
-        <section style={{ padding: "0 24px 120px" }}>
-          <div style={{ maxWidth: 860, margin: "0 auto" }}>
-            <StatsSection fallback={stats} />
-          </div>
-        </section>
+        {/* ── FEATURED PROJECTS ─────────────────────────────────────── */}
+        <FeaturedProjects items={featured} />
 
         {/* ── HOW IT WORKS ──────────────────────────────────────────── */}
         <section style={{ padding: "0 24px 140px" }}>
@@ -403,7 +425,11 @@ export default function LandingPage({ stats }: { stats: PublicStats | null }) {
         .mobile-nav-signin { display: none !important; }
 
         @media (max-width: 900px) {
-          .landing-stats-grid { grid-template-columns: 1fr !important; max-width: 420px; margin: 0 auto; }
+          .landing-featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
+
+        @media (max-width: 640px) {
+          .landing-featured-grid { grid-template-columns: 1fr !important; }
         }
 
         @media (max-width: 768px) {

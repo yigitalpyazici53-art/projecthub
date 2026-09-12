@@ -357,7 +357,7 @@ const sectionStyle: React.CSSProperties = {
   gap: 16,
   padding: "22px",
   borderRadius: 14,
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border-subtle)",
 };
 
@@ -384,7 +384,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const reqStyle: React.CSSProperties = {
-  color: "#B91C1C",
+  color: "var(--danger)",
 };
 
 const inputStyle: React.CSSProperties = {
@@ -392,7 +392,7 @@ const inputStyle: React.CSSProperties = {
   padding: "13px 15px",
   borderRadius: 12,
   border: "1px solid var(--border)",
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   color: "var(--text-primary)",
   fontSize: 15,
   outline: "none",
@@ -413,9 +413,9 @@ const hintStyle: React.CSSProperties = {
 const errorStyle: React.CSSProperties = {
   padding: "12px 16px",
   borderRadius: 10,
-  background: "#FEF2F2",
-  border: "1px solid #FECACA",
-  color: "#B91C1C",
+  background: "var(--danger-bg)",
+  border: "1px solid var(--danger-border)",
+  color: "var(--danger)",
   fontSize: 13,
 };
 
@@ -446,7 +446,7 @@ const saveBtnStyle: React.CSSProperties = {
   padding: "12px 32px",
   borderRadius: 12,
   border: "none",
-  background: "#1A1A18",
+  background: "var(--accent)",
   color: "white",
   fontSize: 14,
   fontWeight: 700,

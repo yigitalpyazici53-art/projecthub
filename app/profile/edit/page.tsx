@@ -21,7 +21,8 @@ const AVAILABILITY_OPTIONS = [
 ];
 
 function getAvatarColor(id: string) {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6"];
+  // Saturated fills that stay legible behind white initials on the dark ground.
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
   return colors[id.charCodeAt(0) % colors.length];
 }
 
@@ -184,7 +185,7 @@ export default function ProfileEditPage() {
               {completionPercent}%
             </span>
           </div>
-          <div style={{ height: 6, background: "#EFEFEC", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: 6, background: "var(--surface-raised)", borderRadius: 99, overflow: "hidden" }}>
             <div style={{
               height: "100%",
               width: `${completionPercent}%`,
@@ -312,7 +313,7 @@ export default function ProfileEditPage() {
                         transition: "all 0.15s ease",
                         background: active
                           ? "color-mix(in srgb, var(--accent) 18%, transparent)"
-                          : "#F7F7F5",
+                          : "var(--surface-raised)",
                         border: active
                           ? "1px solid color-mix(in srgb, var(--accent) 50%, transparent)"
                           : "1px solid var(--border)",
@@ -399,7 +400,7 @@ export default function ProfileEditPage() {
                         transition: "all 0.15s ease",
                         background: active
                           ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                          : "#FAFAF8",
+                          : "var(--surface-raised)",
                         border: active
                           ? "1px solid color-mix(in srgb, var(--accent) 45%, transparent)"
                           : "1px solid var(--border)",
@@ -455,7 +456,7 @@ export default function ProfileEditPage() {
           </button>
           {saveMsg && (
             <p style={{
-              color: saveMsg.startsWith("Error") ? "#B91C1C" : "var(--accent-green)",
+              color: saveMsg.startsWith("Error") ? "var(--danger)" : "var(--accent-green)",
               fontSize: 14, fontWeight: 600, marginLeft: 4,
             }}>
               {saveMsg}
@@ -527,7 +528,7 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "11px 14px",
   borderRadius: 10,
-  background: "#F7F7F5",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border)",
   color: "var(--text-primary)",
   fontSize: 14,

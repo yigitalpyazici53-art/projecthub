@@ -20,24 +20,24 @@ const ADMIN_EMAIL = "yigitalpyazici53@gmail.com";
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, React.CSSProperties> = {
     new: {
-      background: "#F5F5F3",
-      color: "#60a5fa",
-      border: "1px solid #E8E8E4",
+      background: "var(--surface-raised)",
+      color: "var(--tint-blue-text)",
+      border: "1px solid var(--border)",
     },
     reviewed: {
-      background: "#FFFBEB",
-      color: "#B45309",
-      border: "1px solid #FDE68A",
+      background: "var(--tint-amber-bg)",
+      color: "var(--tint-amber-text)",
+      border: "1px solid var(--tint-amber-bg)",
     },
     accepted: {
-      background: "#ECFDF5",
-      color: "#0F6E56",
-      border: "1px solid #D1FAE5",
+      background: "var(--accent-green-glow)",
+      color: "var(--accent-green)",
+      border: "1px solid var(--accent-green-glow)",
     },
     rejected: {
-      background: "#FEF2F2",
-      color: "#B91C1C",
-      border: "1px solid #FECACA",
+      background: "var(--danger-bg)",
+      color: "var(--danger)",
+      border: "1px solid var(--danger-border)",
     },
   };
 
@@ -78,8 +78,8 @@ function LinkChip({
         fontSize: 12,
         padding: "2px 10px",
         borderRadius: 6,
-        background: "#F5F5F3",
-        border: "1px solid #E8E8E4",
+        background: "var(--surface-raised)",
+        border: "1px solid var(--border)",
         color: "var(--accent)",
         textDecoration: "none",
         fontFamily: "var(--font-sans)",
@@ -137,8 +137,8 @@ export default async function AdminApplicationsPage() {
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--accent)",
-              background: "#F5F5F3",
-              border: "1px solid #E8E8E4",
+              background: "var(--surface-raised)",
+              border: "1px solid var(--border)",
               borderRadius: 999,
               padding: "3px 12px",
               marginBottom: 16,
@@ -167,7 +167,7 @@ export default async function AdminApplicationsPage() {
           >
             {rows.length} application{rows.length !== 1 ? "s" : ""} submitted
             {error && (
-              <span style={{ color: "#B91C1C", marginLeft: 8 }}>
+              <span style={{ color: "var(--danger)", marginLeft: 8 }}>
                 · fetch error: {error.message}
               </span>
             )}
@@ -180,8 +180,8 @@ export default async function AdminApplicationsPage() {
             style={{
               textAlign: "center",
               padding: "80px 24px",
-              background: "#FAFAF8",
-              border: "1px solid #F5F5F3",
+              background: "var(--surface-raised)",
+              border: "1px solid var(--border-subtle)",
               borderRadius: 16,
               color: "var(--text-muted)",
               fontFamily: "var(--font-sans)",
@@ -199,8 +199,8 @@ export default async function AdminApplicationsPage() {
               key={app.id}
               style={{
                 background:
-                  "linear-gradient(145deg, #FFFFFF, #FFFFFF)",
-                border: "1px solid #E8E8E4",
+                  "var(--surface)",
+                border: "1px solid var(--border)",
                 borderRadius: 16,
                 padding: "28px 32px",
                 boxShadow: "0 4px 24px rgba(26,26,24,0.08)",
@@ -303,7 +303,7 @@ export default async function AdminApplicationsPage() {
                   flexWrap: "wrap",
                   marginTop: 16,
                   paddingTop: 16,
-                  borderTop: "1px solid #F5F5F3",
+                  borderTop: "1px solid var(--border-subtle)",
                 }}
               >
                 <LinkChip href={app.github_url} label="GitHub" />
@@ -339,11 +339,11 @@ function Chip({
         borderRadius: 999,
         fontFamily: "var(--font-sans)",
         background: accent
-          ? "#F5F5F3"
-          : "#F7F7F5",
+          ? "var(--surface-raised)"
+          : "var(--surface-raised)",
         border: accent
-          ? "1px solid #E8E8E4"
-          : "1px solid #E8E8E4",
+          ? "1px solid var(--border)"
+          : "1px solid var(--border)",
         color: accent ? "var(--accent)" : "var(--text-secondary)",
       }}
     >

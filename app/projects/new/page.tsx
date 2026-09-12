@@ -182,7 +182,7 @@ export default function NewProjectPage() {
                   <div style={{
                     width: 42, height: 42, borderRadius: "50%", display: "flex",
                     alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800,
-                    background: done || active ? "var(--accent)" : "#F7F7F5",
+                    background: done || active ? "var(--accent)" : "var(--surface-raised)",
                     border: done || active ? "none" : "1px solid var(--border)",
                     color: done || active ? "white" : "var(--text-muted)",
                     boxShadow: active ? "0 0 0 6px color-mix(in srgb, var(--accent) 18%, transparent)" : "none",
@@ -471,7 +471,7 @@ export default function NewProjectPage() {
                 {submitting && (
                   <span style={{
                     width: 16, height: 16, borderRadius: "50%",
-                    border: "2px solid #E8E8E4",
+                    border: "2px solid var(--border)",
                     borderTopColor: "white",
                     animation: "spin-slow 0.7s linear infinite",
                     display: "inline-block",
@@ -623,7 +623,7 @@ const sectionBlockStyle: React.CSSProperties = {
   gap: 16,
   padding: "24px",
   borderRadius: 14,
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border-subtle)",
 };
 
@@ -653,7 +653,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const reqStyle: React.CSSProperties = {
-  color: "#B91C1C",
+  color: "var(--danger)",
   fontWeight: 700,
   marginLeft: 2,
 };
@@ -669,7 +669,7 @@ const inputStyle: React.CSSProperties = {
   padding: "14px 16px",
   borderRadius: 12,
   border: "1px solid var(--border)",
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   color: "var(--text-primary)",
   fontSize: 15,
   outline: "none",
@@ -744,7 +744,7 @@ const chipBtnActive: React.CSSProperties = {
 };
 
 const chipBtnInactive: React.CSSProperties = {
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   borderColor: "var(--border)",
   color: "var(--text-secondary)",
 };
@@ -820,7 +820,7 @@ const continueBtnStyle: React.CSSProperties = {
   padding: "14px 36px",
   borderRadius: 12,
   border: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)",
-  background: "#1A1A18",
+  background: "var(--accent)",
   color: "white",
   fontSize: 15,
   fontWeight: 700,
@@ -837,7 +837,7 @@ const submitBtnStyle: React.CSSProperties = {
   padding: "18px 40px",
   borderRadius: 14,
   border: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)",
-  background: "#1A1A18",
+  background: "var(--accent)",
   color: "white",
   fontSize: 17,
   fontWeight: 800,
@@ -855,9 +855,9 @@ const submitBtnStyle: React.CSSProperties = {
 const errorStyle: React.CSSProperties = {
   padding: "12px 16px",
   borderRadius: 10,
-  background: "#FEF2F2",
-  border: "1px solid #FECACA",
-  color: "#B91C1C",
+  background: "var(--danger-bg)",
+  border: "1px solid var(--danger-border)",
+  color: "var(--danger)",
   fontSize: 13,
   marginTop: 8,
 };

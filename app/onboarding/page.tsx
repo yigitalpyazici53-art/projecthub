@@ -168,8 +168,8 @@ export default function OnboardingPage() {
             <div style={stepStyle}>
               <div style={iconCircleStyle}>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="10" fill="#E8E8E4" stroke="#8b5cf6" strokeWidth="1.5" />
-                  <path d="M14 9v5l3 3" stroke="#6B6B66" strokeWidth="1.5" strokeLinecap="round" />
+                  <circle cx="14" cy="14" r="10" fill="var(--surface-raised)" stroke="#8b5cf6" strokeWidth="1.5" />
+                  <path d="M14 9v5l3 3" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </div>
               <h1 style={titleStyle}>What are you here for?</h1>
@@ -217,9 +217,9 @@ export default function OnboardingPage() {
             <div style={stepStyle}>
               <div style={iconCircleStyle}>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <rect x="4" y="10" width="7" height="7" rx="2" fill="#E8E8E4" stroke="#4c8eff" strokeWidth="1.5" />
-                  <rect x="14" y="6" width="7" height="7" rx="2" fill="#E8E8E4" stroke="#8b5cf6" strokeWidth="1.5" />
-                  <rect x="9" y="17" width="7" height="7" rx="2" fill="#D1FAE5" stroke="#0F6E56" strokeWidth="1.5" />
+                  <rect x="4" y="10" width="7" height="7" rx="2" fill="var(--surface-raised)" stroke="#4c8eff" strokeWidth="1.5" />
+                  <rect x="14" y="6" width="7" height="7" rx="2" fill="var(--surface-raised)" stroke="#8b5cf6" strokeWidth="1.5" />
+                  <rect x="9" y="17" width="7" height="7" rx="2" fill="var(--accent-green-glow)" stroke="var(--accent-green)" strokeWidth="1.5" />
                 </svg>
               </div>
               <h1 style={titleStyle}>What are your skills?</h1>
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
                         padding: "7px 14px",
                         borderRadius: 20,
                         border: active ? "1px solid color-mix(in srgb, var(--accent) 60%, transparent)" : "1px solid var(--border)",
-                        background: active ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "#FAFAF8",
+                        background: active ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "var(--surface-raised)",
                         color: active ? "var(--accent-bright)" : "var(--text-secondary)",
                         fontSize: 13,
                         fontWeight: active ? 600 : 500,
@@ -271,10 +271,10 @@ export default function OnboardingPage() {
           {/* ── Step 4 ── */}
           {step === 4 && (
             <div style={stepStyle}>
-              <div style={{ ...iconCircleStyle, background: "#D1FAE5", border: "1px solid #D1FAE5" }}>
+              <div style={{ ...iconCircleStyle, background: "var(--accent-green-glow)", border: "1px solid var(--accent-green-glow)" }}>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="10" fill="#D1FAE5" stroke="#0F6E56" strokeWidth="1.5" />
-                  <path d="M9 14l4 4 6-6" stroke="#0F6E56" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="14" cy="14" r="10" fill="var(--accent-green-glow)" stroke="var(--accent-green)" strokeWidth="1.5" />
+                  <path d="M9 14l4 4 6-6" stroke="var(--accent-green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <h1 style={titleStyle}>You&apos;re all set!</h1>
@@ -400,7 +400,7 @@ const dotDone: React.CSSProperties = {
 
 const dotIdle: React.CSSProperties = {
   width: 8,
-  background: "#E8E8E4",
+  background: "var(--surface-raised)",
 };
 
 const cardStyle: React.CSSProperties = {
@@ -479,7 +479,7 @@ const inputStyle: React.CSSProperties = {
   padding: "11px 14px",
   borderRadius: 10,
   border: "1px solid var(--border)",
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   color: "var(--text-primary)",
   fontSize: 15,
   fontFamily: "var(--font-sans)",
@@ -505,7 +505,7 @@ const optionCardBase: React.CSSProperties = {
 };
 
 const optionCardIdle: React.CSSProperties = {
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border)",
 };
 
@@ -528,7 +528,7 @@ const backBtnStyle: React.CSSProperties = {
   padding: "10px 18px",
   borderRadius: 10,
   border: "1px solid var(--border)",
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   color: "var(--text-secondary)",
   fontSize: 14,
   fontWeight: 500,
@@ -538,7 +538,7 @@ const backBtnStyle: React.CSSProperties = {
 };
 
 const summaryCardStyle: React.CSSProperties = {
-  background: "#FAFAF8",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border)",
   borderRadius: 14,
   padding: "16px 18px",

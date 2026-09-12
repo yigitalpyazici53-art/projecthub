@@ -2,8 +2,8 @@
  * Maps a project stage (DB values: idea | mvp | building | launched | paused)
  * to the badge palette. "launched" reads as "shipped".
  *
- * Colors are CSS variables, so a badge renders dark on public pages and light
- * inside .theme-light (signed-in surfaces) without a second code path.
+ * Colors are CSS variables from app/globals.css, so badges follow the theme
+ * instead of hardcoding hex values at every call site.
  */
 export type StageBadge = { label: string; color: string; bg: string };
 

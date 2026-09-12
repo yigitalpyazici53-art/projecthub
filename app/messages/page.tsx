@@ -11,7 +11,8 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getAvatarColor(id: string): string {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6"];
+  // Saturated fills that stay legible behind white initials on the dark ground.
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
   return colors[id.charCodeAt(0) % colors.length];
 }
 
@@ -39,7 +40,7 @@ interface Conversation {
 
 export default function MessagesPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B6B66", fontSize: 14 }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)", fontSize: 14 }}>Loading…</div>}>
       <MessagesInner />
     </Suspense>
   );
@@ -296,7 +297,7 @@ function MessagesInner() {
     return (
       <main style={pageStyle}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-          <div style={{ color: "#6B6B66", fontSize: 14 }}>Loading conversations…</div>
+          <div style={{ color: "var(--text-secondary)", fontSize: 14 }}>Loading conversations…</div>
         </div>
       </main>
     );
@@ -319,11 +320,11 @@ function MessagesInner() {
           {conversations.length === 0 ? (
             <div style={emptyConvStyle}>
               <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style={{ marginBottom: 18 }}>
-                <rect x="6" y="12" width="32" height="24" rx="6" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5"/>
-                <rect x="18" y="22" width="32" height="24" rx="6" fill="#F5F5F3" stroke="#E8E8E4" strokeWidth="1.5"/>
-                <circle cx="16" cy="24" r="2" fill="#9B9B94"/>
-                <circle cx="23" cy="24" r="2" fill="#9B9B94"/>
-                <circle cx="30" cy="24" r="2" fill="#9B9B94"/>
+                <rect x="6" y="12" width="32" height="24" rx="6" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5"/>
+                <rect x="18" y="22" width="32" height="24" rx="6" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5"/>
+                <circle cx="16" cy="24" r="2" fill="var(--text-muted)"/>
+                <circle cx="23" cy="24" r="2" fill="var(--text-muted)"/>
+                <circle cx="30" cy="24" r="2" fill="var(--text-muted)"/>
               </svg>
               <p style={{ color: "var(--text-primary, #1A1A18)", fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 14, marginBottom: 6 }}>No conversations yet</p>
               <p style={{ color: "var(--text-secondary, #6B6B66)", fontSize: 12, lineHeight: 1.6, marginBottom: 18 }}>
@@ -391,12 +392,12 @@ function MessagesInner() {
           {!activePartnerId ? (
             <div style={noChatStyle}>
               <svg width="88" height="88" viewBox="0 0 88 88" fill="none" style={{ marginBottom: 24 }}>
-                <circle cx="44" cy="44" r="42" stroke="#F5F5F3" strokeWidth="1.5" strokeDasharray="6 3"/>
-                <rect x="18" y="28" width="34" height="26" rx="7" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5"/>
-                <rect x="36" y="38" width="34" height="26" rx="7" fill="#F5F5F3" stroke="#E8E8E4" strokeWidth="1.5"/>
-                <circle cx="28" cy="41" r="2" fill="#9B9B94"/>
-                <circle cx="35" cy="41" r="2" fill="#9B9B94"/>
-                <circle cx="42" cy="41" r="2" fill="#9B9B94"/>
+                <circle cx="44" cy="44" r="42" stroke="var(--surface-raised)" strokeWidth="1.5" strokeDasharray="6 3"/>
+                <rect x="18" y="28" width="34" height="26" rx="7" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5"/>
+                <rect x="36" y="38" width="34" height="26" rx="7" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5"/>
+                <circle cx="28" cy="41" r="2" fill="var(--text-muted)"/>
+                <circle cx="35" cy="41" r="2" fill="var(--text-muted)"/>
+                <circle cx="42" cy="41" r="2" fill="var(--text-muted)"/>
               </svg>
               <h2 style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 18, color: "var(--text-primary, #1A1A18)", marginBottom: 8 }}>
                 Your messages
@@ -438,10 +439,10 @@ function MessagesInner() {
                   <div style={{ textAlign: "center", paddingTop: 64 }}>
                     <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style={{ marginBottom: 14, opacity: 0.65 }}>
                       <path d="M26 6C15.507 6 7 13.611 7 23c0 4.587 1.935 8.756 5.088 11.79L9 43l9.26-2.94A20.01 20.01 0 0026 41c10.493 0 19-7.611 19-18S36.493 6 26 6z"
-                        fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" strokeLinejoin="round"/>
-                      <circle cx="19" cy="23" r="2" fill="#9B9B94"/>
-                      <circle cx="26" cy="23" r="2" fill="#9B9B94"/>
-                      <circle cx="33" cy="23" r="2" fill="#9B9B94"/>
+                        fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5" strokeLinejoin="round"/>
+                      <circle cx="19" cy="23" r="2" fill="var(--text-muted)"/>
+                      <circle cx="26" cy="23" r="2" fill="var(--text-muted)"/>
+                      <circle cx="33" cy="23" r="2" fill="var(--text-muted)"/>
                     </svg>
                     <p style={{ color: "var(--text-secondary, #6B6B66)", fontSize: 13 }}>No messages yet — say hello!</p>
                   </div>
@@ -457,11 +458,11 @@ function MessagesInner() {
                         <div key={msg.id}>
                           {showDate && (
                             <div style={dateDividerStyle}>
-                              <span style={{ flex: 1, height: 1, background: "#EFEFEC" }} />
+                              <span style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
                               <span style={{ padding: "0 12px", fontSize: 11, color: "var(--text-muted)", whiteSpace: "nowrap" }}>
                                 {new Date(msg.created_at).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
                               </span>
-                              <span style={{ flex: 1, height: 1, background: "#EFEFEC" }} />
+                              <span style={{ flex: 1, height: 1, background: "var(--border-subtle)" }} />
                             </div>
                           )}
                           <div style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start", marginBottom: 6 }}>
@@ -471,17 +472,17 @@ function MessagesInner() {
                                 padding: "10px 14px",
                                 borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
                                 background: isMe
-                                  ? "#1A1A18"
+                                  ? "var(--accent)"
                                   : "var(--surface-raised)",
                                 color: isMe ? "white" : "var(--text-primary)",
                                 fontSize: 14,
                                 lineHeight: 1.55,
-                                border: isMe ? "none" : "1px solid #E8E8E4",
+                                border: isMe ? "none" : "1px solid var(--border)",
                                 boxShadow: isMe ? "0 2px 12px transparent" : "0 1px 4px rgba(26,26,24,0.08)",
                               }}
                             >
                               <div>{msg.content}</div>
-                              <div style={{ fontSize: 10, color: isMe ? "#E8E8E4" : "var(--text-muted)", marginTop: 4, textAlign: "right" }}>
+                              <div style={{ fontSize: 10, color: isMe ? "var(--accent-contrast)" : "var(--text-muted)", marginTop: 4, textAlign: "right" }}>
                                 {formatTime(msg.created_at)}
                               </div>
                             </div>
@@ -497,7 +498,7 @@ function MessagesInner() {
               {/* Input bar */}
               <div style={inputBarStyle}>
                 {sendError && (
-                  <p style={{ color: "#B91C1C", fontSize: 12, marginBottom: 6, paddingLeft: 4 }}>{sendError}</p>
+                  <p style={{ color: "var(--danger)", fontSize: 12, marginBottom: 6, paddingLeft: 4 }}>{sendError}</p>
                 )}
                 <div style={inputContainerStyle}>
                   <textarea
@@ -551,7 +552,7 @@ const layoutStyle: React.CSSProperties = {
 const sidebarStyle: React.CSSProperties = {
   width: 300,
   minWidth: 240,
-  borderRight: "1px solid #EFEFEC",
+  borderRight: "1px solid var(--border-subtle)",
   display: "flex",
   flexDirection: "column",
   background: "var(--surface)",
@@ -559,7 +560,7 @@ const sidebarStyle: React.CSSProperties = {
 
 const sidebarHeaderStyle: React.CSSProperties = {
   padding: "22px 18px 16px",
-  borderBottom: "1px solid #EFEFEC",
+  borderBottom: "1px solid var(--border-subtle)",
   display: "flex",
   alignItems: "center",
   gap: 8,
@@ -596,7 +597,7 @@ const emptyConvStyle: React.CSSProperties = {
   justifyContent: "center",
   padding: "32px 24px",
   textAlign: "center",
-  background: "#F7F7F5",
+  background: "var(--surface-raised)",
   borderRadius: 16,
   margin: 12,
 };
@@ -666,10 +667,10 @@ const chatHeaderStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 12,
   padding: "14px 24px",
-  borderBottom: "1px solid #EFEFEC",
+  borderBottom: "1px solid var(--border-subtle)",
   background: "var(--surface)",
   flexShrink: 0,
-  boxShadow: "0 1px 0 #F7F7F5",
+  boxShadow: "0 1px 0 var(--border-subtle)",
 };
 
 const messagesAreaStyle: React.CSSProperties = {
@@ -688,7 +689,7 @@ const dateDividerStyle: React.CSSProperties = {
 
 const inputBarStyle: React.CSSProperties = {
   padding: "12px 20px 18px",
-  borderTop: "1px solid #EFEFEC",
+  borderTop: "1px solid var(--border-subtle)",
   background: "var(--surface)",
   flexShrink: 0,
 };
@@ -697,8 +698,8 @@ const inputContainerStyle: React.CSSProperties = {
   display: "flex",
   gap: 10,
   alignItems: "flex-end",
-  background: "#F7F7F5",
-  border: "1px solid #E8E8E4",
+  background: "var(--surface-raised)",
+  border: "1px solid var(--border)",
   borderRadius: 14,
   padding: "6px 6px 6px 16px",
 };
@@ -722,7 +723,7 @@ const sendBtnStyle: React.CSSProperties = {
   width: 38,
   height: 38,
   borderRadius: 10,
-  background: "#1A1A18",
+  background: "var(--accent)",
   border: "none",
   color: "white",
   display: "flex",

@@ -2,8 +2,8 @@
  * Category-specific accent tints for project category badges, plus the
  * deterministic letter-based avatar tints used on builder cards.
  *
- * Both return CSS variables (defined in app/globals.css), so the same badge
- * renders dark on public pages and light inside .theme-light.
+ * Both return CSS variables (defined in app/globals.css), so badges follow the
+ * theme instead of hardcoding hex values at every call site.
  */
 export type CategoryBadge = { bg: string; color: string };
 

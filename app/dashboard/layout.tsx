@@ -7,5 +7,5 @@ export const metadata: Metadata = privateMetadata(
 );
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return <div className="theme-light">{children}</div>;
+  return <>{children}</>;
 }

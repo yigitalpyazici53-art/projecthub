@@ -16,9 +16,8 @@ body {
    landing page. The variable NAMES are unchanged, so every inline
    style that reads var(--…) follows the theme automatically.
 
-   Signed-in surfaces (dashboard, messages, connections, profile/edit,
-   onboarding, admin, project new/edit) stay light: their layouts wrap
-   children in .theme-light, which restores the light values below. */
+   Every route is dark, signed-in surfaces included — there is no second
+   palette to keep in sync. */
 :root {
   color-scheme: dark;
 
@@ -97,76 +96,10 @@ body {
   --skeleton-sheen: rgba(255, 255, 255, 0.12);
 }
 
-/* ── Editorial Premium light theme — signed-in surfaces only ─────
-   Scoped so the same components render light inside these routes
-   without a second set of light-specific styles. */
-.theme-light {
-  color-scheme: light;
-
-  --background: #F2F0EB;
-  --surface: #FFFFFF;
-  --surface-raised: #F7F7F5;
-  --surface-overlay: #F5F5F3;
-
-  --border: #E8E8E4;
-  --border-subtle: #EFEFEC;
-  --border-highlight: #C8C8C2;
-
-  --accent: #1A1A18;
-  --accent-hover: #2A2A27;
-  --accent-bright: #1A1A18;
-  --accent-glow: transparent;
-  --accent-purple: #6B6B66;
-  --accent-purple-glow: rgba(107, 107, 102, 0.08);
-  --accent-cyan: #0F6E56;
-  --accent-green: #0F6E56;
-  --accent-green-glow: rgba(15, 110, 86, 0.08);
-  --accent-contrast: #FFFFFF;
-
-  --text-primary: #1A1A18;
-  --text-secondary: #6B6B66;
-  --text-muted: #9B9B94;
-
-  --success: #0F6E56;
-  --warning: #B45309;
-  --danger: #B91C1C;
-  --danger-bg: #FEF2F2;
-  --danger-border: #FECACA;
-
-  --gradient-brand: linear-gradient(135deg, #1A1A18 0%, #1A1A18 100%);
-  --gradient-blue: linear-gradient(135deg, #1A1A18 0%, #1A1A18 100%);
-  --gradient-card: #FFFFFF;
-
-  --badge-shipped-bg: #ECFDF5;
-  --badge-shipped-text: #0F6E56;
-  --badge-building-bg: #FFFBEB;
-  --badge-building-text: #B45309;
-  --badge-idea-bg: #F5F5F3;
-  --badge-idea-text: #6B6B66;
-
-  --tint-blue-bg: #EFF6FF;    --tint-blue-text: #1D4ED8;
-  --tint-violet-bg: #F5F3FF;  --tint-violet-text: #6D28D9;
-  --tint-green-bg: #ECFDF5;   --tint-green-text: #047857;
-  --tint-rose-bg: #FFF1F2;    --tint-rose-text: #BE123C;
-  --tint-amber-bg: #FFFBEB;   --tint-amber-text: #B45309;
-  --tint-sky-bg: #F0F9FF;     --tint-sky-text: #0369A1;
-  --tint-slate-bg: #F1F5F9;   --tint-slate-text: #334155;
-
-  --avatar-1: #DBEAFE;
-  --avatar-2: #FCE7F3;
-  --avatar-3: #D1FAE5;
-  --avatar-4: #FEF3C7;
-  --avatar-5: #E0E7FF;
-  --avatar-0: #F5F5F3;
-
-  --skeleton-base: #F0F0EC;
-  --skeleton-sheen: #E8E8E4;
-
-  /* Paint over the dark body ground for the whole signed-in subtree. */
-  background: var(--background);
-  color: var(--text-primary);
-  flex: 1 1 auto;
-}
+/* The light Editorial palette lived here as .theme-light while signed-in
+   routes stayed light. Every route is dark now, so the class was removed
+   rather than left as dead code. Restore it from git history if a light
+   surface is ever needed again. */
 
 /* ── Reset ──────────────────────────────────────────────────────── */
 * { box-sizing: border-box; margin: 0; padding: 0; }

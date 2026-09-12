@@ -30,7 +30,8 @@ interface PendingProfile extends Profile {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getAvatarColor(id: string): string {
-  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#B45309", "#0F6E56", "#3b82f6", "#06b6d4"];
+  // Saturated fills that stay legible behind white initials on the dark ground.
+  const colors = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#06b6d4"];
   return colors[id.charCodeAt(0) % colors.length] ?? "#6366f1";
 }
 
@@ -569,34 +570,34 @@ function EmptyState({
     <div className="empty-state-panel" style={{ maxWidth: 520, margin: "24px auto" }}>
       {svgType === "network" && (
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 20 }}>
-          <circle cx="50" cy="50" r="47" stroke="#E8E8E4" strokeWidth="1.5" strokeDasharray="7 4" />
-          <circle cx="50" cy="50" r="10" fill="#E8E8E4" stroke="#D8D8D2" strokeWidth="1.5" />
-          <circle cx="20" cy="35" r="7" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
-          <circle cx="80" cy="35" r="7" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
-          <circle cx="20" cy="65" r="7" fill="#ECFDF5" stroke="#D1FAE5" strokeWidth="1.5" />
+          <circle cx="50" cy="50" r="47" stroke="var(--border)" strokeWidth="1.5" strokeDasharray="7 4" />
+          <circle cx="50" cy="50" r="10" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5" />
+          <circle cx="20" cy="35" r="7" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5" />
+          <circle cx="80" cy="35" r="7" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5" />
+          <circle cx="20" cy="65" r="7" fill="var(--accent-green-glow)" stroke="var(--accent-green-glow)" strokeWidth="1.5" />
           <circle cx="80" cy="65" r="7" fill="rgba(236,72,153,0.1)" stroke="rgba(236,72,153,0.35)" strokeWidth="1.5" />
-          <circle cx="50" cy="18" r="6" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
-          <line x1="27" y1="38" x2="42" y2="46" stroke="#E8E8E4" strokeWidth="1.2" />
-          <line x1="73" y1="38" x2="58" y2="46" stroke="#E8E8E4" strokeWidth="1.2" />
-          <line x1="27" y1="62" x2="42" y2="54" stroke="#E8E8E4" strokeWidth="1.2" />
-          <line x1="73" y1="62" x2="58" y2="54" stroke="#E8E8E4" strokeWidth="1.2" />
-          <line x1="50" y1="24" x2="50" y2="40" stroke="#E8E8E4" strokeWidth="1.2" />
+          <circle cx="50" cy="18" r="6" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5" />
+          <line x1="27" y1="38" x2="42" y2="46" stroke="var(--border)" strokeWidth="1.2" />
+          <line x1="73" y1="38" x2="58" y2="46" stroke="var(--border)" strokeWidth="1.2" />
+          <line x1="27" y1="62" x2="42" y2="54" stroke="var(--border)" strokeWidth="1.2" />
+          <line x1="73" y1="62" x2="58" y2="54" stroke="var(--border)" strokeWidth="1.2" />
+          <line x1="50" y1="24" x2="50" y2="40" stroke="var(--border)" strokeWidth="1.2" />
         </svg>
       )}
       {svgType === "pending" && (
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 20 }}>
-          <circle cx="50" cy="50" r="47" stroke="#FDE68A" strokeWidth="1.5" strokeDasharray="7 4" />
-          <rect x="22" y="28" width="56" height="44" rx="10" fill="#FFFBEB" stroke="#FDE68A" strokeWidth="1.5" />
-          <path d="M22 42l28 16 28-16" stroke="#FDE68A" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="50" cy="50" r="47" stroke="var(--tint-amber-bg)" strokeWidth="1.5" strokeDasharray="7 4" />
+          <rect x="22" y="28" width="56" height="44" rx="10" fill="var(--tint-amber-bg)" stroke="var(--tint-amber-bg)" strokeWidth="1.5" />
+          <path d="M22 42l28 16 28-16" stroke="var(--tint-amber-bg)" strokeWidth="1.5" strokeLinecap="round" />
           <circle cx="72" cy="30" r="10" fill="rgba(251,146,60,0.2)" stroke="rgba(251,146,60,0.5)" strokeWidth="1.5" />
           <path d="M72 26v5l3 2.5" stroke="rgba(251,146,60,0.8)" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       )}
       {svgType === "sent" && (
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 20 }}>
-          <circle cx="50" cy="50" r="47" stroke="#E8E8E4" strokeWidth="1.5" strokeDasharray="7 4" />
-          <path d="M18 50L82 50M60 34l22 16-22 16" fill="none" stroke="#D8D8D2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="34" cy="50" r="8" fill="#F5F5F3" stroke="#D8D8D2" strokeWidth="1.5" />
+          <circle cx="50" cy="50" r="47" stroke="var(--border)" strokeWidth="1.5" strokeDasharray="7 4" />
+          <path d="M18 50L82 50M60 34l22 16-22 16" fill="none" stroke="var(--border)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="34" cy="50" r="8" fill="var(--surface-raised)" stroke="var(--border)" strokeWidth="1.5" />
         </svg>
       )}
       {!svgType && <div style={{ fontSize: 40, marginBottom: 16 }}>🔗</div>}
@@ -631,7 +632,7 @@ const titleStyle: React.CSSProperties = {
 };
 
 const subtitleStyle: React.CSSProperties = {
-  color: "#6B6B66",
+  color: "var(--text-secondary)",
   fontSize: 18,
 };
 
@@ -692,12 +693,12 @@ const tabCountBase: React.CSSProperties = {
 };
 
 const tabCountActive: React.CSSProperties = {
-  background: "#E8E8E4",
+  background: "var(--surface-raised)",
   color: "var(--text-primary)",
 };
 
 const tabCountInactive: React.CSSProperties = {
-  background: "#EFEFEC",
+  background: "var(--surface-raised)",
   color: "var(--text-muted)",
 };
 
@@ -784,7 +785,7 @@ const skillPillStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
   color: "var(--text-secondary)",
-  background: "#EFEFEC",
+  background: "var(--surface-raised)",
   border: "1px solid var(--border)",
   borderRadius: 6,
   padding: "3px 9px",

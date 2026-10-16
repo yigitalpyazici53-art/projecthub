@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
+import { normalizeUrl } from "@/utils/url";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -116,7 +117,11 @@ export default function NewProjectPage() {
 
       const skillsList = [...selectedSkills].join(", ");
       const lookingFor = [skillsList, lookingForText.trim()].filter(Boolean).join(", ") || null;
-      const techFinal = [techStack.trim(), githubUrl.trim() ? `GitHub: ${githubUrl.trim()}` : ""].filter(Boolean).join(" | ") || null;
+      const linkUrl = githubUrl.trim() ? normalizeUrl(githubUrl) : null;
+      if (githubUrl.trim() && !linkUrl) {
+        setError("That link doesn't look like a web address.");
+        return;
+      }
 
       const { data, error: insertError } = await supabase
         .from("projects")
@@ -128,7 +133,8 @@ export default function NewProjectPage() {
           category: category || null,
           stage,
           looking_for: lookingFor,
-          tech_stack: techFinal,
+          tech_stack: techStack.trim() || null,
+          link_url: linkUrl,
         })
         .select("id")
         .single();
@@ -324,7 +330,7 @@ export default function NewProjectPage() {
 
               <div style={sectionBlockStyle}>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>GitHub / Website</label>
+                  <label style={labelStyle}>Link</label>
                   <input
                     value={githubUrl}
                     onChange={(e) => setGithubUrl(e.target.value)}
@@ -332,7 +338,7 @@ export default function NewProjectPage() {
                     style={inputStyle}
                     type="url"
                   />
-                  <p style={fieldHintStyle}>Optional — a public repo or live link gives credibility.</p>
+                  <p style={fieldHintStyle}>Optional — a repo, demo or live site. Shown as a link on your project page.</p>
                 </div>
               </div>
             </div>

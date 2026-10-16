@@ -14,7 +14,7 @@ import { profilePath } from "@/utils/profileUrl";
  * (all of the owner's projects).
  *
  * Status values follow the DB check constraint: pending | accepted | rejected.
- * The applicant is notified with application_accepted / application_rejected —
+ * The DB trigger notify_application_event tells the applicant (application_accepted / _rejected) —
  * the notifications type constraint has no "declined" variant, so "Decline"
  * in the UI maps to "rejected" in the data.
  */
@@ -31,12 +31,10 @@ function getAvatarColor(id: string): string {
 }
 
 export default function ApplicationsInbox({
-  ownerId,
   projects,
   id,
   hideWhenEmpty = false,
 }: {
-  ownerId: string;
   projects: { id: string; title: string | null }[];
   /** DOM id, so notifications can deep-link with #applications. */
   id?: string;
@@ -47,7 +45,6 @@ export default function ApplicationsInbox({
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
 
   const projectKey = projects.map((p) => p.id).join(",");
   const showProjectTitle = projects.length > 1;
@@ -95,7 +92,6 @@ export default function ApplicationsInbox({
     if (busyId) return;
     setBusyId(row.id);
     setError("");
-    setNotice("");
     const supabase = createClient();
     try {
       const { data, error: updErr } = await supabase
@@ -107,15 +103,8 @@ export default function ApplicationsInbox({
       // RLS turns an unauthorized update into "0 rows", not an error.
       if (!data || data.length === 0) { setError("You can only review applications to your own projects."); return; }
 
+      // The applicant is notified by a DB trigger (notify_application_event).
       setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, status } : r)));
-
-      const { error: notifErr } = await supabase.from("notifications").insert({
-        user_id: row.applicant_id,
-        type: status === "accepted" ? "application_accepted" : "application_rejected",
-        from_user_id: ownerId,
-        entity_id: row.project_id,
-      });
-      if (notifErr) setNotice(`Saved, but the applicant could not be notified: ${notifErr.message}`);
     } finally {
       setBusyId(null);
     }
@@ -134,7 +123,6 @@ export default function ApplicationsInbox({
       </div>
 
       {error && <div style={errorStyle}>{error}</div>}
-      {notice && <div style={noticeStyle}>{notice}</div>}
 
       {loading ? (
         <p style={emptyStyle}>Loading applications…</p>
@@ -361,9 +349,3 @@ const errorStyle: React.CSSProperties = {
   fontSize: 13,
 };
 
-const noticeStyle: React.CSSProperties = {
-  ...errorStyle,
-  background: "color-mix(in srgb, var(--warning) 10%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)",
-  color: "var(--warning)",
-};

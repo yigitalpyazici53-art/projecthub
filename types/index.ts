@@ -38,6 +38,8 @@ export type Project = {
   is_ai_generated?: boolean;
   /** Owned by an example account. Set by a DB trigger, read-only. */
   is_seed?: boolean;
+  /** The project's main link (repo, demo or site). http(s) only, enforced by a DB check. */
+  link_url?: string | null;
   // Proof-of-work links — backend fields, conditionally shown when present
   github_url?: string | null;
   demo_url?: string | null;

@@ -344,7 +344,6 @@ export default function DashboardPage() {
     setActionLoadingId(connectionId);
     const supabase = createClient();
     try {
-      const req = incomingRequests.find((r) => r.id === connectionId);
       const { error } = await supabase
         .from("connections")
         .update({ status: "accepted" })
@@ -356,15 +355,7 @@ export default function DashboardPage() {
       }
       setIncomingRequests((prev) => prev.filter((r) => r.id !== connectionId));
       setConnectionsCount((prev) => prev + 1);
-
-      if (req && profile) {
-        await supabase.from("notifications").insert({
-          user_id: req.sender_id,
-          type: "connection_accepted",
-          from_user_id: profile.id,
-          entity_id: connectionId,
-        });
-      }
+      // The sender is notified by a DB trigger (notify_connection_event).
     } finally {
       setActionLoadingId(null);
     }
@@ -590,7 +581,6 @@ export default function DashboardPage() {
             {user && myProjects.length > 0 && (
               <ApplicationsInbox
                 id="applications"
-                ownerId={user.id}
                 projects={myProjects.map((p) => ({ id: p.id, title: p.title }))}
                 hideWhenEmpty
               />

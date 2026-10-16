@@ -72,6 +72,7 @@ export type Database = {
           created_at: string;
           is_ai_generated: boolean;
           is_seed: boolean;
+          link_url: string | null;
         };
         Insert: {
           id?: string;
@@ -86,6 +87,7 @@ export type Database = {
           created_at?: string;
           is_ai_generated?: boolean;
           is_seed?: boolean;
+          link_url?: string | null;
         };
         Update: {
           id?: string;
@@ -100,6 +102,7 @@ export type Database = {
           created_at?: string;
           is_ai_generated?: boolean;
           is_seed?: boolean;
+          link_url?: string | null;
         };
         Relationships: [];
       };

@@ -11,6 +11,7 @@ import { cleanProfile } from "@/utils/display";
 import ApplicationsInbox from "@/components/ApplicationsInbox";
 import { profilePath } from "@/utils/profileUrl";
 import AIBadge from "@/components/AIBadge";
+import { displayUrl } from "@/utils/url";
 
 interface OwnerProfile {
   username: string | null;
@@ -279,14 +280,7 @@ function ApplyModal({
       return;
     }
 
-    if (project.owner_id) {
-      await supabase.from("notifications").insert({
-        user_id: project.owner_id,
-        type: "application_received" as const,
-        from_user_id: user.id,
-        entity_id: project.id,
-      });
-    }
+    // The owner is notified by a DB trigger (notify_application_event).
 
     setSubmitting(false);
     onSuccess();
@@ -557,7 +551,7 @@ export default function ProjectDetailPage({ params }: Props) {
         const [projResult, sessionResult] = await Promise.all([
           supabase
             .from("projects")
-            .select("id, owner_id, title, tagline, description, stage, looking_for, tech_stack, category, created_at, is_seed")
+            .select("id, owner_id, title, tagline, description, stage, looking_for, tech_stack, category, created_at, is_seed, link_url")
             .eq("id", id)
             .single(),
           supabase.auth.getSession(),
@@ -782,7 +776,6 @@ export default function ProjectDetailPage({ params }: Props) {
             {appStatus === "owner" && project.owner_id && (
               <ApplicationsInbox
                 id="applications"
-                ownerId={project.owner_id}
                 projects={[{ id: project.id, title: project.title }]}
               />
             )}
@@ -853,11 +846,17 @@ export default function ProjectDetailPage({ params }: Props) {
             )}
 
             {/* Proof links */}
-            {(project.github_url || project.demo_url || project.figma_url || project.website_url) && (
+            {(project.link_url || project.github_url || project.demo_url || project.figma_url || project.website_url) && (
               <div style={sectionCardStyle} className="project-section-card">
                 <h2 style={sectionTitleStyle}>Proof links</h2>
                 <p style={sectionSubStyle}>Verified links to the project&apos;s real work.</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                  {project.link_url && /^https?:\/\//i.test(project.link_url) && (
+                    <a href={project.link_url} target="_blank" rel="noopener noreferrer" style={proofLinkStyle} title={project.link_url}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      {displayUrl(project.link_url)}
+                    </a>
+                  )}
                   {project.github_url && (
                     <a href={project.github_url} target="_blank" rel="noopener noreferrer" style={proofLinkStyle}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>

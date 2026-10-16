@@ -118,7 +118,8 @@ export default function ProfileEditPage() {
 
     setSaving(false);
     if (error) {
-      setSaveMsg("Error: " + error.message);
+      // 23505 = profiles_username_lower_key (usernames are unique, case-insensitively)
+      setSaveMsg(error.code === "23505" ? "Error: That username is already taken." : "Error: " + error.message);
     } else {
       setSaveMsg("Profile saved!");
       setTimeout(() => setSaveMsg(""), 3000);

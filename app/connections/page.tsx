@@ -199,15 +199,7 @@ export default function ConnectionsPage() {
       if (accepted) {
         setConnected((prev) => [...prev, accepted]);
         setPending((prev) => prev.filter((p) => p.connectionId !== connectionId));
-        // Notify sender that their request was accepted
-        if (user) {
-          await supabase.from("notifications").insert({
-            user_id: accepted.id,
-            type: "connection_accepted" as const,
-            from_user_id: user.id,
-            entity_id: connectionId,
-          });
-        }
+        // The sender is notified by a DB trigger (notify_connection_event).
       }
     }
     setActionLoading(null);

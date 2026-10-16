@@ -1,28 +1,20 @@
 import { ImageResponse } from "next/og";
+import { OG_BACKGROUND, OG_SIZE, OgLogoMark, loadOgFonts } from "@/utils/og";
 
-export const alt = "ProjectHub — Where student builders prove what they've built";
-export const size = { width: 1200, height: 630 };
+// Site-wide share card (home and every page without its own image). Same
+// dark language as the per-profile cards in app/builders/[username].
+export const alt = "ProjectHub — Prove what you build.";
+export const size = OG_SIZE;
 export const contentType = "image/png";
 
-const HEADLINE = "Where student builders prove what they've built.";
-
-// Satori can't read woff2; without a browser UA Google Fonts serves TTF.
-async function loadFraunces(text: string): Promise<ArrayBuffer | null> {
-  try {
-    const css = await (
-      await fetch(`https://fonts.googleapis.com/css2?family=Fraunces:wght@500&text=${encodeURIComponent(text)}`)
-    ).text();
-    const src = css.match(/src: url\((.+?)\) format\('(opentype|truetype)'\)/);
-    if (!src) return null;
-    const res = await fetch(src[1]);
-    return res.ok ? await res.arrayBuffer() : null;
-  } catch {
-    return null;
-  }
-}
+const HEADLINE = "Prove what you build.";
+const SUBHEAD = "A proof-of-work portfolio for student builders: ship projects, show the receipts, share one link.";
+const PILLS = ["Shipped projects", "Real teams", "One shareable profile"];
+const FOOTER_LEFT = "For student builders";
+const FOOTER_RIGHT = "projecthubstudents.com";
 
 export default async function OpengraphImage() {
-  const fraunces = await loadFraunces(HEADLINE);
+  const fonts = await loadOgFonts(["ProjectHub", HEADLINE, SUBHEAD, ...PILLS, FOOTER_LEFT, FOOTER_RIGHT].join(" "));
 
   return new ImageResponse(
     (
@@ -33,50 +25,62 @@ export default async function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "72px 80px",
-          background: "#FAFAF8",
-          color: "#1A1A18",
+          padding: "64px 72px",
+          color: "#FAFAFA",
+          fontFamily: fonts.length ? "Inter" : undefined,
+          background: OG_BACKGROUND,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 14, height: 14, borderRadius: 7, background: "#0F6E56" }} />
-          <div style={{ fontSize: 26, letterSpacing: 4, textTransform: "uppercase", color: "#6B6B66" }}>
-            ProjectHub
+        {/* Brand row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <OgLogoMark px={56} />
+          <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: -0.5 }}>ProjectHub</div>
+        </div>
+
+        {/* Message */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div style={{ display: "flex", fontSize: 96, fontWeight: 600, letterSpacing: -3, lineHeight: 1.02 }}>
+            {HEADLINE}
+          </div>
+          <div style={{ display: "flex", fontSize: 32, lineHeight: 1.4, color: "#CBD5E1", maxWidth: 960 }}>
+            {SUBHEAD}
+          </div>
+          <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+            {PILLS.map((p) => (
+              <div
+                key={p}
+                style={{
+                  display: "flex",
+                  fontSize: 24,
+                  padding: "8px 18px",
+                  borderRadius: 999,
+                  color: "#E9D5FF",
+                  background: "rgba(139,92,246,0.16)",
+                  border: "1px solid rgba(196,181,253,0.35)",
+                }}
+              >
+                {p}
+              </div>
+            ))}
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            fontSize: 78,
-            lineHeight: 1.08,
-            letterSpacing: -1.5,
-            maxWidth: 980,
-            fontFamily: fraunces ? "Fraunces" : undefined,
-          }}
-        >
-          {HEADLINE}
-        </div>
-
+        {/* Footer */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            borderTop: "1px solid #E8E8E4",
+            borderTop: "1px solid rgba(255,255,255,0.12)",
             paddingTop: 28,
-            fontSize: 26,
-            color: "#6B6B66",
+            fontSize: 24,
           }}
         >
-          <div style={{ display: "flex" }}>Proof-of-work portfolios · First 100 Builders</div>
-          <div style={{ display: "flex", color: "#1A1A18" }}>projecthubstudents.com</div>
+          <div style={{ display: "flex", color: "#94A3B8" }}>{FOOTER_LEFT}</div>
+          <div style={{ display: "flex", color: "#C4B5FD" }}>{FOOTER_RIGHT}</div>
         </div>
       </div>
     ),
-    {
-      ...size,
-      fonts: fraunces ? [{ name: "Fraunces", data: fraunces, weight: 500, style: "normal" }] : undefined,
-    },
+    { ...size, fonts: fonts.length ? fonts : undefined },
   );
 }

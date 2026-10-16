@@ -206,8 +206,8 @@ export default function BuilderProfilePage({ params }: PageProps) {
       return;
     }
 
-    const { data: connData, error: insertError } = await supabase
-      .from("connections").insert({ sender_id: user.id, receiver_id: builder.id }).select("id").maybeSingle();
+    const { error: insertError } = await supabase
+      .from("connections").insert({ sender_id: user.id, receiver_id: builder.id });
     if (insertError) {
       // Race / unique-constraint safety net: if the insert races with another
       // tab, Postgres will reject it — refetch and show the correct state
@@ -229,9 +229,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
       setConnectStatus("sent");
       setShowSentToast(true);
       setConnectionsCount(n => n + 1);
-      await supabase.from("notifications").insert({
-        user_id: builder.id, type: "connection_request", from_user_id: user.id, entity_id: connData?.id ?? null,
-      });
+      // The receiver is notified by a DB trigger (notify_connection_event).
     }
   };
 

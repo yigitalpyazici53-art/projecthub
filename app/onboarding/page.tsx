@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { cleanList, cleanText } from "@/utils/display";
+import { normalizeUrl } from "@/utils/url";
 
 // Three steps, each skippable: (1) who you are, (2) skills, (3) first project.
 // Finishing or skipping the last step stamps profiles.onboarding_completed_at,
@@ -31,17 +32,6 @@ const STAGES = [
 
 const STEP_COUNT = 3;
 
-function normalizeUrl(raw: string): string | null {
-  const v = raw.trim();
-  if (!v) return null;
-  const withScheme = /^https?:\/\//i.test(v) ? v : `https://${v}`;
-  try {
-    const u = new URL(withScheme);
-    return u.hostname.includes(".") ? u.toString() : null;
-  } catch {
-    return null;
-  }
-}
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -175,8 +165,7 @@ export default function OnboardingPage() {
         tagline: oneLiner.trim(),
         description: oneLiner.trim(),
         stage,
-        // No link column yet; /projects/new keeps links in tech_stack the same way.
-        tech_stack: url ? `${/github\.com/i.test(url) ? "GitHub" : "Link"}: ${url}` : null,
+        link_url: url,
       })
       .select("id")
       .single();

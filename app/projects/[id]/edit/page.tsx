@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
+import { normalizeUrl } from "@/utils/url";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -38,6 +39,7 @@ export default function EditProjectPage({ params }: Props) {
   const [stage, setStage] = useState("idea");
   const [lookingFor, setLookingFor] = useState("");
   const [techStack, setTechStack] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -46,7 +48,7 @@ export default function EditProjectPage({ params }: Props) {
         supabase.auth.getUser(),
         supabase
           .from("projects")
-          .select("id, owner_id, title, tagline, description, category, stage, looking_for, tech_stack")
+          .select("id, owner_id, title, tagline, description, category, stage, looking_for, tech_stack, link_url")
           .eq("id", id)
           .single(),
       ]);
@@ -62,6 +64,7 @@ export default function EditProjectPage({ params }: Props) {
       setStage(project.stage ?? "idea");
       setLookingFor(project.looking_for ?? "");
       setTechStack(project.tech_stack ?? "");
+      setLinkUrl(project.link_url ?? "");
       setStatus("ready");
     })();
   }, [id, router]);
@@ -70,6 +73,8 @@ export default function EditProjectPage({ params }: Props) {
     setError("");
     if (!title.trim()) { setError("Project title is required."); return; }
     if (title.trim().length > 80) { setError("Title must be 80 characters or fewer."); return; }
+    const normalizedLink = linkUrl.trim() ? normalizeUrl(linkUrl) : null;
+    if (linkUrl.trim() && !normalizedLink) { setError("That link doesn't look like a web address."); return; }
 
     setSubmitting(true);
     const supabase = createClient();
@@ -83,6 +88,7 @@ export default function EditProjectPage({ params }: Props) {
         stage: stage || null,
         looking_for: lookingFor.trim() || null,
         tech_stack: techStack.trim() || null,
+        link_url: normalizedLink,
       })
       .eq("id", id);
 
@@ -244,6 +250,19 @@ export default function EditProjectPage({ params }: Props) {
                 style={inputStyle}
               />
               <span style={hintStyle}>Comma-separated technologies.</span>
+            </div>
+
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Link</label>
+              <input
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="github.com/you/project or your live site"
+                style={inputStyle}
+                type="url"
+                inputMode="url"
+              />
+              <span style={hintStyle}>Optional — a repo, demo or live site.</span>
             </div>
           </div>
 

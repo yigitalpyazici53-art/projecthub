@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import Logo from "@/components/Logo";
+import { postAuthPath } from "@/utils/onboarding";
 
 const GOOGLE_SVG = (
   <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -80,8 +81,9 @@ export default function SignupPage() {
 
     if (!trimmedName) { setError("Full name is required."); setLoading(false); return; }
     if (!trimmedUsername) { setError("Username is required."); setLoading(false); return; }
-    if (!/^[a-z0-9_]+$/.test(trimmedUsername)) { setError("Username can only contain lowercase letters, numbers, and underscores."); setLoading(false); return; }
-    if (trimmedUsername.length < 3 || trimmedUsername.length > 20) { setError("Username must be 3–20 characters."); setLoading(false); return; }
+    // Same rule as the DB trigger (enforce_username_format): a-z 0-9 . _ -
+    if (!/^[a-z0-9._-]+$/.test(trimmedUsername)) { setError("Username can only contain lowercase letters, numbers, dots, underscores and hyphens."); setLoading(false); return; }
+    if (trimmedUsername.length < 3 || trimmedUsername.length > 30) { setError("Username must be 3–30 characters."); setLoading(false); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); setLoading(false); return; }
 
     try {
@@ -156,7 +158,7 @@ export default function SignupPage() {
     }
 
     router.refresh();
-    router.push("/dashboard");
+    router.push(userId ? await postAuthPath(supabase, userId) : "/dashboard");
   };
 
   const handleResend = async () => {
@@ -317,7 +319,7 @@ export default function SignupPage() {
 
             <div>
               <label style={labelStyle}>Username</label>
-              <input type="text" value={username} onChange={e => setUsername(e.target.value)} required placeholder="adalovelace" autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} style={inputStyle} />
+              <input type="text" value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""))} required placeholder="adalovelace" autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} style={inputStyle} />
               <p style={hintStyle}>3–20 lowercase letters, numbers, or underscores.</p>
             </div>
 

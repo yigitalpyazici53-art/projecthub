@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import Logo from "@/components/Logo";
+import { postAuthPath } from "@/utils/onboarding";
 
 const GOOGLE_SVG = (
   <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +74,7 @@ function LoginForm() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
@@ -85,7 +86,7 @@ function LoginForm() {
     }
 
     const next = searchParams.get("next") ?? "/dashboard";
-    router.replace(next);
+    router.replace(signInData.user ? await postAuthPath(supabase, signInData.user.id, next) : next);
     router.refresh();
   };
 

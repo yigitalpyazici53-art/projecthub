@@ -111,7 +111,7 @@ export default function ProjectsPage() {
         const supabase = createClient();
         const { data, error: dbError } = await supabase
           .from("projects")
-          .select("id, owner_id, title, tagline, description, category, stage, looking_for, tech_stack, created_at, is_ai_generated")
+          .select("id, owner_id, title, tagline, description, category, stage, looking_for, tech_stack, created_at, is_seed")
           .order("created_at", { ascending: false });
 
         if (dbError) { setError(`Could not load projects: ${dbError.message}`); return; }
@@ -183,7 +183,9 @@ export default function ProjectsPage() {
       categoryFilter === "All" ||
       (p.category ?? "").split(",").map((c) => c.trim()).includes(categoryFilter);
     return matchesSearch && matchesStage && matchesCategory;
-  });
+  })
+    // Real projects before examples; newest-first order is kept within each (sort is stable).
+    .sort((a, b) => Number(Boolean(a.is_seed)) - Number(Boolean(b.is_seed)));
 
   return (
     <main style={pageStyle}>

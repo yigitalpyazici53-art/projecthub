@@ -9,6 +9,7 @@ import { avatarTint } from "@/utils/category";
 import { Reveal } from "@/components/motion/Reveal";
 import type { Profile } from "@/types";
 import { cleanProfiles } from "@/utils/display";
+import { profilePath } from "@/utils/profileUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -99,28 +100,33 @@ export default function BuildersPage() {
     const load = async () => {
       try {
         const supabase = createClient();
-        const { data, error: dbError } = await supabase
-          .from("profiles")
-          .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, created_at, is_ai_generated")
-          .order("created_at", { ascending: false });
+        const [profilesRes, projectsRes] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, created_at, is_seed")
+            .order("created_at", { ascending: false }),
+          supabase.from("projects").select("owner_id, stage"),
+        ]);
 
-        if (dbError) {
-          setError(`Could not load builders: ${dbError.message}`);
+        // Shipped-project counts per builder, and who owns any project at all
+        // (client-side aggregation).
+        const counts: Record<string, number> = {};
+        const owners = new Set<string>();
+        ((projectsRes.data ?? []) as { owner_id: string | null; stage: string | null }[]).forEach((r) => {
+          if (!r.owner_id) return;
+          owners.add(r.owner_id);
+          if (r.stage === "launched") counts[r.owner_id] = (counts[r.owner_id] ?? 0) + 1;
+        });
+        setShippedByOwner(counts);
+
+        if (profilesRes.error) {
+          setError(`Could not load builders: ${profilesRes.error.message}`);
         } else {
-          setBuilders(cleanProfiles(data as Profile[] | null));
-        }
-
-        // Shipped-project counts per builder (client-side aggregation)
-        const { data: shippedRows } = await supabase
-          .from("projects")
-          .select("owner_id, stage")
-          .eq("stage", "launched");
-        if (shippedRows) {
-          const counts: Record<string, number> = {};
-          (shippedRows as { owner_id: string | null }[]).forEach((r) => {
-            if (r.owner_id) counts[r.owner_id] = (counts[r.owner_id] ?? 0) + 1;
-          });
-          setShippedByOwner(counts);
+          // A profile with no name and no projects has nothing to show yet:
+          // keep it out of the directory (the row itself is untouched).
+          setBuilders(
+            cleanProfiles(profilesRes.data as Profile[] | null).filter((b) => b.full_name || owners.has(b.id)),
+          );
         }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Unexpected error loading builders.");
@@ -151,7 +157,7 @@ export default function BuildersPage() {
       const matchesRole = roleFilter === "All" || b.role === roleFilter;
       return matchesSearch && matchesRole;
     })
-    .sort((a, b) => (a.is_ai_generated ? 1 : 0) - (b.is_ai_generated ? 1 : 0));
+    .sort((a, b) => (a.is_seed ? 1 : 0) - (b.is_seed ? 1 : 0));
 
   return (
     <main style={pageStyle}>
@@ -199,7 +205,7 @@ export default function BuildersPage() {
               {filtered.map((builder) => {
                 const skills = (builder.skills ?? "").split(",").map((s) => s.trim()).filter(Boolean);
                 const shipped = shippedByOwner[builder.id] ?? 0;
-                const href = `/builders/${builder.username || builder.id}`;
+                const href = profilePath(builder.username || builder.id);
 
                 return (
                   <article
@@ -260,7 +266,7 @@ export default function BuildersPage() {
                           {[builder.university, builder.role].filter(Boolean).join(" · ") || `@${builder.username}`}
                         </div>
                       </div>
-                      {builder.is_ai_generated && (
+                      {builder.is_seed && (
                         <span style={{
                           fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
                           color: "var(--text-muted)", background: "var(--surface-raised)",

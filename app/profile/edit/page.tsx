@@ -31,6 +31,7 @@ export default function ProfileEditPage() {
   const { user, loading: authLoading } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [originalUsername, setOriginalUsername] = useState<string | null>(null);
   const [profile, setProfile] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -53,6 +54,7 @@ export default function ProfileEditPage() {
       .then(({ data }) => {
         if (data) {
           setProfile(data);
+          setOriginalUsername(data.username ?? null);
           if (data.avatar_url) setAvatarPreview(data.avatar_url);
         }
         setLoading(false);
@@ -92,13 +94,20 @@ export default function ProfileEditPage() {
 
   const handleSave = async () => {
     if (!user) return;
+    // New usernames follow the DB rule (enforce_username_format); an existing
+    // legacy username can be kept as is.
+    const nextUsername = (profile.username ?? "").trim();
+    if (nextUsername !== (originalUsername ?? "") && !/^[a-z0-9._-]{3,30}$/.test(nextUsername)) {
+      setSaveMsg("Error: Username must be 3–30 characters: lowercase letters, numbers, dots, underscores or hyphens.");
+      return;
+    }
     setSaving(true);
     setSaveMsg("");
     const supabase = createClient();
 
     const { error } = await supabase.from("profiles").update({
       full_name: profile.full_name,
-      username: profile.username,
+      username: nextUsername === (originalUsername ?? "") ? originalUsername : nextUsername,
       university: profile.university,
       role: profile.role,
       bio: profile.bio,

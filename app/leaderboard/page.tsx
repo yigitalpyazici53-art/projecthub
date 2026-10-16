@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { getInitials } from "@/utils/getInitials";
 import { cleanProfiles } from "@/utils/display";
+import { profilePath } from "@/utils/profileUrl";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -330,7 +331,7 @@ export default function LeaderboardPage() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
                         <Link
-                          href={builder.username ? `/builders/${builder.username}` : "#"}
+                          href={builder.username ? profilePath(builder.username) : "#"}
                           style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-sans)", textDecoration: "none" }}
                         >
                           {builder.full_name || builder.username || "Builder"}

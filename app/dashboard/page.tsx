@@ -10,6 +10,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import type { Profile, Project, Connection, Notification } from "@/types";
 import ApplicationsInbox from "@/components/ApplicationsInbox";
 import { cleanProfile, cleanProfiles } from "@/utils/display";
+import { profilePath } from "@/utils/profileUrl";
+import ProfileCompletion from "@/components/ProfileCompletion";
+import { needsOnboarding } from "@/utils/onboarding";
 
 export const dynamic = "force-dynamic";
 
@@ -129,7 +132,7 @@ export default function DashboardPage() {
           await Promise.all([
             supabase
               .from("profiles")
-              .select("id, full_name, username, university, role, bio, skills, interests, github_url")
+              .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, is_seed, onboarding_completed_at")
               .eq("id", user.id)
               .maybeSingle(),
 
@@ -164,7 +167,7 @@ export default function DashboardPage() {
           setError(`Profile error: ${profileResult.error.message}`);
         } else if (!profileResult.data) {
           const baseUsername = (user.email?.split("@")[0] ?? "user")
-            .toLowerCase().replace(/[^a-z0-9]/g, "_").slice(0, 20);
+            .toLowerCase().replace(/[^a-z0-9._-]/g, "_").slice(0, 24).padEnd(3, "_");
           await supabase.from("profiles").insert({
             id: user.id,
             full_name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
@@ -172,19 +175,18 @@ export default function DashboardPage() {
           });
           const { data: created } = await supabase
             .from("profiles")
-            .select("id, full_name, username, university, role, bio, skills, interests, github_url")
+            .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, is_seed, onboarding_completed_at")
             .eq("id", user.id)
             .maybeSingle();
           setProfile(cleanProfile(created as Profile | null));
-          // New user — show onboarding unless already seen
-          if (typeof window !== "undefined" && !localStorage.getItem("onboarding_seen")) {
-            if (mounted) router.replace("/onboarding");
-            return;
-          }
+          // New user — onboarding first.
+          if (mounted) router.replace("/onboarding");
+          return;
         } else {
           const pd = profileResult.data as Profile;
-          // Existing user with no university — show onboarding once
-          if (!pd.university && typeof window !== "undefined" && !localStorage.getItem("onboarding_seen")) {
+          // One-time onboarding for anyone who hasn't finished or skipped it
+          // (stored on the profile, so it holds across devices).
+          if (needsOnboarding(pd)) {
             if (mounted) router.replace("/onboarding");
             return;
           }
@@ -456,6 +458,10 @@ export default function DashboardPage() {
         {error && <p style={errorBannerStyle}>{error}</p>}
         {actionError && <p style={errorBannerStyle}>{actionError}</p>}
 
+        {profile && (
+          <ProfileCompletion profile={profile} projectCount={myProjects.length} style={{ marginBottom: 24 }} />
+        )}
+
         {/* ── Stats row — 3 numbers; "Profile views" removed (always 0) ── */}
         <div className="animate-fade-up animate-delay-1 responsive-stats-row-3" style={statsRowStyle}>
           <div className="card-hover" style={statCardStyle}>
@@ -595,38 +601,6 @@ export default function DashboardPage() {
           {/* Right column */}
           <div style={rightColStyle}>
 
-            {/* Profile completion */}
-            <div style={cardStyle}>
-              <h2 style={{ ...cardTitleStyle, marginBottom: 16 }}>Profile completion</h2>
-              <div style={completionBarBgStyle}>
-                <div style={{ ...completionBarFillStyle, width: `${profileCompletion}%` }} />
-              </div>
-              <div style={{ marginTop: 8, fontSize: 14 }}>
-                <span style={{ color: "var(--accent-green)", fontWeight: 600 }}>{profileCompletion}%</span>
-                <span style={{ color: "var(--text-muted)" }}> complete</span>
-              </div>
-              <div style={{ display: "grid", gap: 8, marginTop: 16 }}>
-                {([
-                  ["Full name", profile?.full_name],
-                  ["University", profile?.university],
-                  ["Role", profile?.role],
-                  ["Bio", profile?.bio],
-                  ["Skills", profile?.skills],
-                  ["GitHub URL", profile?.github_url],
-                ] as [string, string | null | undefined][]).map(([label, val]) => (
-                  <div key={label} style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ color: val ? "var(--accent-green)" : "var(--text-muted)" }}>{val ? "✓" : "○"}</span>
-                    <span style={{ color: val ? "var(--text-primary)" : "var(--text-muted)", fontSize: 13 }}>{label}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop: 16 }}>
-                <Link href="/profile/edit" className="btn-primary" style={{ display: "block", textAlign: "center" }}>
-                  Complete Profile
-                </Link>
-              </div>
-            </div>
-
             {/* Quick actions */}
             <div style={cardStyle}>
               <h2 style={{ ...cardTitleStyle, marginBottom: 16 }}>Quick actions</h2>
@@ -733,7 +707,7 @@ export default function DashboardPage() {
                       dotColor = "var(--accent-green)";
                       text = <><strong style={{ color: "var(--text-primary)" }}>{fromName}</strong> accepted your connection request</>;
                       actionBtn = n.fromProfile?.username
-                        ? <Link href={`/builders/${n.fromProfile.username}`} style={notifActionStyle}>View</Link>
+                        ? <Link href={profilePath(n.fromProfile.username)} style={notifActionStyle}>View</Link>
                         : null;
                     } else if (n.type === "project_liked") {
                       icon = "❤️";
@@ -1105,21 +1079,6 @@ const declineBtnStyle: React.CSSProperties = {
   fontWeight: 600,
   fontSize: 13,
   cursor: "pointer",
-};
-
-const completionBarBgStyle: React.CSSProperties = {
-  width: "100%",
-  height: 8,
-  borderRadius: 4,
-  background: "var(--surface-raised)",
-  overflow: "hidden",
-};
-
-const completionBarFillStyle: React.CSSProperties = {
-  height: "100%",
-  borderRadius: 4,
-  background: "var(--accent)",
-  transition: "width 0.5s ease",
 };
 
 const quickActionsGridStyle: React.CSSProperties = {

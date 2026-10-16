@@ -35,6 +35,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .from("profiles")
         .select("username, created_at")
         .not("username", "is", null)
+        // Example profiles are noindex; keep them out of the sitemap too.
+        .eq("is_seed", false)
         .order("created_at", { ascending: false })
         .limit(5000),
     ]);

@@ -9,6 +9,7 @@ import SkeletonLoader from "@/components/SkeletonLoader";
 import { getInitials } from "@/utils/getInitials";
 import type { Profile } from "@/types";
 import { cleanProfiles } from "@/utils/display";
+import { profilePath } from "@/utils/profileUrl";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -442,7 +443,7 @@ function ConnectedCard({ profile }: { profile: ConnectedProfile }) {
       {/* Actions */}
       <div style={cardFooterStyle}>
         <Link
-          href={`/builders/${profile.username || profile.id}`}
+          href={profilePath(profile.username || profile.id)}
           style={outlinedBtnStyle}
         >
           View profile
@@ -503,7 +504,7 @@ function PendingCard({
         >
           Decline
         </button>
-        <Link href={`/builders/${profile.username || profile.id}`} style={ghostBtnStyle}>
+        <Link href={profilePath(profile.username || profile.id)} style={ghostBtnStyle}>
           View
         </Link>
       </div>
@@ -541,7 +542,7 @@ function SentCard({
       <SkillPills skills={profile.skills} />
 
       <div style={cardFooterStyle}>
-        <Link href={`/builders/${profile.username || profile.id}`} style={outlinedBtnStyle}>
+        <Link href={profilePath(profile.username || profile.id)} style={outlinedBtnStyle}>
           View profile
         </Link>
         <button

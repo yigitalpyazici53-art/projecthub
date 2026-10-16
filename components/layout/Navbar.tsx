@@ -7,6 +7,7 @@ import { createClient } from "@/utils/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import Logo from "@/components/Logo";
 import { cleanText } from "@/utils/display";
+import { profilePath } from "@/utils/profileUrl";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -407,7 +408,7 @@ export default function Navbar() {
 
   if (pathname && HIDDEN_ROUTES.includes(pathname)) return null;
 
-  const myProfilePath = username ? `/builders/${username}` : undefined;
+  const myProfilePath = username ? profilePath(username) : undefined;
 
   return (
     <>

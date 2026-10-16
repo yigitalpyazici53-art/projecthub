@@ -19,6 +19,9 @@ type PublicPageMeta = {
   /** Path relative to SITE_URL, used for the canonical and og:url. */
   path: string;
   ogDescription?: string;
+  /** The route ships its own opengraph-image / twitter-image files; don't
+      point at the site-wide card. */
+  ownImage?: boolean;
 };
 
 // Absolute titles: a nested layout with a string title resets the root
@@ -27,7 +30,7 @@ export function brandedTitle(title: string): string {
   return title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
 }
 
-export function publicMetadata({ title, description, path, ogDescription }: PublicPageMeta): Metadata {
+export function publicMetadata({ title, description, path, ogDescription, ownImage = false }: PublicPageMeta): Metadata {
   const fullTitle = brandedTitle(title);
   const shareDescription = ogDescription ?? description;
   return {
@@ -41,13 +44,13 @@ export function publicMetadata({ title, description, path, ogDescription }: Publ
       siteName: SITE_NAME,
       type: "website",
       locale: "en_US",
-      images: [OG_IMAGE],
+      ...(ownImage ? {} : { images: [OG_IMAGE] }),
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description: shareDescription,
-      images: [OG_IMAGE.url],
+      ...(ownImage ? {} : { images: [OG_IMAGE.url] }),
     },
   };
 }

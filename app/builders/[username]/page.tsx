@@ -10,6 +10,10 @@ import { stageBadge } from "@/utils/stage";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import type { Profile, Project } from "@/types";
 import { cleanProfile } from "@/utils/display";
+import AIBadge from "@/components/AIBadge";
+import ProfileCompletion from "@/components/ProfileCompletion";
+import ShareProfile from "@/components/ShareProfile";
+import { decodeUsernameParam, profilePath } from "@/utils/profileUrl";
 
 type PageProps = { params: Promise<{ username: string }> };
 type ConnectStatus =
@@ -37,7 +41,9 @@ type SkillEndorsements = Record<string, EndorsementRow[]>;
 const OPEN_AVAILABILITY = ["Open to cofound", "Open to join"];
 
 export default function BuilderProfilePage({ params }: PageProps) {
-  const { username } = use(params);
+  // Params arrive percent-encoded; legacy usernames can contain spaces.
+  const { username: rawUsername } = use(params);
+  const username = decodeUsernameParam(rawUsername);
   const router = useRouter();
 
   const [builder, setBuilder] = useState<Profile | null>(null);
@@ -84,7 +90,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
       try {
         const { data, error: dbError } = await supabase
           .from("profiles")
-          .select("id, full_name, username, university, role, bio, skills, interests, github_url, linkedin_url, portfolio_url, avatar_url")
+          .select("id, full_name, username, university, role, bio, skills, interests, github_url, linkedin_url, portfolio_url, avatar_url, is_seed")
           .eq("username", username)
           .maybeSingle();
 
@@ -176,11 +182,13 @@ export default function BuilderProfilePage({ params }: PageProps) {
 
   const handleConnect = async () => {
     if (connectStatus === "sending" || connectStatus === "sent" || connectStatus === "already_connected") return;
+    // Example accounts can't receive requests (also enforced by RLS).
+    if (builder?.is_seed) return;
     setConnectError("");
     setConnectStatus("sending");
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push(`/login?next=/builders/${username}`); return; }
+    if (!user) { router.push(`/login?next=${encodeURIComponent(profilePath(username))}`); return; }
     if (!builder) return;
 
     // Defensive pre-check: if a row already exists (either direction), don't insert
@@ -293,6 +301,10 @@ export default function BuilderProfilePage({ params }: PageProps) {
           ← All builders
         </Link>
 
+        {connectStatus === "own_profile" && (
+          <ProfileCompletion profile={builder} projectCount={projectsCount} style={{ marginBottom: 32 }} />
+        )}
+
         {/* ── Header ── */}
         <Reveal>
           <header style={{ marginBottom: 48 }}>
@@ -319,6 +331,9 @@ export default function BuilderProfilePage({ params }: PageProps) {
                   }}>
                     {builder.full_name || builder.username || "Unnamed Builder"}
                   </h1>
+                  {builder.is_seed && (
+                    <div style={{ marginBottom: 8 }}><AIBadge size="md" /></div>
+                  )}
                   {builder.bio && (
                     <p style={{ fontSize: 15, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 8, maxWidth: 520 }}>
                       {builder.bio}
@@ -334,6 +349,8 @@ export default function BuilderProfilePage({ params }: PageProps) {
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {connectStatus === "own_profile" ? (
                   <Link href="/profile/edit" className="btn-secondary" style={{ fontSize: 13 }}>Edit profile</Link>
+                ) : builder.is_seed ? (
+                  <p style={exampleNoteStyle}>This is an example profile — it shows what a ProjectHub portfolio looks like.</p>
                 ) : connectStatus === "incoming" ? (
                   <Link href="/connections" className="btn-secondary" style={{ fontSize: 13 }}>
                     Respond to request →
@@ -563,7 +580,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
                   );
                 })}
               </div>
-              {connectStatus !== "own_profile" && connectStatus !== "already_connected" && myId && (
+              {connectStatus !== "own_profile" && connectStatus !== "already_connected" && myId && !builder.is_seed && (
                 <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 12 }}>
                   Connect with {builderFirstName} to endorse their skills.
                 </p>
@@ -573,6 +590,11 @@ export default function BuilderProfilePage({ params }: PageProps) {
         )}
 
         {/* ── Share profile ── */}
+        {connectStatus === "own_profile" && builder.username ? (
+          <Reveal>
+            <ShareProfile username={builder.username} />
+          </Reveal>
+        ) : (
         <Reveal>
           <button
             type="button"
@@ -583,6 +605,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
             {copied ? "Link copied ✓" : "Share profile"}
           </button>
         </Reveal>
+        )}
 
       </div>
 
@@ -624,6 +647,18 @@ const card: React.CSSProperties = {
   borderRadius: 12,
   padding: 28,
   marginBottom: 16,
+};
+
+const exampleNoteStyle: React.CSSProperties = {
+  margin: 0,
+  maxWidth: 260,
+  padding: "8px 12px",
+  borderRadius: 8,
+  fontSize: 12,
+  lineHeight: 1.5,
+  color: "var(--text-secondary)",
+  background: "var(--surface-raised)",
+  border: "1px dashed var(--border)",
 };
 
 const iconLink: React.CSSProperties = {

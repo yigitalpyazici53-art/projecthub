@@ -18,6 +18,10 @@ export type Profile = {
   avatar_url?: string | null;
   created_at?: string;
   is_ai_generated?: boolean;
+  /** Example account (auth email @seed.ph.internal). Set by a DB trigger, read-only. */
+  is_seed?: boolean;
+  /** Null until the user finishes or skips /onboarding. */
+  onboarding_completed_at?: string | null;
 };
 
 export type Project = {
@@ -32,6 +36,8 @@ export type Project = {
   tech_stack: string | null;
   created_at: string;
   is_ai_generated?: boolean;
+  /** Owned by an example account. Set by a DB trigger, read-only. */
+  is_seed?: boolean;
   // Proof-of-work links — backend fields, conditionally shown when present
   github_url?: string | null;
   demo_url?: string | null;

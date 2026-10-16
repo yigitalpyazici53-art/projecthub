@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { cleanList, cleanText } from "@/utils/display";
+
+// Three steps, each skippable: (1) who you are, (2) skills, (3) first project.
+// Finishing or skipping the last step stamps profiles.onboarding_completed_at,
+// which is what stops the one-time redirect here (see utils/onboarding.ts).
+
+const MAX_SKILLS = 8;
 
 const SKILL_OPTIONS = [
   "React", "Next.js", "TypeScript", "JavaScript", "Python", "Node.js",
@@ -14,239 +21,266 @@ const SKILL_OPTIONS = [
   "Video Editing", "Photography", "Research", "Operations",
 ];
 
-// Purpose options drive three things:
-//   - the label shown on the summary card
-//   - what we persist to profiles.role (so the rest of the app can see it)
-//   - the primary "next step" CTA on the final step
-const PURPOSE_OPTIONS = [
-  { id: "idea",       label: "I have an idea",    icon: "💡", desc: "I want to find builders for my project",   role: "Founder",                  ctaLabel: "Post your first project", ctaHref: "/projects/new" },
-  { id: "build",      label: "I want to build",   icon: "🔨", desc: "I want to join a project and contribute",   role: "Builder",                  ctaLabel: "Browse builders",         ctaHref: "/builders"     },
-  { id: "explore",    label: "Just exploring",    icon: "🔭", desc: "I'm here to see what's being built",        role: "Explorer",                 ctaLabel: "Go to dashboard",         ctaHref: "/dashboard"    },
-  { id: "cofounders", label: "Find co-founders",  icon: "🤝", desc: "I'm looking for the right founding team",   role: "Looking for cofounders",   ctaLabel: "Browse builders",         ctaHref: "/builders"     },
-] as const;
+// Same values as /projects/new.
+const STAGES = [
+  { value: "idea", label: "💡 Idea", desc: "Just an idea, exploring" },
+  { value: "mvp", label: "🚀 MVP", desc: "Building a first version" },
+  { value: "building", label: "🔨 Building", desc: "Actively in development" },
+  { value: "launched", label: "✅ Launched", desc: "Live and getting users" },
+];
+
+const STEP_COUNT = 3;
+
+function normalizeUrl(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return null;
+  const withScheme = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  try {
+    const u = new URL(withScheme);
+    return u.hostname.includes(".") ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
 
   const [step, setStep] = useState(1);
-  const [fullName, setFullName] = useState("");
-  const [university, setUniversity] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  // Prefill the name from auth metadata once per user. Adjusting state during
-  // render (not in an effect) avoids an extra render pass, and keying on the id
-  // stops a session refresh from overwriting what the user has typed.
-  const [prefilledFor, setPrefilledFor] = useState<string | null>(null);
-  if (user && prefilledFor !== user.id) {
-    setPrefilledFor(user.id);
-    const name =
-      user.user_metadata?.full_name ??
-      user.user_metadata?.name ?? "";
-    if (name) setFullName(name);
-  }
+  // Step 1
+  const [fullName, setFullName] = useState("");
+  const [bio, setBio] = useState("");
+  const [university, setUniversity] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // Step 2
+  const [skills, setSkills] = useState<string[]>([]);
+  const [customSkill, setCustomSkill] = useState("");
+
+  // Step 3
+  const [title, setTitle] = useState("");
+  const [oneLiner, setOneLiner] = useState("");
+  const [link, setLink] = useState("");
+  const [stage, setStage] = useState("idea");
 
   useEffect(() => {
-    if (!authLoading && !user) router.replace("/login");
+    if (authLoading) return;
+    if (!user) { router.replace("/login?next=/onboarding"); return; }
+    // Prefill from the profile (and the auth name for brand-new accounts).
+    createClient()
+      .from("profiles")
+      .select("full_name, bio, university, avatar_url, skills")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const metaName = (user.user_metadata?.full_name ?? user.user_metadata?.name ?? "") as string;
+        setFullName(cleanText(data?.full_name) ?? metaName);
+        setBio(cleanText(data?.bio) ?? "");
+        setUniversity(cleanText(data?.university) ?? "");
+        setAvatarUrl(cleanText(data?.avatar_url));
+        setSkills(cleanList(data?.skills).slice(0, MAX_SKILLS));
+      });
   }, [authLoading, user, router]);
 
-  const markSeen = () => {
-    if (typeof window !== "undefined") localStorage.setItem("onboarding_seen", "1");
-  };
+  const goTo = (n: number) => { setError(""); setStep(n); };
 
-  const handleSkip = () => { markSeen(); router.replace("/dashboard"); };
-
-  const purposeOption = PURPOSE_OPTIONS.find(o => o.id === purpose);
-
-  const handleComplete = async (nextHref: string) => {
+  const finish = async (nextHref: string) => {
     if (!user) return;
-    setSaving(true);
-    const supabase = createClient();
-    const updates: { full_name?: string; university?: string; skills?: string; role?: string } = {};
-    if (fullName.trim())           updates.full_name  = fullName.trim();
-    if (university.trim())         updates.university = university.trim();
-    if (selectedSkills.length > 0) updates.skills     = selectedSkills.join(", ");
-    if (purposeOption)             updates.role       = purposeOption.role;
-    if (Object.keys(updates).length > 0) {
-      await supabase.from("profiles").update(updates).eq("id", user.id);
-    }
-    markSeen();
-    setSaving(false);
+    await createClient()
+      .from("profiles")
+      .update({ onboarding_completed_at: new Date().toISOString() })
+      .eq("id", user.id);
     router.replace(nextHref);
+    router.refresh();
   };
 
+  // ── Step 1 ──
+  const handleAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (!file.type.startsWith("image/")) { setError("Please choose an image file."); return; }
+    if (file.size > 5 * 1024 * 1024) { setError("Images must be under 5 MB."); return; }
+    setError("");
+    setAvatarUploading(true);
+    const supabase = createClient();
+    const ext = (file.name.split(".").pop() || "png").toLowerCase();
+    const path = `${user.id}/avatar.${ext}`;
+    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (upErr) { setError(`Avatar upload failed: ${upErr.message}`); setAvatarUploading(false); return; }
+    const publicUrl = `${supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl}?t=${Date.now()}`;
+    await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", user.id);
+    setAvatarUrl(publicUrl);
+    setAvatarUploading(false);
+  };
+
+  const saveStep1 = async () => {
+    if (!user) return;
+    if (!fullName.trim()) { setError("Add your name, or skip this step for now."); return; }
+    setSaving(true);
+    const { error: err } = await createClient()
+      .from("profiles")
+      .update({ full_name: fullName.trim(), bio: bio.trim() || null, university: university.trim() || null })
+      .eq("id", user.id);
+    setSaving(false);
+    if (err) { setError(err.message); return; }
+    goTo(2);
+  };
+
+  // ── Step 2 ──
   const toggleSkill = (skill: string) => {
-    setSelectedSkills(prev =>
-      prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
-    );
+    setError("");
+    setSkills((prev) => {
+      if (prev.includes(skill)) return prev.filter((s) => s !== skill);
+      if (prev.length >= MAX_SKILLS) { setError(`Pick up to ${MAX_SKILLS} skills.`); return prev; }
+      return [...prev, skill];
+    });
   };
 
-  const canProceedStep1 = fullName.trim().length > 0;
-  const canProceedStep2 = purpose !== "";
+  const addCustomSkill = () => {
+    const v = customSkill.trim().replace(/,/g, "");
+    if (!v) return;
+    if (!skills.some((s) => s.toLowerCase() === v.toLowerCase())) toggleSkill(v);
+    setCustomSkill("");
+  };
+
+  const saveStep2 = async () => {
+    if (!user) return;
+    if (skills.length === 0) { goTo(3); return; }
+    setSaving(true);
+    const { error: err } = await createClient().from("profiles").update({ skills: skills.join(", ") }).eq("id", user.id);
+    setSaving(false);
+    if (err) { setError(err.message); return; }
+    goTo(3);
+  };
+
+  // ── Step 3 ──
+  const saveProject = async () => {
+    if (!user) return;
+    if (!title.trim()) { setError("Give your project a title, or skip for now."); return; }
+    if (!oneLiner.trim()) { setError("Add one sentence about what it does."); return; }
+    const url = link.trim() ? normalizeUrl(link) : null;
+    if (link.trim() && !url) { setError("That link doesn't look like a web address."); return; }
+    setSaving(true);
+    const { data, error: err } = await createClient()
+      .from("projects")
+      .insert({
+        owner_id: user.id,
+        title: title.trim(),
+        tagline: oneLiner.trim(),
+        description: oneLiner.trim(),
+        stage,
+        // No link column yet; /projects/new keeps links in tech_stack the same way.
+        tech_stack: url ? `${/github\.com/i.test(url) ? "GitHub" : "Link"}: ${url}` : null,
+      })
+      .select("id")
+      .single();
+    if (err || !data) { setSaving(false); setError(err?.message ?? "Could not create the project."); return; }
+    await finish(`/projects/${data.id}`);
+  };
+
+  const chip = (active: boolean): React.CSSProperties => ({
+    padding: "7px 14px",
+    borderRadius: 20,
+    border: active ? "1px solid color-mix(in srgb, var(--accent) 60%, transparent)" : "1px solid var(--border)",
+    background: active ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "var(--surface-raised)",
+    color: active ? "var(--accent-bright)" : "var(--text-secondary)",
+    fontSize: 13,
+    fontWeight: active ? 600 : 500,
+    cursor: "pointer",
+    fontFamily: "var(--font-sans)",
+    whiteSpace: "nowrap",
+  });
+
+  // Skipping a middle step moves on; skipping the last one finishes onboarding.
+  const onSkip = () => (step < STEP_COUNT ? goTo(step + 1) : finish("/dashboard"));
 
   return (
     <main style={pageStyle}>
-      {/* Background */}
       <div className="page-grid-bg" />
       <div className="page-radial-glow" />
 
       <div className="page-z" style={containerStyle}>
-        {/* Progress dots */}
         <div style={dotsRowStyle}>
-          {[1, 2, 3, 4].map(n => (
-            <div
-              key={n}
-              style={{
-                ...dotBase,
-                ...(n === step ? dotActive : n < step ? dotDone : dotIdle),
-              }}
-            />
+          {Array.from({ length: STEP_COUNT }, (_, i) => i + 1).map((n) => (
+            <div key={n} style={{ ...dotBase, ...(n === step ? dotActive : n < step ? dotDone : dotIdle) }} />
           ))}
         </div>
 
-        {/* Card */}
         <div style={cardStyle}>
-          {/* Skip button */}
-          {step < 4 && (
-            <button type="button" onClick={handleSkip} style={skipBtnStyle}>
-              Skip for now
-            </button>
-          )}
+          <button type="button" onClick={onSkip} disabled={saving} style={skipBtnStyle}>
+            Skip for now
+          </button>
 
-          {/* ── Step 1 ── */}
+          {/* ── Step 1: about you ── */}
           {step === 1 && (
             <div style={stepStyle}>
-              <div style={iconCircleStyle}>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <path d="M14 3L25 8.5V14C25 19.8 20.5 25.2 14 27C7.5 25.2 3 19.8 3 14V8.5L14 3Z"
-                    fill="color-mix(in srgb, var(--accent) 20%, transparent)" stroke="var(--accent)" strokeWidth="1.5" strokeLinejoin="round" />
-                  <path d="M10 14l3 3 5-5" stroke="var(--accent-bright)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
               <h1 style={titleStyle}>Welcome to ProjectHub</h1>
-              <p style={subtitleStyle}>Tell us a bit about yourself to get the most out of the platform.</p>
+              <p style={subtitleStyle}>Your profile is your proof-of-work portfolio. Start with the basics.</p>
 
-              <div style={fieldGroupStyle}>
-                <label style={labelStyle}>Full name</label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={e => setFullName(e.target.value)}
-                  placeholder="e.g. Alex Johnson"
-                  style={inputStyle}
-                  autoFocus
-                />
+              <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  aria-label="Upload a profile photo"
+                  style={avatarBtnStyle}
+                >
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <span style={{ fontSize: 22, color: "var(--text-muted)" }}>+</span>
+                  )}
+                </button>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>
+                    {avatarUploading ? "Uploading…" : avatarUrl ? "Looking good" : "Add a photo"}
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Optional · JPG or PNG, up to 5 MB</div>
+                </div>
+                <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatar} style={{ display: "none" }} />
               </div>
 
               <div style={fieldGroupStyle}>
-                <label style={labelStyle}>University <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>(optional)</span></label>
-                <input
-                  type="text"
-                  value={university}
-                  onChange={e => setUniversity(e.target.value)}
-                  placeholder="e.g. MIT, Stanford, UC Berkeley…"
-                  style={inputStyle}
-                />
+                <label style={labelStyle} htmlFor="onb-name">Full name</label>
+                <input id="onb-name" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
+                  placeholder="e.g. Alex Johnson" style={inputStyle} autoComplete="name" />
+              </div>
+              <div style={fieldGroupStyle}>
+                <label style={labelStyle} htmlFor="onb-bio">Short bio</label>
+                <textarea id="onb-bio" value={bio} onChange={(e) => setBio(e.target.value.slice(0, 160))} rows={2}
+                  placeholder="CS student building tools for study groups" style={{ ...inputStyle, resize: "vertical" }} />
+                <span style={hintStyle}>{bio.length}/160</span>
+              </div>
+              <div style={fieldGroupStyle}>
+                <label style={labelStyle} htmlFor="onb-uni">School <span style={optionalStyle}>optional</span></label>
+                <input id="onb-uni" type="text" value={university} onChange={(e) => setUniversity(e.target.value)}
+                  placeholder="e.g. Boğaziçi University" style={inputStyle} />
               </div>
 
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                disabled={!canProceedStep1}
-                className="btn-primary"
-                style={{ width: "100%", marginTop: 8, opacity: canProceedStep1 ? 1 : 0.45 }}
-              >
-                Continue →
+              {error && <p style={errorStyle}>{error}</p>}
+              <button type="button" onClick={saveStep1} disabled={saving || avatarUploading} className="btn-accent" style={primaryBtnStyle}>
+                {saving ? "Saving…" : "Continue →"}
               </button>
             </div>
           )}
 
-          {/* ── Step 2 ── */}
+          {/* ── Step 2: skills ── */}
           {step === 2 && (
             <div style={stepStyle}>
-              <div style={iconCircleStyle}>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="10" fill="var(--surface-raised)" stroke="#8b5cf6" strokeWidth="1.5" />
-                  <path d="M14 9v5l3 3" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <h1 style={titleStyle}>What are you here for?</h1>
-              <p style={subtitleStyle}>Choose the option that best describes your goal.</p>
-
-              <div className="responsive-2col" style={optionsGridStyle}>
-                {PURPOSE_OPTIONS.map(opt => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setPurpose(opt.id)}
-                    style={{
-                      ...optionCardBase,
-                      ...(purpose === opt.id ? optionCardActive : optionCardIdle),
-                    }}
-                  >
-                    <span style={{ fontSize: 28, marginBottom: 8 }}>{opt.icon}</span>
-                    <span style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 15, color: "var(--text-primary)", marginBottom: 4 }}>
-                      {opt.label}
-                    </span>
-                    <span style={{ fontSize: 12, color: "var(--text-secondary)", textAlign: "center", lineHeight: 1.4 }}>
-                      {opt.desc}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-                <button type="button" onClick={() => setStep(1)} style={backBtnStyle}>← Back</button>
-                <button
-                  type="button"
-                  onClick={() => setStep(3)}
-                  disabled={!canProceedStep2}
-                  className="btn-primary"
-                  style={{ flex: 1, opacity: canProceedStep2 ? 1 : 0.45 }}
-                >
-                  Continue →
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── Step 3 ── */}
-          {step === 3 && (
-            <div style={stepStyle}>
-              <div style={iconCircleStyle}>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <rect x="4" y="10" width="7" height="7" rx="2" fill="var(--surface-raised)" stroke="#4c8eff" strokeWidth="1.5" />
-                  <rect x="14" y="6" width="7" height="7" rx="2" fill="var(--surface-raised)" stroke="#8b5cf6" strokeWidth="1.5" />
-                  <rect x="9" y="17" width="7" height="7" rx="2" fill="var(--accent-green-glow)" stroke="var(--accent-green)" strokeWidth="1.5" />
-                </svg>
-              </div>
-              <h1 style={titleStyle}>What are your skills?</h1>
-              <p style={subtitleStyle}>Pick all that apply — you can always update these later.</p>
+              <h1 style={titleStyle}>What can you build with?</h1>
+              <p style={subtitleStyle}>Pick up to {MAX_SKILLS}. These show on your profile and help teams find you.</p>
 
               <div style={skillsGridStyle}>
-                {SKILL_OPTIONS.map(skill => {
-                  const active = selectedSkills.includes(skill);
+                {[...SKILL_OPTIONS, ...skills.filter((s) => !SKILL_OPTIONS.includes(s))].map((skill) => {
+                  const active = skills.includes(skill);
                   return (
-                    <button
-                      key={skill}
-                      type="button"
-                      onClick={() => toggleSkill(skill)}
-                      style={{
-                        padding: "7px 14px",
-                        borderRadius: 20,
-                        border: active ? "1px solid color-mix(in srgb, var(--accent) 60%, transparent)" : "1px solid var(--border)",
-                        background: active ? "color-mix(in srgb, var(--accent) 18%, transparent)" : "var(--surface-raised)",
-                        color: active ? "var(--accent-bright)" : "var(--text-secondary)",
-                        fontSize: 13,
-                        fontWeight: active ? 600 : 500,
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
-                        fontFamily: "var(--font-sans)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <button key={skill} type="button" onClick={() => toggleSkill(skill)} style={chip(active)} aria-pressed={active}>
                       {active && <span style={{ marginRight: 5, fontSize: 11 }}>✓</span>}
                       {skill}
                     </button>
@@ -254,109 +288,121 @@ export default function OnboardingPage() {
                 })}
               </div>
 
+              <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                <input type="text" value={customSkill} onChange={(e) => setCustomSkill(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomSkill(); } }}
+                  placeholder="Add another skill" style={{ ...inputStyle, flex: 1, minWidth: 0 }} />
+                <button type="button" onClick={addCustomSkill} style={backBtnStyle}>Add</button>
+              </div>
+              <span style={{ ...hintStyle, marginTop: 6 }}>{skills.length}/{MAX_SKILLS} selected</span>
+
+              {error && <p style={errorStyle}>{error}</p>}
               <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-                <button type="button" onClick={() => setStep(2)} style={backBtnStyle}>← Back</button>
-                <button
-                  type="button"
-                  onClick={() => setStep(4)}
-                  className="btn-primary"
-                  style={{ flex: 1 }}
-                >
-                  {selectedSkills.length === 0 ? "Skip skills →" : `Continue with ${selectedSkills.length} skill${selectedSkills.length !== 1 ? "s" : ""} →`}
+                <button type="button" onClick={() => goTo(1)} style={backBtnStyle}>← Back</button>
+                <button type="button" onClick={saveStep2} disabled={saving} className="btn-accent" style={{ ...primaryBtnStyle, flex: 1, marginTop: 0 }}>
+                  {saving ? "Saving…" : "Continue →"}
                 </button>
               </div>
             </div>
           )}
 
-          {/* ── Step 4 ── */}
-          {step === 4 && (
+          {/* ── Step 3: first project ── */}
+          {step === 3 && (
             <div style={stepStyle}>
-              <div style={{ ...iconCircleStyle, background: "var(--accent-green-glow)", border: "1px solid var(--accent-green-glow)" }}>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="10" fill="var(--accent-green-glow)" stroke="var(--accent-green)" strokeWidth="1.5" />
-                  <path d="M9 14l4 4 6-6" stroke="var(--accent-green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <h1 style={titleStyle}>You&apos;re all set!</h1>
-              <p style={subtitleStyle}>Here&apos;s a summary of your profile — welcome to the community.</p>
+              <h1 style={titleStyle}>Add your first project</h1>
+              <p style={subtitleStyle}>Anything you&apos;ve built or are building counts — a class project, a side project, a startup.</p>
 
-              <div style={summaryCardStyle}>
-                {fullName && (
-                  <SummaryRow icon="👤" label="Name" value={fullName} />
-                )}
-                {university && (
-                  <SummaryRow icon="🎓" label="University" value={university} />
-                )}
-                {PURPOSE_OPTIONS.find(o => o.id === purpose) && (
-                  <SummaryRow
-                    icon={PURPOSE_OPTIONS.find(o => o.id === purpose)!.icon}
-                    label="Here to"
-                    value={PURPOSE_OPTIONS.find(o => o.id === purpose)!.label}
-                  />
-                )}
-                {selectedSkills.length > 0 && (
-                  <div style={summaryRowStyle}>
-                    <span style={{ fontSize: 16 }}>🛠</span>
-                    <div style={{ flex: 1 }}>
-                      <span style={summaryLabelStyle}>Skills</span>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
-                        {selectedSkills.slice(0, 6).map(s => (
-                          <span key={s} style={summarySkillPillStyle}>{s}</span>
-                        ))}
-                        {selectedSkills.length > 6 && (
-                          <span style={summarySkillPillStyle}>+{selectedSkills.length - 6} more</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
+              <div style={fieldGroupStyle}>
+                <label style={labelStyle} htmlFor="onb-title">Title</label>
+                <input id="onb-title" type="text" value={title} onChange={(e) => setTitle(e.target.value.slice(0, 80))}
+                  placeholder="e.g. StudySync" style={inputStyle} />
+              </div>
+              <div style={fieldGroupStyle}>
+                <label style={labelStyle} htmlFor="onb-oneliner">What it does, in one sentence</label>
+                <input id="onb-oneliner" type="text" value={oneLiner} onChange={(e) => setOneLiner(e.target.value.slice(0, 140))}
+                  placeholder="Matches students into study groups by course and schedule." style={inputStyle} />
+              </div>
+              <div style={fieldGroupStyle}>
+                <label style={labelStyle} htmlFor="onb-link">Link <span style={optionalStyle}>optional</span></label>
+                <input id="onb-link" type="url" inputMode="url" value={link} onChange={(e) => setLink(e.target.value)}
+                  placeholder="github.com/you/project or your demo" style={inputStyle} />
+              </div>
+              <div style={fieldGroupStyle}>
+                <span style={labelStyle}>Stage</span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {STAGES.map((s) => (
+                    <button key={s.value} type="button" onClick={() => setStage(s.value)} style={chip(stage === s.value)}
+                      aria-pressed={stage === s.value} title={s.desc}>
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+                <span style={hintStyle}>{STAGES.find((s) => s.value === stage)?.desc}</span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => handleComplete(purposeOption?.ctaHref ?? "/dashboard")}
-                disabled={saving}
-                className="btn-primary"
-                style={{ width: "100%", marginTop: 8, opacity: saving ? 0.7 : 1 }}
-              >
-                {saving
-                  ? "Saving…"
-                  : `${purposeOption?.ctaLabel ?? "Go to dashboard"} →`}
-              </button>
-              {purposeOption && purposeOption.ctaHref !== "/dashboard" && (
-                <button
-                  type="button"
-                  onClick={() => handleComplete("/dashboard")}
-                  disabled={saving}
-                  style={secondarySkipStyle}
-                >
-                  Skip to dashboard
+              {error && <p style={errorStyle}>{error}</p>}
+              <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                <button type="button" onClick={() => goTo(2)} style={backBtnStyle}>← Back</button>
+                <button type="button" onClick={saveProject} disabled={saving} className="btn-accent" style={{ ...primaryBtnStyle, flex: 1, marginTop: 0 }}>
+                  {saving ? "Creating…" : "Add project & finish"}
                 </button>
-              )}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Step indicator text */}
         <p style={{ textAlign: "center", color: "var(--text-muted)", fontSize: 13, marginTop: 16 }}>
-          Step {step} of 4
+          Step {step} of {STEP_COUNT}
         </p>
       </div>
     </main>
   );
 }
 
-function SummaryRow({ icon, label, value }: { icon: string; label: string; value: string }) {
-  return (
-    <div style={summaryRowStyle}>
-      <span style={{ fontSize: 16 }}>{icon}</span>
-      <div>
-        <span style={summaryLabelStyle}>{label}</span>
-        <p style={{ color: "var(--text-primary)", fontSize: 14, fontWeight: 500, margin: 0 }}>{value}</p>
-      </div>
-    </div>
-  );
-}
+const primaryBtnStyle: React.CSSProperties = {
+  width: "100%",
+  marginTop: 8,
+  fontSize: 15,
+  padding: "12px 20px",
+  border: "none",
+  cursor: "pointer",
+};
+
+const avatarBtnStyle: React.CSSProperties = {
+  width: 64,
+  height: 64,
+  borderRadius: "50%",
+  flexShrink: 0,
+  overflow: "hidden",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "var(--surface-raised)",
+  border: "1px dashed var(--border-highlight)",
+  cursor: "pointer",
+  padding: 0,
+};
+
+const hintStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: "var(--text-muted)",
+};
+
+const optionalStyle: React.CSSProperties = {
+  fontWeight: 400,
+  color: "var(--text-muted)",
+  marginLeft: 4,
+};
+
+const errorStyle: React.CSSProperties = {
+  margin: "4px 0 8px",
+  padding: "10px 12px",
+  borderRadius: 8,
+  fontSize: 13,
+  color: "var(--danger)",
+  background: "var(--danger-bg)",
+  border: "1px solid var(--danger-border)",
+};
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
@@ -433,18 +479,6 @@ const skipBtnStyle: React.CSSProperties = {
   transition: "color 0.15s",
 };
 
-const iconCircleStyle: React.CSSProperties = {
-  width: 56,
-  height: 56,
-  borderRadius: 16,
-  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom: 20,
-};
-
 const titleStyle: React.CSSProperties = {
   fontFamily: "var(--font-serif)",
   fontWeight: 500,
@@ -487,33 +521,6 @@ const inputStyle: React.CSSProperties = {
   transition: "border-color 0.15s",
 };
 
-// Columns handled by `.responsive-2col` (1fr 1fr desktop → 1fr mobile).
-const optionsGridStyle: React.CSSProperties = {
-  gap: 12,
-  marginBottom: 8,
-};
-
-const optionCardBase: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  padding: "20px 12px",
-  borderRadius: 14,
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-  fontFamily: "var(--font-sans)",
-};
-
-const optionCardIdle: React.CSSProperties = {
-  background: "var(--surface-raised)",
-  border: "1px solid var(--border)",
-};
-
-const optionCardActive: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 45%, transparent)",
-};
-
 const skillsGridStyle: React.CSSProperties = {
   display: "flex",
   flexWrap: "wrap",
@@ -537,54 +544,3 @@ const backBtnStyle: React.CSSProperties = {
   whiteSpace: "nowrap",
 };
 
-const summaryCardStyle: React.CSSProperties = {
-  background: "var(--surface-raised)",
-  border: "1px solid var(--border)",
-  borderRadius: 14,
-  padding: "16px 18px",
-  display: "flex",
-  flexDirection: "column",
-  gap: 14,
-  marginBottom: 8,
-};
-
-const summaryRowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: 12,
-};
-
-const summaryLabelStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: "var(--text-muted)",
-  textTransform: "uppercase",
-  letterSpacing: "0.05em",
-  display: "block",
-  marginBottom: 2,
-};
-
-const summarySkillPillStyle: React.CSSProperties = {
-  padding: "3px 10px",
-  borderRadius: 20,
-  background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-  border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)",
-  color: "var(--accent-bright)",
-  fontSize: 12,
-  fontWeight: 500,
-};
-
-const secondarySkipStyle: React.CSSProperties = {
-  marginTop: 10,
-  width: "100%",
-  padding: "8px 12px",
-  background: "none",
-  border: "none",
-  color: "var(--text-muted)",
-  fontSize: 13,
-  fontWeight: 500,
-  cursor: "pointer",
-  fontFamily: "var(--font-sans)",
-  textDecoration: "underline",
-  textUnderlineOffset: 3,
-};

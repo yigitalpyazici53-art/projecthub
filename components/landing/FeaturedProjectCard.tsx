@@ -57,7 +57,7 @@ export default function FeaturedProjectCard({
         >
           {stage.label}
         </span>
-        {project.is_ai_generated && <span className="lp-pill lp-pill-demo">demo</span>}
+        {project.is_seed && <span className="lp-pill lp-pill-demo" title="A sample project that shows what ProjectHub looks like. Not a real team.">Example</span>}
       </div>
 
       <h3 className="font-serif lp-card-title">{project.title || "Untitled Project"}</h3>

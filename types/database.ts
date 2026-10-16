@@ -17,6 +17,8 @@ export type Database = {
           avatar_url: string | null;
           created_at: string;
           is_ai_generated: boolean;
+          is_seed: boolean;
+          onboarding_completed_at: string | null;
         };
         Insert: {
           id: string;
@@ -33,6 +35,8 @@ export type Database = {
           avatar_url?: string | null;
           created_at?: string;
           is_ai_generated?: boolean;
+          is_seed?: boolean;
+          onboarding_completed_at?: string | null;
         };
         Update: {
           id?: string;
@@ -49,6 +53,8 @@ export type Database = {
           avatar_url?: string | null;
           created_at?: string;
           is_ai_generated?: boolean;
+          is_seed?: boolean;
+          onboarding_completed_at?: string | null;
         };
         Relationships: [];
       };
@@ -65,6 +71,7 @@ export type Database = {
           tech_stack: string | null;
           created_at: string;
           is_ai_generated: boolean;
+          is_seed: boolean;
         };
         Insert: {
           id?: string;
@@ -78,6 +85,7 @@ export type Database = {
           tech_stack?: string | null;
           created_at?: string;
           is_ai_generated?: boolean;
+          is_seed?: boolean;
         };
         Update: {
           id?: string;
@@ -91,6 +99,7 @@ export type Database = {
           tech_stack?: string | null;
           created_at?: string;
           is_ai_generated?: boolean;
+          is_seed?: boolean;
         };
         Relationships: [];
       };

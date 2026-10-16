@@ -23,10 +23,19 @@ export function cleanText(value: string | null | undefined): string | null {
   return isEmptyValue(value) ? null : value!.trim();
 }
 
-/** Splits a comma list and drops blank and placeholder entries. */
+/** Splits a comma list, drops blank/placeholder entries and case-insensitive repeats ("design, Design"). */
 export function cleanList(value: string | null | undefined): string[] {
   if (!value) return [];
-  return value.split(",").map((s) => s.trim()).filter((s) => !isEmptyValue(s));
+  const seen = new Set<string>();
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => {
+      const key = s.toLowerCase();
+      if (isEmptyValue(s) || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
 /**

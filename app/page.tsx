@@ -55,7 +55,7 @@ async function getFeaturedProjects(): Promise<FeaturedProject[]> {
     const supabase = createPublicClient();
     const { data: projects } = await supabase
       .from("projects")
-      .select("id, owner_id, title, tagline, description, category, stage, looking_for, tech_stack, created_at, is_ai_generated")
+      .select("id, owner_id, title, tagline, description, category, stage, looking_for, tech_stack, created_at, is_seed")
       .not("title", "is", null)
       .order("created_at", { ascending: false })
       .limit(100);
@@ -63,7 +63,7 @@ async function getFeaturedProjects(): Promise<FeaturedProject[]> {
 
     const picked = [...projects]
       .sort((a, b) =>
-        Number(a.is_ai_generated) - Number(b.is_ai_generated) ||
+        Number(a.is_seed) - Number(b.is_seed) ||
         (STAGE_RANK[a.stage ?? ""] ?? 9) - (STAGE_RANK[b.stage ?? ""] ?? 9),
       )
       .slice(0, FEATURED_COUNT);

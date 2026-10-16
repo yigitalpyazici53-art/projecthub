@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { getInitials } from "@/utils/getInitials";
 import { cleanProfiles } from "@/utils/display";
 import type { Application, Profile } from "@/types";
+import { profilePath } from "@/utils/profileUrl";
 
 /**
  * Applications to one or more projects the signed-in user owns, with
@@ -154,7 +155,7 @@ export default function ApplicationsInbox({
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     {p?.username ? (
-                      <Link href={`/builders/${p.username}`} className="u-link" style={nameStyle} title={name}>{name}</Link>
+                      <Link href={profilePath(p.username)} className="u-link" style={nameStyle} title={name}>{name}</Link>
                     ) : (
                       <div style={nameStyle} title={name}>{name}</div>
                     )}
@@ -183,7 +184,7 @@ export default function ApplicationsInbox({
                       Decline
                     </button>
                     {p?.username && (
-                      <Link href={`/builders/${p.username}`} style={ghostBtnStyle}>View profile</Link>
+                      <Link href={profilePath(p.username)} style={ghostBtnStyle}>View profile</Link>
                     )}
                   </div>
                 )}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Project, Profile } from "@/types";
 import { stageBadge } from "@/utils/stage";
 import { categoryBadge } from "@/utils/category";
+import AIBadge from "@/components/AIBadge";
 
 // Variants are mostly for the parent grid + intent (owner vs visitor); the
 // card body is identical across all three call sites by design.
@@ -110,14 +111,7 @@ export default function ProjectCard({
         }}>
           {stage.label}
         </span>
-        {project.is_ai_generated && (
-          <span style={{
-            fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 999,
-            color: "var(--text-muted)", background: "var(--surface-raised)",
-          }}>
-            demo
-          </span>
-        )}
+        {project.is_seed && <AIBadge />}
       </div>
 
       {/* Headline — Fraunces */}

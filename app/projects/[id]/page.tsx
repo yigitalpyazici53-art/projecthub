@@ -9,6 +9,8 @@ import SkeletonLoader from "@/components/SkeletonLoader";
 import type { Project, ProjectUpdate } from "@/types";
 import { cleanProfile } from "@/utils/display";
 import ApplicationsInbox from "@/components/ApplicationsInbox";
+import { profilePath } from "@/utils/profileUrl";
+import AIBadge from "@/components/AIBadge";
 
 interface OwnerProfile {
   username: string | null;
@@ -17,7 +19,8 @@ interface OwnerProfile {
   role: string | null;
 }
 
-type ApplicationStatus = "none" | "pending" | "accepted" | "rejected" | "owner" | "unauthenticated";
+// "example": a seed project — visible, but nobody can apply.
+type ApplicationStatus = "none" | "pending" | "accepted" | "rejected" | "owner" | "unauthenticated" | "example";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -554,7 +557,7 @@ export default function ProjectDetailPage({ params }: Props) {
         const [projResult, sessionResult] = await Promise.all([
           supabase
             .from("projects")
-            .select("id, owner_id, title, tagline, description, stage, looking_for, tech_stack, category, created_at")
+            .select("id, owner_id, title, tagline, description, stage, looking_for, tech_stack, category, created_at, is_seed")
             .eq("id", id)
             .single(),
           supabase.auth.getSession(),
@@ -588,10 +591,12 @@ export default function ProjectDetailPage({ params }: Props) {
         setUpdates((updatesResult.data ?? []) as ProjectUpdate[]);
         setUpdatesLoading(false);
 
-        if (!userId) {
-          setAppStatus("unauthenticated");
-        } else if (userId === proj.owner_id) {
+        if (userId && userId === proj.owner_id) {
           setAppStatus("owner");
+        } else if (proj.is_seed) {
+          setAppStatus("example");
+        } else if (!userId) {
+          setAppStatus("unauthenticated");
         } else {
           const existing = appResult.data;
           if (existing) {
@@ -707,7 +712,7 @@ export default function ProjectDetailPage({ params }: Props) {
     );
   }
 
-  const builderHref = ownerProfile?.username ? `/builders/${ownerProfile.username}` : null;
+  const builderHref = ownerProfile?.username ? profilePath(ownerProfile.username) : null;
   const techList = project.tech_stack ? project.tech_stack.split(",").map((t) => t.trim()).filter(Boolean) : [];
   const lookingForList = project.looking_for ? project.looking_for.split(",").map((s) => s.trim()).filter(Boolean) : [];
   const stageColor = getStageColor(project.stage);
@@ -749,15 +754,7 @@ export default function ProjectDetailPage({ params }: Props) {
                   {getStageLabel(project.stage)}
                 </span>
               )}
-              {project.is_ai_generated && (
-                <span style={{
-                  fontSize: 11, fontWeight: 700, borderRadius: 20, padding: "4px 12px",
-                  color: "var(--text-secondary)", border: "1px solid rgba(139,154,176,0.22)",
-                  background: "rgba(139,154,176,0.07)", letterSpacing: "0.03em",
-                }}>
-                  Demo Project
-                </span>
-              )}
+              {project.is_seed && <AIBadge size="md" />}
               <span style={metaDateStyle}>Posted {formatDate(project.created_at)}</span>
             </div>
           </div>
@@ -1001,6 +998,19 @@ export default function ProjectDetailPage({ params }: Props) {
                         {shareUrl}
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Example project: no applications */}
+                {appStatus === "example" && (
+                  <div style={{ padding: "20px 18px", borderRadius: 12, background: "var(--surface-raised)", border: "1px dashed var(--border)" }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>This is an example project</div>
+                    <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.55, margin: "0 0 14px" }}>
+                      It shows what a ProjectHub project page looks like, so it isn&apos;t taking applications.
+                    </p>
+                    <Link href="/projects" className="u-link" style={{ fontSize: 13, color: "var(--accent-purple)", fontWeight: 600 }}>
+                      Browse real projects →
+                    </Link>
                   </div>
                 )}
 

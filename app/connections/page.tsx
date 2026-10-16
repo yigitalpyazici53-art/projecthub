@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import { getInitials } from "@/utils/getInitials";
 import type { Profile } from "@/types";
+import { cleanProfiles } from "@/utils/display";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -133,7 +134,7 @@ export default function ConnectionsPage() {
         if (profileError) { setError(profileError.message); return; }
 
         const profileMap: Record<string, Profile> = {};
-        (profileData ?? []).forEach((p: Profile) => { profileMap[p.id] = p; });
+        cleanProfiles(profileData as Profile[] | null).forEach((p) => { profileMap[p.id] = p; });
 
         setConnected(
           uniqueById(
@@ -386,6 +387,23 @@ function AvatarCircle({ profile }: { profile: Profile }) {
   );
 }
 
+// Avatar, name, handle and university, with the status badge on its own line
+// under them. The badge used to float top-right and collided with long names.
+function CardIdentity({ profile, badge }: { profile: Profile; badge: React.ReactNode }) {
+  const name = profile.full_name || profile.username || "Builder";
+  return (
+    <div style={cardHeaderStyle}>
+      <AvatarCircle profile={profile} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={cardNameStyle} title={name}>{name}</div>
+        <div style={cardHandleStyle}>@{profile.username || "no-handle"}</div>
+        {profile.university && <div style={cardUniStyle}>{profile.university}</div>}
+        <div style={{ marginTop: 8 }}>{badge}</div>
+      </div>
+    </div>
+  );
+}
+
 function SkillPills({ skills }: { skills: string | null }) {
   if (!skills) return null;
   const list = skills.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 4);
@@ -401,21 +419,15 @@ function SkillPills({ skills }: { skills: string | null }) {
 function ConnectedCard({ profile }: { profile: ConnectedProfile }) {
   return (
     <article className="card-hover" style={cardStyle}>
-      {/* Connected badge */}
-      <div style={connectedBadgeStyle}>
-        <span style={connectedDotStyle} />
-        Connected
-      </div>
-
-      {/* Avatar + name row */}
-      <div style={cardHeaderStyle}>
-        <AvatarCircle profile={profile} />
-        <div style={{ minWidth: 0 }}>
-          <div style={cardNameStyle}>{profile.full_name || profile.username || "Builder"}</div>
-          <div style={cardHandleStyle}>@{profile.username || "no-handle"}</div>
-          {profile.university && <div style={cardUniStyle}>{profile.university}</div>}
-        </div>
-      </div>
+      <CardIdentity
+        profile={profile}
+        badge={
+          <span style={connectedBadgeStyle}>
+            <span style={connectedDotStyle} />
+            Connected
+          </span>
+        }
+      />
 
       {/* Bio */}
       {profile.bio && (
@@ -456,20 +468,15 @@ function PendingCard({
 }) {
   return (
     <article className="card-hover" style={cardStyle}>
-      {/* Pending badge */}
-      <div style={pendingBadgeStyle}>
-        <span style={pendingDotStyle} />
-        Wants to connect
-      </div>
-
-      <div style={cardHeaderStyle}>
-        <AvatarCircle profile={profile} />
-        <div style={{ minWidth: 0 }}>
-          <div style={cardNameStyle}>{profile.full_name || profile.username || "Builder"}</div>
-          <div style={cardHandleStyle}>@{profile.username || "no-handle"}</div>
-          {profile.university && <div style={cardUniStyle}>{profile.university}</div>}
-        </div>
-      </div>
+      <CardIdentity
+        profile={profile}
+        badge={
+          <span style={pendingBadgeStyle}>
+            <span style={pendingDotStyle} />
+            Wants to connect
+          </span>
+        }
+      />
 
       {profile.bio && (
         <p style={bioStyle}>
@@ -515,20 +522,15 @@ function SentCard({
 }) {
   return (
     <article className="card-hover" style={cardStyle}>
-      {/* Sent badge */}
-      <div style={sentBadgeStyle}>
-        <span style={sentDotStyle} />
-        Request sent
-      </div>
-
-      <div style={cardHeaderStyle}>
-        <AvatarCircle profile={profile} />
-        <div style={{ minWidth: 0 }}>
-          <div style={cardNameStyle}>{profile.full_name || profile.username || "Builder"}</div>
-          <div style={cardHandleStyle}>@{profile.username || "no-handle"}</div>
-          {profile.university && <div style={cardUniStyle}>{profile.university}</div>}
-        </div>
-      </div>
+      <CardIdentity
+        profile={profile}
+        badge={
+          <span style={sentBadgeStyle}>
+            <span style={sentDotStyle} />
+            Request sent
+          </span>
+        }
+      />
 
       {profile.bio && (
         <p style={bioStyle}>
@@ -767,11 +769,17 @@ const cardHandleStyle: React.CSSProperties = {
   fontSize: 13,
   color: "var(--accent)",
   marginBottom: 2,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 };
 
 const cardUniStyle: React.CSSProperties = {
   fontSize: 12,
   color: "var(--text-muted)",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 };
 
 const bioStyle: React.CSSProperties = {
@@ -800,11 +808,8 @@ const cardFooterStyle: React.CSSProperties = {
   flexWrap: "wrap",
 };
 
-// Status badges (top-right corner)
+// Status badges (under the name, see CardIdentity)
 const connectedBadgeStyle: React.CSSProperties = {
-  position: "absolute",
-  top: 14,
-  right: 14,
   display: "inline-flex",
   alignItems: "center",
   gap: 5,
@@ -826,9 +831,6 @@ const connectedDotStyle: React.CSSProperties = {
 };
 
 const pendingBadgeStyle: React.CSSProperties = {
-  position: "absolute",
-  top: 14,
-  right: 14,
   display: "inline-flex",
   alignItems: "center",
   gap: 5,
@@ -850,9 +852,6 @@ const pendingDotStyle: React.CSSProperties = {
 };
 
 const sentBadgeStyle: React.CSSProperties = {
-  position: "absolute",
-  top: 14,
-  right: 14,
   display: "inline-flex",
   alignItems: "center",
   gap: 5,

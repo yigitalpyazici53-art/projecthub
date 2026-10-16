@@ -9,6 +9,7 @@ import { getInitials } from "@/utils/getInitials";
 import { stageBadge } from "@/utils/stage";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import type { Profile, Project } from "@/types";
+import { cleanProfile } from "@/utils/display";
 
 type PageProps = { params: Promise<{ username: string }> };
 type ConnectStatus =
@@ -88,7 +89,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
           .maybeSingle();
 
         if (dbError || !data) { setNotFound(true); return; }
-        const profile = data as Profile;
+        const profile = cleanProfile(data as Profile);
         setBuilder(profile);
 
         const [pRes, cRes, , userRes] = await Promise.all([

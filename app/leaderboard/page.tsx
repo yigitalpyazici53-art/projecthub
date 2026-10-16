@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { getInitials } from "@/utils/getInitials";
+import { cleanProfiles } from "@/utils/display";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -117,9 +118,10 @@ export default function LeaderboardPage() {
       const supabase = createClient();
       try {
         // Fetch all profiles
-        const { data: profiles } = await supabase
+        const { data: rawProfiles } = await supabase
           .from("profiles")
           .select("id, full_name, username, university, role, avatar_url");
+        const profiles = rawProfiles ? cleanProfiles(rawProfiles) : null;
 
         if (!profiles || profiles.length === 0) { setLoading(false); return; }
 
@@ -375,8 +377,8 @@ export default function LeaderboardPage() {
                       <div style={{
                         padding: "6px 14px",
                         borderRadius: 20,
-                        background: isTop3 ? (rank === 1 ? "var(--tint-amber-bg)" : rank === 2 ? "rgba(156,163,175,0.1)" : "rgba(205,124,45,0.1)") : "#F5F5F3",
-                        border: `1px solid ${isTop3 ? (rank === 1 ? "var(--tint-amber-bg)" : rank === 2 ? "rgba(156,163,175,0.25)" : "rgba(205,124,45,0.25)") : "#E8E8E4"}`,
+                        background: isTop3 ? (rank === 1 ? "var(--tint-amber-bg)" : rank === 2 ? "rgba(156,163,175,0.1)" : "rgba(205,124,45,0.1)") : "var(--surface-raised)",
+                        border: `1px solid ${isTop3 ? (rank === 1 ? "var(--tint-amber-bg)" : rank === 2 ? "rgba(156,163,175,0.25)" : "rgba(205,124,45,0.25)") : "var(--border)"}`,
                         minWidth: 64,
                         textAlign: "center",
                       }}>

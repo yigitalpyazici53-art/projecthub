@@ -8,6 +8,7 @@ import { getInitials } from "@/utils/getInitials";
 import { avatarTint } from "@/utils/category";
 import { Reveal } from "@/components/motion/Reveal";
 import type { Profile } from "@/types";
+import { cleanProfiles } from "@/utils/display";
 
 export const dynamic = "force-dynamic";
 
@@ -106,7 +107,7 @@ export default function BuildersPage() {
         if (dbError) {
           setError(`Could not load builders: ${dbError.message}`);
         } else {
-          setBuilders((data ?? []) as Profile[]);
+          setBuilders(cleanProfiles(data as Profile[] | null));
         }
 
         // Shipped-project counts per builder (client-side aggregation)

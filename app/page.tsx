@@ -3,6 +3,7 @@ import LandingPageClient, { type FeaturedProject, type PublicStats } from "./Lan
 import { SITE_NAME } from "@/utils/seo";
 import { createPublicClient } from "@/utils/supabase/public";
 import type { Profile, Project } from "@/types";
+import { cleanProfiles } from "@/utils/display";
 
 export const revalidate = 60;
 
@@ -72,7 +73,7 @@ async function getFeaturedProjects(): Promise<FeaturedProject[]> {
       .from("profiles")
       .select("id, full_name, username, university, avatar_url")
       .in("id", ownerIds);
-    const ownerMap = new Map((owners ?? []).map((o) => [o.id, o as Profile]));
+    const ownerMap = new Map(cleanProfiles(owners).map((o) => [o.id, o as Profile]));
 
     return picked.map((p) => ({
       project: p as Project,

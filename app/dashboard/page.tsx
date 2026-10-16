@@ -7,7 +7,9 @@ import { createClient } from "@/utils/supabase/client";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import ProjectCard from "@/components/cards/ProjectCard";
 import { useAuth } from "@/contexts/AuthContext";
-import type { Profile, Project, Connection, Notification, Application } from "@/types";
+import type { Profile, Project, Connection, Notification } from "@/types";
+import ApplicationsInbox from "@/components/ApplicationsInbox";
+import { cleanProfile, cleanProfiles } from "@/utils/display";
 
 export const dynamic = "force-dynamic";
 
@@ -99,15 +101,10 @@ export default function DashboardPage() {
   const [connectionsCount, setConnectionsCount] = useState(0);
   const [notifications, setNotifications] = useState<(Notification & { fromProfile?: Profile })[]>([]);
 
-  interface ApplicationWithProfile extends Application {
-    applicantProfile?: Profile;
-    projectTitle?: string;
-  }
   interface MatchedProject extends Project {
     matchPct: number;
     matchReason: string;
   }
-  const [applications, setApplications] = useState<ApplicationWithProfile[]>([]);
   const [matchedProjects, setMatchedProjects] = useState<MatchedProject[]>([]);
 
   useEffect(() => {
@@ -178,7 +175,7 @@ export default function DashboardPage() {
             .select("id, full_name, username, university, role, bio, skills, interests, github_url")
             .eq("id", user.id)
             .maybeSingle();
-          setProfile(created as Profile | null);
+          setProfile(cleanProfile(created as Profile | null));
           // New user — show onboarding unless already seen
           if (typeof window !== "undefined" && !localStorage.getItem("onboarding_seen")) {
             if (mounted) router.replace("/onboarding");
@@ -191,7 +188,7 @@ export default function DashboardPage() {
             if (mounted) router.replace("/onboarding");
             return;
           }
-          setProfile(pd);
+          setProfile(cleanProfile(pd));
         }
 
         const incoming = (incomingResult.data ?? []) as Connection[];
@@ -237,7 +234,7 @@ export default function DashboardPage() {
 
           if (relatedProfiles) {
             const mapped: Record<string, Profile> = {};
-            relatedProfiles.forEach((p: Profile) => { if (p.id) mapped[p.id] = p; });
+            cleanProfiles(relatedProfiles as Profile[]).forEach((p) => { if (p.id) mapped[p.id] = p; });
             setRequestProfiles(mapped);
           }
         }
@@ -262,7 +259,7 @@ export default function DashboardPage() {
               .from("profiles")
               .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url")
               .in("id", fromIds);
-            (fromProfiles ?? []).forEach((p: Profile) => { fromProfileMap[p.id] = p; });
+            cleanProfiles(fromProfiles as Profile[] | null).forEach((p) => { fromProfileMap[p.id] = p; });
           }
           setNotifications(
             (notifData as Notification[]).map((n) => ({
@@ -271,36 +268,6 @@ export default function DashboardPage() {
             }))
           );
         }
-        // Load applications to user's projects
-        const projects = (projectsResult.data ?? []) as Project[];
-        if (projects.length > 0) {
-          const projectIds = projects.map((p) => p.id);
-          const { data: appData } = await supabase
-            .from("applications")
-            .select("id, project_id, applicant_id, role, message, status, created_at")
-            .in("project_id", projectIds)
-            .order("created_at", { ascending: false });
-
-          if (appData && appData.length > 0) {
-            const appList = appData as Application[];
-            const applicantIds = [...new Set(appList.map((a) => a.applicant_id))];
-            const { data: applicantProfiles } = await supabase
-              .from("profiles")
-              .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url")
-              .in("id", applicantIds);
-            const profMap: Record<string, Profile> = {};
-            (applicantProfiles ?? []).forEach((p: Profile) => { profMap[p.id] = p; });
-            const projectTitleMap: Record<string, string> = {};
-            projects.forEach((p) => { projectTitleMap[p.id] = p.title ?? "Untitled Project"; });
-
-            setApplications(appList.map((a) => ({
-              ...a,
-              applicantProfile: profMap[a.applicant_id],
-              projectTitle: projectTitleMap[a.project_id],
-            })));
-          }
-        }
-
         // AI-powered project matching
         const userProfile = profileResult.data as Profile | null;
         if (userProfile) {
@@ -417,58 +384,6 @@ export default function DashboardPage() {
         return;
       }
       setIncomingRequests((prev) => prev.filter((r) => r.id !== connectionId));
-    } finally {
-      setActionLoadingId(null);
-    }
-  };
-
-  const handleAcceptApp = async (appId: string) => {
-    if (actionLoadingId) return;
-    setActionError("");
-    setActionLoadingId(appId);
-    const supabase = createClient();
-    try {
-      const app = applications.find((a) => a.id === appId);
-      const { error } = await supabase
-        .from("applications")
-        .update({ status: "accepted" })
-        .eq("id", appId);
-      if (error) { setActionError(error.message); return; }
-      setApplications((prev) => prev.map((a) => a.id === appId ? { ...a, status: "accepted" } : a));
-      if (app) {
-        await supabase.from("notifications").insert({
-          user_id: app.applicant_id,
-          type: "application_accepted" as const,
-          from_user_id: profile?.id ?? null,
-          entity_id: app.project_id,
-        });
-      }
-    } finally {
-      setActionLoadingId(null);
-    }
-  };
-
-  const handleRejectApp = async (appId: string) => {
-    if (actionLoadingId) return;
-    setActionError("");
-    setActionLoadingId(appId + "_reject");
-    const supabase = createClient();
-    try {
-      const app = applications.find((a) => a.id === appId);
-      const { error } = await supabase
-        .from("applications")
-        .update({ status: "rejected" })
-        .eq("id", appId);
-      if (error) { setActionError(error.message); return; }
-      setApplications((prev) => prev.map((a) => a.id === appId ? { ...a, status: "rejected" } : a));
-      if (app) {
-        await supabase.from("notifications").insert({
-          user_id: app.applicant_id,
-          type: "application_rejected" as const,
-          from_user_id: profile?.id ?? null,
-          entity_id: app.project_id,
-        });
-      }
     } finally {
       setActionLoadingId(null);
     }
@@ -666,66 +581,13 @@ export default function DashboardPage() {
             )}
 
             {/* Applications to your projects */}
-            {applications.length > 0 && (
-              <div style={cardStyle}>
-                <div style={cardHeaderStyle}>
-                  <h2 style={sectionLabelStyle}>APPLICATIONS</h2>
-                  <span style={badgeCountStyle}>{applications.filter((a) => a.status === "pending").length || applications.length}</span>
-                </div>
-                <div style={{ display: "grid", gap: 12 }}>
-                  {applications.map((app) => {
-                    const p = app.applicantProfile;
-                    return (
-                      <div key={app.id} style={{ ...requestRowStyle, flexDirection: "column", alignItems: "stretch", gap: 10 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                          <div style={{ ...avatarStyle, background: p ? getAvatarColor(p.id) : "#6366f1" }}>
-                            {getInitials(p)}
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={requestNameStyle}>{p?.full_name || p?.username || "Unknown"}</div>
-                            <div style={requestUniStyle}>
-                              {app.role && <span style={{ color: "var(--text-secondary)", fontWeight: 600 }}>{app.role}</span>}
-                              {app.role && (p?.university || p?.role) && " · "}
-                              {p?.university || p?.role}
-                            </div>
-                          </div>
-                          {/* Status badge */}
-                          {app.status === "accepted" && (
-                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--accent-green)", background: "var(--accent-green-glow)", border: "1px solid var(--accent-green-glow)", borderRadius: 20, padding: "3px 9px" }}>Accepted</span>
-                          )}
-                          {app.status === "rejected" && (
-                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--danger)", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 20, padding: "3px 9px" }}>Rejected</span>
-                          )}
-                        </div>
-
-                        {app.message && (
-                          <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6, margin: "0 0 0 54px", fontStyle: "italic" }}>
-                            &ldquo;{app.message.length > 120 ? app.message.slice(0, 120) + "…" : app.message}&rdquo;
-                          </p>
-                        )}
-
-                        {app.projectTitle && (
-                          <div style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 54 }}>
-                            Project: <span style={{ color: "var(--text-muted)" }}>{app.projectTitle}</span>
-                          </div>
-                        )}
-
-                        {app.status === "pending" && (
-                          <div style={{ display: "flex", gap: 8, marginLeft: 54 }}>
-                            <button type="button" disabled={!!actionLoadingId} style={{ ...acceptBtnStyle, opacity: actionLoadingId === app.id ? 0.6 : 1 }} onClick={() => handleAcceptApp(app.id)}>{actionLoadingId === app.id ? "…" : "Accept"}</button>
-                            <button type="button" disabled={!!actionLoadingId} style={{ ...declineBtnStyle, opacity: actionLoadingId === app.id + "_reject" ? 0.6 : 1 }} onClick={() => handleRejectApp(app.id)}>{actionLoadingId === app.id + "_reject" ? "…" : "Reject"}</button>
-                            {p?.username && (
-                              <Link href={`/builders/${p.username}`} style={{ ...declineBtnStyle, background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border-subtle)", textDecoration: "none" }}>
-                                View profile
-                              </Link>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+            {user && myProjects.length > 0 && (
+              <ApplicationsInbox
+                id="applications"
+                ownerId={user.id}
+                projects={myProjects.map((p) => ({ id: p.id, title: p.title }))}
+                hideWhenEmpty
+              />
             )}
 
           </div>
@@ -885,7 +747,7 @@ export default function DashboardPage() {
                       icon = "📋";
                       dotColor = "#8b5cf6";
                       text = <><strong style={{ color: "var(--text-primary)" }}>{fromName}</strong> applied to join your project</>;
-                      actionBtn = <Link href="/dashboard" style={notifActionStyle}>Review</Link>;
+                      actionBtn = <Link href={n.entity_id ? `/projects/${n.entity_id}#applications` : "/dashboard#applications"} style={notifActionStyle}>Review</Link>;
                     } else if (n.type === "application_accepted") {
                       icon = "🎉";
                       dotColor = "var(--accent-green)";

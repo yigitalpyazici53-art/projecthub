@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { privateMetadata, publicMetadata, truncate } from "@/utils/seo";
 import { createPublicClient } from "@/utils/supabase/public";
+import { cleanProfile } from "@/utils/display";
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -8,11 +9,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   const path = `/builders/${encodeURIComponent(username)}`;
 
-  const { data: builder } = await createPublicClient()
+  const { data } = await createPublicClient()
     .from("profiles")
     .select("full_name, username, university, role, bio")
     .eq("username", username)
     .maybeSingle();
+  const builder = cleanProfile(data);
 
   if (!builder) {
     return privateMetadata("Builder not found");

@@ -7,6 +7,7 @@ import SkeletonLoader from "@/components/SkeletonLoader";
 import ProjectCard from "@/components/cards/ProjectCard";
 import { Reveal } from "@/components/motion/Reveal";
 import type { Project, Profile } from "@/types";
+import { cleanProfiles } from "@/utils/display";
 
 export const dynamic = "force-dynamic";
 
@@ -135,7 +136,7 @@ export default function ProjectsPage() {
 
         if (profileResult.data) {
           const map: Record<string, Profile> = {};
-          (profileResult.data as Profile[]).forEach((p) => { map[p.id] = p; });
+          cleanProfiles(profileResult.data as Profile[]).forEach((p) => { map[p.id] = p; });
           setProfilesMap(map);
         }
 

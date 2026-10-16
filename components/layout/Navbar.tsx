@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import Logo from "@/components/Logo";
+import { cleanText } from "@/utils/display";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -30,56 +31,55 @@ const HIDDEN_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-pas
 // Defined outside Navbar so React sees a stable component type across re-renders.
 // If defined inside, React would treat it as a new type on every Navbar render,
 // unmounting and remounting the Link elements and dropping click events.
-function NavLink({ href, label, pathname, mobile = false }: { href: string; label: string; pathname: string | null; mobile?: boolean }) {
-  const isActive = pathname === href || (href !== "/dashboard" && (pathname?.startsWith(href) ?? false));
-  if (mobile) {
-    return (
-      <Link
-        href={href}
-        style={{
-          display: "block",
-          padding: "12px 16px",
-          borderRadius: 8,
-          fontFamily: "var(--font-sans)",
-          fontSize: 15,
-          fontWeight: isActive ? 600 : 400,
-          color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-          background: isActive ? "var(--surface-raised)" : "transparent",
-          textDecoration: "none",
-          transition: "background 0.15s ease, color 0.15s ease",
-        }}
-      >
-        {label}
-      </Link>
-    );
-  }
+// `exclude` keeps a section link quiet on a sub-route that has its own entry
+// (Builders stays unlit on your own profile, which "My Profile" covers).
+function NavLink({ href, label, pathname, mobile = false, exclude }: { href: string; label: string; pathname: string | null; mobile?: boolean; exclude?: string }) {
+  const isActive = pathname !== exclude && (pathname === href || (href !== "/dashboard" && href !== "/" && (pathname?.startsWith(href) ?? false)));
   return (
     <Link
       href={href}
-      className="u-link"
-      style={{
-        fontFamily: "var(--font-sans)",
-        fontSize: 14,
-        fontWeight: isActive ? 600 : 400,
-        color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-        padding: "6px 10px",
-        transition: "color 0.15s ease",
-        whiteSpace: "nowrap",
-      }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
-      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; }}
+      className={`${mobile ? "app-nav-mlink" : "app-nav-link"}${isActive ? " active" : ""}`}
+      aria-current={isActive ? "page" : undefined}
     >
       {label}
     </Link>
   );
 }
 
+// The bell merges two sources: pending connection requests (connections
+// table) and application events (notifications table).
+const APP_NOTIF_TYPES = ["application_received", "application_accepted", "application_rejected"] as const;
+type AppNotifType = (typeof APP_NOTIF_TYPES)[number];
+
 interface NotifItem {
   id: string;
-  sender_id: string;
+  kind: "connection_request" | AppNotifType;
   created_at: string;
   senderName: string | null;
   senderUsername: string | null;
+  projectId: string | null;
+  projectTitle: string | null;
+}
+
+function notifHref(n: NotifItem): string {
+  if (n.kind === "connection_request") return "/connections";
+  if (!n.projectId) return "/dashboard";
+  return n.kind === "application_received" ? `/projects/${n.projectId}#applications` : `/projects/${n.projectId}`;
+}
+
+function NotifText({ n }: { n: NotifItem }) {
+  const who = <strong>{n.senderName ?? n.senderUsername ?? "Someone"}</strong>;
+  const project = n.projectTitle ? <strong>{n.projectTitle}</strong> : "your project";
+  switch (n.kind) {
+    case "connection_request":
+      return <>{who} sent you a connection request</>;
+    case "application_received":
+      return <>{who} applied to join {project}</>;
+    case "application_accepted":
+      return <>Your application to {n.projectTitle ? <strong>{n.projectTitle}</strong> : "a project"} was <strong style={{ color: "var(--success)" }}>accepted</strong></>;
+    case "application_rejected":
+      return <>Your application to {n.projectTitle ? <strong>{n.projectTitle}</strong> : "a project"} was declined</>;
+  }
 }
 
 function timeAgoShort(iso: string): string {
@@ -122,13 +122,22 @@ function NotificationBell({ userId }: { userId: string | null }) {
     const fetchCount = async () => {
       const lastRead = localStorage.getItem(`notif_read_${userId}`) ?? "1970-01-01T00:00:00Z";
       const supabase = createClient();
-      const { count } = await supabase
-        .from("connections")
-        .select("id", { count: "exact", head: true })
-        .eq("receiver_id", userId)
-        .eq("status", "pending")
-        .gt("created_at", lastRead);
-      setUnreadCount(count ?? 0);
+      const [connRes, appRes] = await Promise.all([
+        supabase
+          .from("connections")
+          .select("id", { count: "exact", head: true })
+          .eq("receiver_id", userId)
+          .eq("status", "pending")
+          .gt("created_at", lastRead),
+        supabase
+          .from("notifications")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("read", false)
+          .in("type", APP_NOTIF_TYPES)
+          .gt("created_at", lastRead),
+      ]);
+      setUnreadCount((connRes.count ?? 0) + (appRes.count ?? 0));
     };
     fetchCount();
   }, [userId]);
@@ -139,44 +148,81 @@ function NotificationBell({ userId }: { userId: string | null }) {
     const fetchNotifs = async () => {
       setLoading(true);
       const supabase = createClient();
-      const { data: rows } = await supabase
-        .from("connections")
-        .select("id, sender_id, created_at")
-        .eq("receiver_id", userId)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(5);
+      const [connRes, appRes] = await Promise.all([
+        supabase
+          .from("connections")
+          .select("id, sender_id, created_at")
+          .eq("receiver_id", userId)
+          .eq("status", "pending")
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("notifications")
+          .select("id, type, from_user_id, entity_id, created_at")
+          .eq("user_id", userId)
+          .in("type", APP_NOTIF_TYPES)
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
+      const conns = (connRes.data ?? []) as { id: string; sender_id: string; created_at: string }[];
+      const apps = (appRes.data ?? []) as { id: string; type: AppNotifType; from_user_id: string | null; entity_id: string | null; created_at: string }[];
 
-      if (rows && rows.length > 0) {
-        const ids = (rows as { sender_id: string }[]).map((r) => r.sender_id);
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("id, full_name, username")
-          .in("id", ids);
-        const pMap: Record<string, { full_name: string | null; username: string | null }> = {};
-        ((profiles ?? []) as { id: string; full_name: string | null; username: string | null }[])
-          .forEach((p) => { pMap[p.id] = p; });
-        setNotifs(
-          (rows as { id: string; sender_id: string; created_at: string }[]).map((r) => ({
-            id: r.id,
-            sender_id: r.sender_id,
-            created_at: r.created_at,
-            senderName: pMap[r.sender_id]?.full_name ?? null,
-            senderUsername: pMap[r.sender_id]?.username ?? null,
-          }))
-        );
-      } else {
-        setNotifs([]);
-      }
+      const profileIds = [...new Set([
+        ...conns.map((c) => c.sender_id),
+        ...apps.map((a) => a.from_user_id).filter((x): x is string => Boolean(x)),
+      ])];
+      const projectIds = [...new Set(apps.map((a) => a.entity_id).filter((x): x is string => Boolean(x)))];
+      const [profRes, projRes] = await Promise.all([
+        profileIds.length > 0
+          ? supabase.from("profiles").select("id, full_name, username").in("id", profileIds)
+          : Promise.resolve({ data: [] }),
+        projectIds.length > 0
+          ? supabase.from("projects").select("id, title").in("id", projectIds)
+          : Promise.resolve({ data: [] }),
+      ]);
+      const pMap: Record<string, { full_name: string | null; username: string | null }> = {};
+      ((profRes.data ?? []) as { id: string; full_name: string | null; username: string | null }[])
+        .forEach((p) => { pMap[p.id] = { full_name: cleanText(p.full_name), username: p.username }; });
+      const projMap: Record<string, string | null> = {};
+      ((projRes.data ?? []) as { id: string; title: string | null }[]).forEach((p) => { projMap[p.id] = p.title; });
+
+      const items: NotifItem[] = [
+        ...conns.map((c) => ({
+          id: `c_${c.id}`,
+          kind: "connection_request" as const,
+          created_at: c.created_at,
+          senderName: pMap[c.sender_id]?.full_name ?? null,
+          senderUsername: pMap[c.sender_id]?.username ?? null,
+          projectId: null,
+          projectTitle: null,
+        })),
+        ...apps.map((a) => ({
+          id: `n_${a.id}`,
+          kind: a.type,
+          created_at: a.created_at,
+          senderName: a.from_user_id ? pMap[a.from_user_id]?.full_name ?? null : null,
+          senderUsername: a.from_user_id ? pMap[a.from_user_id]?.username ?? null : null,
+          projectId: a.entity_id,
+          projectTitle: a.entity_id ? projMap[a.entity_id] ?? null : null,
+        })),
+      ];
+      items.sort((x, y) => y.created_at.localeCompare(x.created_at));
+      setNotifs(items.slice(0, 8));
       setLoading(false);
     };
     fetchNotifs();
   }, [open, userId]);
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
     if (!userId) return;
     localStorage.setItem(`notif_read_${userId}`, new Date().toISOString());
     setUnreadCount(0);
+    await createClient()
+      .from("notifications")
+      .update({ read: true })
+      .eq("user_id", userId)
+      .eq("read", false)
+      .in("type", APP_NOTIF_TYPES);
   };
 
   if (!userId) return null;
@@ -259,14 +305,14 @@ function NotificationBell({ userId }: { userId: string | null }) {
                 <BellSVG />
               </div>
               <p style={{ color: "var(--text-secondary)", fontSize: 13, fontWeight: 500, margin: 0 }}>No notifications yet</p>
-              <p style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 6 }}>Connection requests will appear here.</p>
+              <p style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 6 }}>Connection requests and application updates will appear here.</p>
             </div>
           ) : (
             <div style={{ maxHeight: 280, overflowY: "auto" }}>
               {notifs.map((n) => (
                 <Link
                   key={n.id}
-                  href="/connections"
+                  href={notifHref(n)}
                   onClick={() => setOpen(false)}
                   style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "11px 14px", borderBottom: "1px solid var(--border-subtle)", textDecoration: "none" }}
                   onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "var(--surface-raised)"}
@@ -277,7 +323,7 @@ function NotificationBell({ userId }: { userId: string | null }) {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, color: "var(--text-primary)", margin: 0, lineHeight: 1.4 }}>
-                      <strong>{n.senderName ?? n.senderUsername ?? "Someone"}</strong>{" "}sent you a connection request
+                      <NotifText n={n} />
                     </p>
                     <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "3px 0 0" }}>{timeAgoShort(n.created_at)}</p>
                   </div>
@@ -289,8 +335,8 @@ function NotificationBell({ userId }: { userId: string | null }) {
 
           {/* Footer */}
           <div style={{ padding: "10px 14px", borderTop: "1px solid var(--border-subtle)" }}>
-            <Link href="/connections" onClick={() => setOpen(false)} className="u-link" style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>
-              View all connection requests →
+            <Link href="/dashboard" onClick={() => setOpen(false)} className="u-link" style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>
+              View all notifications →
             </Link>
           </div>
         </div>
@@ -325,8 +371,8 @@ export default function Navbar() {
         .eq("id", uid)
         .maybeSingle();
       setUsername(profile?.username ?? null);
-      setFullName(profile?.full_name ?? null);
-      setUniversity(profile?.university ?? null);
+      setFullName(cleanText(profile?.full_name));
+      setUniversity(cleanText(profile?.university));
     };
 
     // Immediately read session so the nav renders on mount
@@ -361,6 +407,8 @@ export default function Navbar() {
 
   if (pathname && HIDDEN_ROUTES.includes(pathname)) return null;
 
+  const myProfilePath = username ? `/builders/${username}` : undefined;
+
   return (
     <>
       <nav
@@ -373,18 +421,15 @@ export default function Navbar() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          borderBottom: "1px solid var(--border)",
-          background: "rgba(250,250,248,0.85)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
         }}
+        className="app-nav"
       >
         {/* Logo */}
         <Logo size="md" tone="dark" style={{ flexShrink: 0 }} />
 
         {/* Desktop nav items */}
         <div className="nav-desktop-items" style={{ alignItems: "center", gap: 4 }}>
-          {(userId ? navItems : publicNavItems).map(item => <NavLink key={item.href} href={item.href} label={item.label} pathname={pathname} />)}
+          {(userId ? navItems : publicNavItems).map(item => <NavLink key={item.href} href={item.href} label={item.label} pathname={pathname} exclude={item.href === "/builders" ? myProfilePath : undefined} />)}
         </div>
 
         {/* Right side */}
@@ -394,14 +439,10 @@ export default function Navbar() {
           <div className="nav-desktop-items" style={{ alignItems: "center", gap: 8 }}>
             {userId ? (
               <>
-                <Link href="/projects/new" className="btn-primary" style={{ padding: "8px 16px", fontSize: 13 }}>
+                <Link href="/projects/new" className="app-nav-cta">
                   + Add project
                 </Link>
-                {username && (
-                  <Link href={`/builders/${username}`} className="btn-ghost" style={{ fontSize: 13 }}>
-                    My Profile
-                  </Link>
-                )}
+                {myProfilePath && <NavLink href={myProfilePath} label="My Profile" pathname={pathname} />}
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -417,7 +458,7 @@ export default function Navbar() {
                 <Link href="/login" className="btn-ghost" style={{ fontSize: 13 }}>
                   Sign in
                 </Link>
-                <Link href="/signup" className="btn-primary" style={{ padding: "8px 18px", fontSize: 13 }}>
+                <Link href="/signup" className="app-nav-cta">
                   Create your profile
                 </Link>
               </>
@@ -440,15 +481,7 @@ export default function Navbar() {
 
       {/* Overlay — dims content behind the mobile menu */}
       {menuOpen && (
-        <div
-          style={{
-            position: "fixed", inset: 0,
-            background: "rgba(26,26,24,0.28)",
-            zIndex: 98,
-            animation: "fade-in 0.2s ease",
-          }}
-          onClick={() => setMenuOpen(false)}
-        />
+        <div className="app-nav-overlay" onClick={() => setMenuOpen(false)} />
       )}
 
       {/* Mobile slide-in menu from left */}
@@ -501,7 +534,7 @@ export default function Navbar() {
           </div>
         )}
 
-        {(userId ? navItems : publicNavItems).map(item => <NavLink key={item.href} href={item.href} label={item.label} pathname={pathname} mobile />)}
+        {(userId ? navItems : publicNavItems).map(item => <NavLink key={item.href} href={item.href} label={item.label} pathname={pathname} mobile exclude={item.href === "/builders" ? myProfilePath : undefined} />)}
 
         <div style={{
           marginTop: 12, paddingTop: 12,
@@ -511,18 +544,10 @@ export default function Navbar() {
         }}>
           {userId ? (
             <>
-              <Link href="/projects/new" className="btn-primary" style={{ justifyContent: "center" }}>
+              <Link href="/projects/new" className="app-nav-cta" style={{ padding: "12px 16px", fontSize: 14 }}>
                 + Add project
               </Link>
-              {username && (
-                <Link href={`/builders/${username}`} style={{
-                  display: "block", padding: "12px 16px", borderRadius: 8,
-                  fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 400,
-                  color: "var(--text-secondary)", textDecoration: "none",
-                }}>
-                  My Profile
-                </Link>
-              )}
+              {myProfilePath && <NavLink href={myProfilePath} label="My Profile" pathname={pathname} mobile />}
               <button
                 type="button"
                 onClick={handleLogout}
@@ -543,7 +568,7 @@ export default function Navbar() {
               <Link href="/login" className="btn-secondary" style={{ flex: 1, justifyContent: "center" }}>
                 Sign in
               </Link>
-              <Link href="/signup" className="btn-primary" style={{ flex: 1, justifyContent: "center" }}>
+              <Link href="/signup" className="app-nav-cta" style={{ flex: 1, padding: "10px 12px" }}>
                 Create profile
               </Link>
             </div>

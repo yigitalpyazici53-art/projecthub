@@ -7,6 +7,8 @@ import { createClient } from "@/utils/supabase/client";
 import { getInitials } from "@/utils/getInitials";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import type { Project, ProjectUpdate } from "@/types";
+import { cleanProfile } from "@/utils/display";
+import ApplicationsInbox from "@/components/ApplicationsInbox";
 
 interface OwnerProfile {
   username: string | null;
@@ -581,7 +583,7 @@ export default function ProjectDetailPage({ params }: Props) {
             .order("created_at", { ascending: false }),
         ]);
 
-        setOwnerProfile((profileResult.data ?? null) as OwnerProfile | null);
+        setOwnerProfile(cleanProfile(profileResult.data as OwnerProfile | null));
         setSimilarProjects(((similarResult.data ?? []) as Project[]));
         setUpdates((updatesResult.data ?? []) as ProjectUpdate[]);
         setUpdatesLoading(false);
@@ -779,6 +781,15 @@ export default function ProjectDetailPage({ params }: Props) {
               <p style={descStyle}>{project.description || project.tagline || "No description provided yet."}</p>
             </div>
 
+            {/* Applications — owner only */}
+            {appStatus === "owner" && project.owner_id && (
+              <ApplicationsInbox
+                id="applications"
+                ownerId={project.owner_id}
+                projects={[{ id: project.id, title: project.title }]}
+              />
+            )}
+
             {/* Project updates */}
             <div style={sectionCardStyle} className="project-section-card">
               <h2 style={sectionTitleStyle}><span className="label-caps" style={{ fontSize: 12 }}>Project updates</span></h2>
@@ -953,7 +964,7 @@ export default function ProjectDetailPage({ params }: Props) {
                         </svg>
                         Edit Project
                       </Link>
-                      <Link href="/dashboard" style={ownerActionSecondaryStyle}>
+                      <a href="#applications" style={ownerActionSecondaryStyle}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                           <circle cx="9" cy="7" r="4"/>
@@ -961,7 +972,7 @@ export default function ProjectDetailPage({ params }: Props) {
                           <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                         View Applicants
-                      </Link>
+                      </a>
                     </div>
 
                     {/* Delete project */}

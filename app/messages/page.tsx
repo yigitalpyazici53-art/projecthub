@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getInitials } from "@/utils/getInitials";
 import type { Profile, Message } from "@/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { cleanProfiles } from "@/utils/display";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -93,7 +94,7 @@ function MessagesInner() {
 
     // Get last message and unread count per conversation
     const convList: Conversation[] = await Promise.all(
-      (profiles as Profile[]).map(async (partner) => {
+      cleanProfiles(profiles as Profile[]).map(async (partner) => {
         const { data: msgs } = await supabase
           .from("messages")
           .select("content, created_at, read, sender_id")

@@ -19,6 +19,7 @@ export type Database = {
           is_ai_generated: boolean;
           is_seed: boolean;
           onboarding_completed_at: string | null;
+          email_notifications: boolean;
         };
         Insert: {
           id: string;
@@ -37,6 +38,7 @@ export type Database = {
           is_ai_generated?: boolean;
           is_seed?: boolean;
           onboarding_completed_at?: string | null;
+          email_notifications?: boolean;
         };
         Update: {
           id?: string;
@@ -55,6 +57,7 @@ export type Database = {
           is_ai_generated?: boolean;
           is_seed?: boolean;
           onboarding_completed_at?: string | null;
+          email_notifications?: boolean;
         };
         Relationships: [];
       };
@@ -328,6 +331,10 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      unsubscribe_email: {
+        Args: { p_user: string; p_token: string };
+        Returns: boolean;
+      };
       get_public_stats: {
         Args: Record<string, never>;
         Returns: {

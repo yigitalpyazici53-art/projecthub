@@ -22,6 +22,8 @@ export type Profile = {
   is_seed?: boolean;
   /** Null until the user finishes or skips /onboarding. */
   onboarding_completed_at?: string | null;
+  /** Email notifications on/off (default on). Turned off from settings or a one-click unsubscribe link. */
+  email_notifications?: boolean;
 };
 
 export type Project = {

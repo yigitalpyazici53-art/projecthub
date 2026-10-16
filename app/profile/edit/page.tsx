@@ -32,6 +32,8 @@ export default function ProfileEditPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [originalUsername, setOriginalUsername] = useState<string | null>(null);
+  const [emailSaving, setEmailSaving] = useState(false);
+  const [emailMsg, setEmailMsg] = useState("");
   const [profile, setProfile] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -90,6 +92,28 @@ export default function ProfileEditPage() {
     setAvatarUploading(false);
     setSaveMsg("Avatar updated!");
     setTimeout(() => setSaveMsg(""), 3000);
+  };
+
+  const emailOn = profile.email_notifications !== false;
+
+  // Links from emails land on #notifications; the section only exists once
+  // the profile has loaded, so the browser's own anchor jump misses it.
+  useEffect(() => {
+    if (!loading && window.location.hash === "#notifications") {
+      document.getElementById("notifications")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [loading]);
+
+  const toggleEmail = async () => {
+    if (!user || emailSaving) return;
+    const next = !emailOn;
+    setEmailSaving(true);
+    setEmailMsg("");
+    const { error } = await createClient().from("profiles").update({ email_notifications: next }).eq("id", user.id);
+    setEmailSaving(false);
+    if (error) { setEmailMsg("Could not save: " + error.message); return; }
+    setProfile(prev => ({ ...prev, email_notifications: next }));
+    setEmailMsg(next ? "Email notifications are on." : "Email notifications are off.");
   };
 
   const handleSave = async () => {
@@ -388,6 +412,50 @@ export default function ProfileEditPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Email notifications — saves on toggle, independent of "Save" */}
+            <div id="notifications" style={{ ...cardStyle, scrollMarginTop: 96 }}>
+              <h2 style={sectionTitleStyle}>✉️ Email notifications</h2>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+                <p style={{ ...helpTextStyle, margin: 0 }}>
+                  Email me about connection requests, applications and new messages.
+                  At most one email per type per hour.
+                </p>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={emailOn}
+                  aria-label="Email notifications"
+                  onClick={toggleEmail}
+                  disabled={emailSaving}
+                  style={{
+                    flexShrink: 0,
+                    width: 46,
+                    height: 26,
+                    borderRadius: 999,
+                    border: "1px solid var(--border)",
+                    background: emailOn ? "var(--accent)" : "var(--surface-raised)",
+                    position: "relative",
+                    cursor: emailSaving ? "default" : "pointer",
+                    opacity: emailSaving ? 0.6 : 1,
+                    transition: "background 0.15s ease",
+                    padding: 0,
+                  }}
+                >
+                  <span style={{
+                    position: "absolute",
+                    top: 2,
+                    left: emailOn ? 22 : 2,
+                    width: 20,
+                    height: 20,
+                    borderRadius: "50%",
+                    background: "#FFFFFF",
+                    transition: "left 0.15s ease",
+                  }} />
+                </button>
+              </div>
+              {emailMsg && <p style={{ ...helpTextStyle, marginTop: 10, marginBottom: 0 }}>{emailMsg}</p>}
             </div>
 
             {/* Availability */}

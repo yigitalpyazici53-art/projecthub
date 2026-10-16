@@ -38,7 +38,6 @@ export default function Footer() {
           {[
             { label: "Terms", href: "/terms" },
             { label: "Privacy", href: "/privacy" },
-            { label: "GitHub", href: "https://github.com" },
           ].map((item) => (
             <Link
               key={item.label}

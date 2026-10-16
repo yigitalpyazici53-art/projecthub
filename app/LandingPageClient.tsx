@@ -435,7 +435,6 @@ export default function LandingPage({
             <div style={{ display: "flex", gap: 24 }}>
               <Link href="/terms" className="lp-link-sm">Terms</Link>
               <Link href="/privacy" className="lp-link-sm">Privacy</Link>
-              <a href="https://github.com" target="_blank" rel="noreferrer" className="lp-link-sm">GitHub</a>
             </div>
           </div>
         </footer>

@@ -18,25 +18,32 @@ const SIZES = {
 };
 
 function LogoIcon({ px, tone }: { px: number; tone: "light" | "dark" }) {
-  const plate = tone === "dark" ? "#8B5CF6" : "#1A1A18";
-  const ink = "#FAFAF8";
+  // Same geometry as public/logo-mark.svg. The "P" is light on dark
+  // backgrounds; on the (currently unused) light tone it switches to ink.
+  const ink = tone === "dark" ? "#FAFAFA" : "#1A1A18";
   return (
     <svg
       width={px}
       height={px}
-      viewBox="0 0 28 28"
+      viewBox="-24 -24 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       style={{ flexShrink: 0 }}
       aria-hidden="true"
     >
-      <rect width="28" height="28" rx="7" fill={plate} />
-      <line x1="9" y1="10" x2="19" y2="10" stroke={ink} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="9" y1="10" x2="14" y2="20" stroke={ink} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="19" y1="10" x2="14" y2="20" stroke={ink} strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="9" cy="10" r="2.5" fill={ink} />
-      <circle cx="19" cy="10" r="2.5" fill={ink} />
-      <circle cx="14" cy="20" r="2.5" fill={ink} />
+      <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="none" stroke="#8B5CF6" strokeWidth="1.8" />
+      <polygon points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="#8B5CF6" opacity="0.15" />
+      <text
+        x="0"
+        y="5"
+        textAnchor="middle"
+        fontFamily="Inter, system-ui, -apple-system, sans-serif"
+        fontSize="17"
+        fill={ink}
+        fontWeight="600"
+      >
+        P
+      </text>
     </svg>
   );
 }

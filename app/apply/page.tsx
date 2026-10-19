@@ -357,7 +357,7 @@ export default function ApplyPage() {
                       type="email"
                       value={form.email}
                       onChange={field("email")}
-                      placeholder="you@university.edu"
+                      placeholder="you@email.com"
                       required
                       style={inp}
                     />

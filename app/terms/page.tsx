@@ -118,7 +118,7 @@ export default function TermsPage() {
           <ul style={ulStyle}>
             <li>Spam other users, send unsolicited bulk messages, or mass-send connection requests.</li>
             <li>Harass, bully, threaten, or discriminate against anyone on the platform.</li>
-            <li>Impersonate another person, organization, or university.</li>
+            <li>Impersonate another person, organization, school, or university.</li>
             <li>Post illegal, abusive, hateful, sexual, or deliberately misleading content.</li>
             <li>Scrape, crawl, or abuse the platform with automated tools.</li>
             <li>Attempt to break security, bypass access controls, or disrupt the service.</li>

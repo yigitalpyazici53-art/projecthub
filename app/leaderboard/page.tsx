@@ -403,12 +403,12 @@ export default function LeaderboardPage() {
 
         {/* Top Universities */}
         <div className="animate-fade-up animate-delay-2" style={{ ...cardStyle, marginTop: 20 }}>
-          <h2 style={sectionTitleStyle}>Top Universities</h2>
+          <h2 style={sectionTitleStyle}>Top Schools</h2>
 
           {loading ? (
             <div style={{ padding: "24px 0", textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>Loading…</div>
           ) : universities.length === 0 ? (
-            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>No university data yet.</p>
+            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>No school data yet.</p>
           ) : (
             <div style={{ display: "grid", gap: 14 }}>
               {universities.map((uni, idx) => {

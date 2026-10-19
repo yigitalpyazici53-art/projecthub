@@ -201,8 +201,8 @@ function Navbar() {
 // ─── Profile preview (hardcoded realistic example) ────────────────────────────
 
 const PREVIEW_PROJECTS = [
-  { title: "StudySync", desc: "AI-powered study group matcher", year: "2026", stage: "shipped" },
-  { title: "CampusEats", desc: "Food delivery for dorms", year: "2025", stage: "shipped" },
+  { title: "StudySync", desc: "AI study group matcher", year: "2026", stage: "shipped" },
+  { title: "Science Fair Tracker", desc: "Project log for the school fair", year: "2025", stage: "shipped" },
 ];
 
 const PREVIEW_SKILLS = [
@@ -218,7 +218,7 @@ function ProfilePreview() {
         <span className="lp-preview-avatar">ED</span>
         <div>
           <div className="font-serif lp-preview-name">Elif Demir</div>
-          <div className="lp-caps" style={{ marginTop: 4 }}>Boğaziçi University · Full-stack Developer</div>
+          <div className="lp-caps" style={{ marginTop: 4 }}>Robert College · High school · Full-stack Developer</div>
         </div>
         <span className="lp-pill lp-pill-shipped" style={{ marginLeft: "auto" }}>2 shipped</span>
       </div>
@@ -308,7 +308,7 @@ const HOW_IT_WORKS = [
   {
     num: "1",
     title: "Create your builder profile",
-    desc: "Add your skills, university, and links. Your profile is the single page that shows what you can actually do.",
+    desc: "Add your skills, school, and links. Your profile is the single page that shows what you can actually do.",
   },
   {
     num: "2",
@@ -356,6 +356,15 @@ export default function LandingPage({
             >
               The portfolio platform for student builders. Ship projects, collect
               endorsements, share your proof-of-work profile.
+            </motion.p>
+
+            <motion.p
+              className="font-serif lp-hero-belong"
+              initial={reduced ? false : { opacity: 0, y: 20 }}
+              animate={reduced ? undefined : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: EASE, delay: 0.85 }}
+            >
+              High school or university — if you build, you belong here.
             </motion.p>
 
             <motion.div
@@ -575,6 +584,10 @@ export default function LandingPage({
         }
         .lp-hero-sub {
           font-size: 18px; line-height: 1.65; color: #94A3B8;
+          max-width: 560px; margin: 0 auto 16px;
+        }
+        .lp-hero-belong {
+          font-size: 17px; font-style: italic; line-height: 1.5; color: #C4B5FD;
           max-width: 560px; margin: 0 auto 40px;
         }
         .lp-hero-actions {

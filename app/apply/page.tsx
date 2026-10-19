@@ -362,12 +362,12 @@ export default function ApplyPage() {
                       style={inp}
                     />
                   </Field>
-                  <Field label="University">
+                  <Field label="School or university">
                     <input
                       type="text"
                       value={form.university}
                       onChange={field("university")}
-                      placeholder="e.g. MIT, Boğaziçi University"
+                      placeholder="e.g. Robert College, Boğaziçi University"
                       style={inp}
                     />
                   </Field>

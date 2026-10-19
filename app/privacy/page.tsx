@@ -108,7 +108,7 @@ export default function PrivacyPage() {
           <ul style={ulStyle}>
             <li>Your email address (used for sign-in and essential account messages).</li>
             <li>
-              Profile information you provide &mdash; full name, username, university, role,
+              Profile information you provide &mdash; full name, username, school, role,
               bio, skills, interests, and links (GitHub, LinkedIn, portfolio, avatar).
             </li>
             <li>Projects you post, including title, description, tech stack, and roles you&apos;re looking for.</li>

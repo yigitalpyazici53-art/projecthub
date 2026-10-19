@@ -292,7 +292,7 @@ export default function SignupPage() {
               <Logo size="lg" gradient tone="dark" />
             </div>
             <h1 style={titleStyle}>Create your account</h1>
-            <p style={subtitleStyle}>Connect with builders at your university</p>
+            <p style={subtitleStyle}>Connect with builders at your school or university</p>
           </div>
 
           <button

@@ -17,7 +17,6 @@ export type Profile = {
   portfolio_url?: string | null;
   avatar_url?: string | null;
   created_at?: string;
-  is_ai_generated?: boolean;
   /** Example account (auth email @seed.ph.internal). Set by a DB trigger, read-only. */
   is_seed?: boolean;
   /** Null until the user finishes or skips /onboarding. */
@@ -37,7 +36,6 @@ export type Project = {
   looking_for: string | null;
   tech_stack: string | null;
   created_at: string;
-  is_ai_generated?: boolean;
   /** Owned by an example account. Set by a DB trigger, read-only. */
   is_seed?: boolean;
   /** The project's main link (repo, demo or site). http(s) only, enforced by a DB check. */

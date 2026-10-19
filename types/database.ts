@@ -16,7 +16,6 @@ export type Database = {
           portfolio_url: string | null;
           avatar_url: string | null;
           created_at: string;
-          is_ai_generated: boolean;
           is_seed: boolean;
           onboarding_completed_at: string | null;
           email_notifications: boolean;
@@ -35,7 +34,6 @@ export type Database = {
           portfolio_url?: string | null;
           avatar_url?: string | null;
           created_at?: string;
-          is_ai_generated?: boolean;
           is_seed?: boolean;
           onboarding_completed_at?: string | null;
           email_notifications?: boolean;
@@ -54,7 +52,6 @@ export type Database = {
           portfolio_url?: string | null;
           avatar_url?: string | null;
           created_at?: string;
-          is_ai_generated?: boolean;
           is_seed?: boolean;
           onboarding_completed_at?: string | null;
           email_notifications?: boolean;
@@ -73,7 +70,6 @@ export type Database = {
           looking_for: string | null;
           tech_stack: string | null;
           created_at: string;
-          is_ai_generated: boolean;
           is_seed: boolean;
           link_url: string | null;
         };
@@ -88,7 +84,6 @@ export type Database = {
           looking_for?: string | null;
           tech_stack?: string | null;
           created_at?: string;
-          is_ai_generated?: boolean;
           is_seed?: boolean;
           link_url?: string | null;
         };
@@ -103,7 +98,6 @@ export type Database = {
           looking_for?: string | null;
           tech_stack?: string | null;
           created_at?: string;
-          is_ai_generated?: boolean;
           is_seed?: boolean;
           link_url?: string | null;
         };

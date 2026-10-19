@@ -29,8 +29,9 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 });
 
 // ── Seed data ─────────────────────────────────────────────────────────────────
-// All seed records carry is_ai_generated = true so they can be identified
-// and cleared without ever touching real user data.
+// Seed accounts use the @seed.ph.internal email domain. A database trigger
+// derives is_seed from it (profiles, and projects via their owner), so seed
+// records can be identified and cleared without touching real user data.
 
 const SEED_DOMAIN = "@seed.ph.internal";
 
@@ -608,7 +609,6 @@ async function seedProfiles(authCache: Map<string, string>): Promise<string[]> {
           linkedin_url: null,
           portfolio_url: null,
           avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(fields.full_name)}`,
-          is_ai_generated: true,
           created_at: withinLastDays(i, SEED_PROFILES.length),
         },
         { onConflict: "id" }
@@ -645,7 +645,7 @@ async function seedProjects(ownerIds: string[]): Promise<void> {
       .from("projects")
       .select("id")
       .eq("title", proj.title)
-      .eq("is_ai_generated", true)
+      .eq("is_seed", true)
       .maybeSingle();
 
     if (checkErr) {
@@ -660,7 +660,6 @@ async function seedProjects(ownerIds: string[]): Promise<void> {
     const { error } = await supabase.from("projects").insert({
       ...proj,
       owner_id: ownerIds[i % ownerIds.length],
-      is_ai_generated: true,
       created_at: withinLastDays(i, SEED_PROJECTS.length),
     });
 
@@ -673,17 +672,17 @@ async function seedProjects(ownerIds: string[]): Promise<void> {
 }
 
 // ── Clear runner ──────────────────────────────────────────────────────────────
-// Deletes ONLY rows where is_ai_generated = true. Real user data is untouched.
+// Deletes ONLY rows where is_seed = true. Real user data is untouched.
 
 async function clearSeedData(): Promise<void> {
-  console.log("\n🧹  Clearing seed data (is_ai_generated = true)…\n");
+  console.log("\n🧹  Clearing seed data (is_seed = true)…\n");
   console.log("    Real user data will NOT be touched.\n");
 
   // 1. Seeded projects
   const { error: projErr, count: projCount } = await supabase
     .from("projects")
     .delete({ count: "exact" })
-    .eq("is_ai_generated", true);
+    .eq("is_seed", true);
   if (projErr) console.error(`  ✗  projects: ${projErr.message}`);
   else console.log(`  ✓  Deleted ${projCount ?? 0} project(s)`);
 
@@ -691,14 +690,14 @@ async function clearSeedData(): Promise<void> {
   const { data: seededProfiles } = await supabase
     .from("profiles")
     .select("id")
-    .eq("is_ai_generated", true);
+    .eq("is_seed", true);
   const seedIds = (seededProfiles ?? []).map((p: { id: string }) => p.id);
 
   if (seedIds.length > 0) {
     const { error: profErr, count: profCount } = await supabase
       .from("profiles")
       .delete({ count: "exact" })
-      .eq("is_ai_generated", true);
+      .eq("is_seed", true);
     if (profErr) console.error(`  ✗  profiles: ${profErr.message}`);
     else console.log(`  ✓  Deleted ${profCount ?? 0} profile(s)`);
   }
@@ -740,7 +739,7 @@ async function main() {
   const { data: preSeeded } = await supabase
     .from("profiles")
     .select("id")
-    .eq("is_ai_generated", true);
+    .eq("is_seed", true);
   const preExistingIds = (preSeeded ?? []).map((p: { id: string }) => p.id);
 
   const newIds = await seedProfiles(authCache);
@@ -752,8 +751,8 @@ async function main() {
 ✅  Seed complete!
 
 Verify in Supabase dashboard:
-  → Table Editor → profiles  (filter is_ai_generated = true → should show 25 rows)
-  → Table Editor → projects  (filter is_ai_generated = true → should show 20 rows)
+  → Table Editor → profiles  (filter is_seed = true → should show 25 rows)
+  → Table Editor → projects  (filter is_seed = true → should show 20 rows)
 
 Verify in the browser (run npm run dev first):
   → /builders  (should show 25 builder cards spread across the last 14 days)

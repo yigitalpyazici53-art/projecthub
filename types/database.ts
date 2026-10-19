@@ -335,6 +335,10 @@ export type Database = {
         Args: { p_user: string; p_token: string };
         Returns: boolean;
       };
+      health_report: {
+        Args: { p_token: string };
+        Returns: { stale_queued_emails: number } | null;
+      };
       get_public_stats: {
         Args: Record<string, never>;
         Returns: {

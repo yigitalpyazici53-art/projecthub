@@ -3,7 +3,7 @@
  * Bump it when any of them changes materially: every account is then asked
  * once more on its next visit (/consent).
  */
-export const POLICY_VERSION = "2026-10-30";
+export const POLICY_VERSION = "2026-10-30.2";
 export const POLICY_UPDATED = "October 30, 2026";
 export const POLICY_UPDATED_TR = "30 Ekim 2026";
 

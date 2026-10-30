@@ -45,7 +45,9 @@ function ConsentInner() {
     const { error: err } = await supabase.rpc("record_consent", { p_version: POLICY_VERSION, p_source: "reconsent" });
     if (err) { setError(`Could not save: ${err.message}`); setSaving(false); return; }
     markConsentOk(user.id);
-    router.replace(await postAuthPath(supabase, next));
+    // Full navigation: the client router may still hold the proxy's earlier
+    // redirect of `next` back to /consent.
+    window.location.replace(await postAuthPath(supabase, next));
   };
 
   const handleSignOut = async () => {

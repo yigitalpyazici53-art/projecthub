@@ -87,8 +87,10 @@ export default function PrivacyPage() {
 
       <Section title="5. Emails">
         <P>
-          We send sign-in codes and password reset emails, and notification emails about activity on your account
-          (connection requests and acceptances, applications and their outcome, new messages). These are service
+          We send sign-in codes, signup confirmation, password reset and email change emails, and notification
+          emails about activity on your account (connection requests and acceptances, applications and their
+          outcome, new messages). All of them are sent from noreply@projecthubstudents.com through our email
+          provider Resend (USA), which processes your email address and the content of the email. These are service
           emails, not marketing. You can turn notification emails off in your profile settings or with the
           unsubscribe link in every email; sign-in and security emails can&apos;t be turned off. We don&apos;t send
           marketing emails.
@@ -114,7 +116,7 @@ export default function PrivacyPage() {
           rows={[
             ["Supabase, Inc.", "Database, authentication, file storage, background functions", "Company in the USA; your data is stored in the EU (AWS eu-west-1, Ireland)"],
             ["Vercel, Inc.", "Website hosting; server functions", "Company in the USA; server functions run in Dublin, Ireland (dub1); pages are delivered through a global network"],
-            ["Resend, Inc.", "Sending notification emails (your email address, the email's content)", "USA"],
+            ["Resend, Inc.", "Sending all our emails: sign-in codes and links, signup confirmation, password reset, email change, and notification emails (your email address, the email's content)", "USA"],
             ["Google LLC / Google Ireland Ltd.", "Google Analytics, only if you accept analytics cookies; Google sign-in, only if you use it", "USA and other countries"],
           ]}
         />
@@ -123,10 +125,23 @@ export default function PrivacyPage() {
           requires it.
         </P>
         <P>
-          <strong>Transfers abroad.</strong> Because these providers are based in, or may access data from, countries
-          outside Türkiye (the EU and the USA), using them involves a transfer of personal data abroad. We carry out
-          these transfers under the safeguards set out in Article 9 of the KVKK (such as standard contracts) and the
-          providers&apos; data processing terms. You can ask us for details of the safeguards for each provider.
+          <strong>Transfers abroad.</strong> Using these providers means your personal data is transferred outside
+          Türkiye: to Ireland (EU) for Supabase and Vercel, and to the USA for Resend and Google, and potentially
+          to the USA for Supabase and Vercel too, as US companies that may access the data. The table above lists
+          which provider receives which data and why.
+        </P>
+        <P>
+          For Google Analytics the transfer is based on your explicit consent, given in the cookie banner (KVKK Art.
+          9(6)(a)). The other transfers are necessary to provide the service you signed up for (KVKK Art. 9(6)(b)).
+          This exception is meant for transfers that are not regular or repeated. For ongoing transfers, the KVKK
+          expects standard contracts notified to the Personal Data Protection Authority. We have not yet signed
+          KVKK standard contracts with these providers or notified the Authority; we will update this policy when
+          we do.
+        </P>
+        <P>
+          Supabase, Vercel and Resend each have a data processing agreement that forms part of their terms of
+          service and incorporates the European Commission&apos;s Standard Contractual Clauses (2021/914). These
+          are the providers&apos; EU-law safeguards. They are not KVKK standard contracts.
         </P>
       </Section>
 

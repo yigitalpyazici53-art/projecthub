@@ -74,13 +74,30 @@ export default function KvkkPage() {
           rows={[
             ["Supabase, Inc.", "Veritabanı, kimlik doğrulama, dosya depolama", "ABD merkezli şirket; veriler AB'de (İrlanda, AWS eu-west-1) saklanır"],
             ["Vercel, Inc.", "Web sitesi barındırma ve sunucu fonksiyonları", "ABD merkezli şirket; sunucu fonksiyonları Dublin, İrlanda'da çalışır; sayfalar küresel bir ağ üzerinden iletilir"],
-            ["Resend, Inc.", "Bildirim e-postalarının gönderimi", "ABD"],
+            ["Resend, Inc.", "Tüm e-postaların gönderimi: giriş kodu ve bağlantısı, kayıt onayı, şifre sıfırlama, e-posta değişikliği ve bildirim e-postaları (e-posta adresiniz ve e-postanın içeriği işlenir). Gönderen adres: noreply@projecthubstudents.com", "ABD"],
             ["Google LLC / Google Ireland Ltd.", "Google Analytics (yalnızca açık rızayla) ve Google ile giriş (yalnızca kullanırsanız)", "ABD ve diğer ülkeler"],
           ]}
         />
         <P>
-          Bu sağlayıcılar Türkiye dışında bulunduğundan, aktarımlar KVKK&apos;nın 9. maddesinde öngörülen uygun
-          güvenceler (standart sözleşme gibi) ve sağlayıcıların veri işleme koşulları çerçevesinde yapılır.
+          Bu sağlayıcıları kullandığımız için kişisel verileriniz <strong>yurt dışına</strong> aktarılır:
+          Supabase ve Vercel için İrlanda&apos;ya (AB), Resend ve Google için ABD&apos;ye. Supabase ve Vercel ABD
+          merkezli şirketler olduğundan, verilere ABD&apos;den erişilmesi de mümkündür. Hangi sağlayıcıya hangi
+          verinin hangi amaçla aktarıldığı yukarıdaki tabloda yer alır.
+        </P>
+        <P>
+          Yurt dışına aktarım KVKK m.9 kapsamında yapılır. Google Analytics için aktarım açık rızanıza dayanır
+          (m.9/6-a). Diğer aktarımlar, istediğiniz hizmetin sunulması, yani sözleşmenin ifası için zorunludur
+          (m.9/6-b). Bu istisna arızi, yani düzenli ve tekrarlı olmayan aktarımlar için öngörülmüştür. Süreklilik
+          arz eden aktarımlar için KVKK, standart sözleşme imzalanmasını ve sözleşmenin Kurul&apos;a bildirilmesini
+          öngörür (m.9/4-b ve m.9/5). Bu sağlayıcılarla henüz KVKK standart sözleşmesi imzalanmamış ve Kurul&apos;a bildirim
+          yapılmamıştır. Bu adımlar tamamlandığında metin güncellenecektir.
+        </P>
+        <P>
+          Supabase, Vercel ve Resend&apos;in hizmet koşullarının parçası olan veri işleme sözleşmeleri (DPA), Avrupa
+          Komisyonu&apos;nun Standart Sözleşme Hükümlerini (2021/914) içerir. Bunlar sağlayıcıların AB hukukuna
+          göre sunduğu güvencelerdir. KVKK standart sözleşmesi yerine geçmez.
+        </P>
+        <P>
           Herkese açık profil bilgileriniz diğer kullanıcılar ve ziyaretçiler tarafından görüntülenebilir
           (profilinizi gizleyebilirsiniz). Kanunen yetkili kamu kurum ve kuruluşlarına, talep halinde ve
           mevzuatın gerektirdiği ölçüde aktarım yapılabilir.

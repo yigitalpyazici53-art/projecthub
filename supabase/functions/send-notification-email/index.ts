@@ -27,7 +27,8 @@ type Kind =
   | "application_accepted"
   | "application_rejected"
   | "new_message"
-  | "test";
+  | "test"
+  | "report";
 
 interface LogRow {
   id: string;
@@ -57,7 +58,7 @@ function compose(
   kind: Kind,
   name: string,
   project: string,
-  ctx: { fromId: string | null; fromUsername: string | null; projectId: string | null },
+  ctx: { fromId: string | null; fromUsername: string | null; projectId: string | null; reportedUsername?: string | null },
 ): { sentence: string; button: string; href: string } {
   const projectHref = ctx.projectId ? `${SITE_URL}/projects/${ctx.projectId}` : `${SITE_URL}/projects`;
   switch (kind) {
@@ -83,10 +84,16 @@ function compose(
       };
     case "test":
       return { sentence: "This is a test notification from ProjectHub", button: "Open dashboard", href: `${SITE_URL}/dashboard` };
+    case "report":
+      return {
+        sentence: `New report on ProjectHub${ctx.reportedUsername ? ` about @${ctx.reportedUsername}` : ""}`,
+        button: "View reported profile",
+        href: ctx.reportedUsername ? profileUrl(ctx.reportedUsername) : SITE_URL,
+      };
   }
 }
 
-function renderHtml(sentence: string, button: string, href: string, settingsUrl: string, unsubscribeUrl: string): string {
+function renderHtml(sentence: string, button: string, href: string, footer: string, body = ""): string {
   return `<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(sentence)}</title></head>
@@ -96,15 +103,14 @@ function renderHtml(sentence: string, button: string, href: string, settingsUrl:
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:12px;border:1px solid #e6e6ec;">
         <tr><td style="padding:28px 28px 0;font-size:15px;font-weight:600;color:#6d28d9;">ProjectHub</td></tr>
         <tr><td style="padding:16px 28px 8px;font-size:18px;line-height:1.5;font-weight:600;color:#1a1a1f;">${esc(sentence)}</td></tr>
+        ${body ? `<tr><td style="padding:0 28px 8px;font-size:14px;line-height:1.6;color:#3f3f46;white-space:pre-wrap;">${esc(body)}</td></tr>` : ""}
         <tr><td style="padding:16px 28px 28px;">
           <a href="${esc(href)}" style="display:inline-block;background:#8B5CF6;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:12px 22px;border-radius:8px;">${esc(button)}</a>
         </td></tr>
       </table>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
         <tr><td style="padding:16px 8px;font-size:12px;line-height:1.6;color:#6b6b76;text-align:center;">
-          You're getting this because email notifications are on for your ProjectHub account.<br>
-          <a href="${esc(settingsUrl)}" style="color:#6b6b76;">Notification settings</a> &middot;
-          <a href="${esc(unsubscribeUrl)}" style="color:#6b6b76;">Unsubscribe</a>
+          ${footer}
         </td></tr>
       </table>
     </td></tr>
@@ -152,7 +158,9 @@ Deno.serve(async (req) => {
     .select("is_seed, email_notifications")
     .eq("id", row.user_id)
     .maybeSingle();
-  if (!recipient || recipient.is_seed || !recipient.email_notifications) return fail("recipient not eligible", 200);
+  // Reports reach the admin even with notifications off.
+  const optedIn = recipient?.email_notifications || row.kind === "report";
+  if (!recipient || recipient.is_seed || !optedIn) return fail("recipient not eligible", 200);
 
   const { data: authUser, error: authErr } = await supabase.auth.admin.getUserById(row.user_id);
   const to = authUser?.user?.email;
@@ -172,6 +180,30 @@ Deno.serve(async (req) => {
     project = clean(p?.title) ?? project;
   }
 
+  // Report details for the admin email.
+  let reportedUsername: string | null = null;
+  let reportBody = "";
+  if (row.kind === "report" && row.entity_id) {
+    const { data: r } = await supabase
+      .from("reports")
+      .select("reason, details, reported_id, message_id")
+      .eq("id", row.entity_id)
+      .maybeSingle();
+    if (r) {
+      if (r.reported_id) {
+        const { data: rp } = await supabase.from("profiles").select("username").eq("id", r.reported_id).maybeSingle();
+        reportedUsername = rp?.username ?? null;
+      }
+      reportBody = [
+        `Reason: ${r.reason}`,
+        r.details ? `Details: ${r.details}` : "",
+        r.message_id ? "A message is attached (see the reports table)." : "",
+        `Reported by: ${fromUsername ? `@${fromUsername}` : "a member"}`,
+        `Report id: ${row.entity_id}`,
+      ].filter(Boolean).join("\n");
+    }
+  }
+
   const { data: token, error: tokenErr } = await supabase.rpc("email_unsubscribe_token", { p_user: row.user_id });
   if (tokenErr || !token) return fail(`token: ${tokenErr?.message ?? "missing"}`);
   const q = `u=${row.user_id}&t=${token}`;
@@ -183,7 +215,17 @@ Deno.serve(async (req) => {
     fromId: row.from_user_id,
     fromUsername,
     projectId: row.entity_id,
+    reportedUsername,
   });
+
+  const footerHtml = row.kind === "report"
+    ? "You're getting this because you're the ProjectHub admin."
+    : `You're getting this because email notifications are on for your ProjectHub account.<br>
+          <a href="${esc(settingsUrl)}" style="color:#6b6b76;">Notification settings</a> &middot;
+          <a href="${esc(unsubscribeUrl)}" style="color:#6b6b76;">Unsubscribe</a>`;
+  const footerText = row.kind === "report"
+    ? "You're getting this because you're the ProjectHub admin.\n"
+    : `Notification settings: ${settingsUrl}\nUnsubscribe: ${unsubscribeUrl}\n`;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -197,8 +239,8 @@ Deno.serve(async (req) => {
       from: FROM,
       to: [to],
       subject: sentence,
-      html: renderHtml(sentence, button, href, settingsUrl, unsubscribeUrl),
-      text: `${sentence}\n\n${button}: ${href}\n\n—\nNotification settings: ${settingsUrl}\nUnsubscribe: ${unsubscribeUrl}\n`,
+      html: renderHtml(sentence, button, href, footerHtml, reportBody),
+      text: `${sentence}\n\n${reportBody ? `${reportBody}\n\n` : ""}${button}: ${href}\n\n—\n${footerText}`,
       headers: {
         "List-Unsubscribe": `<${oneClickUrl}>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

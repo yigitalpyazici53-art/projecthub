@@ -1,3 +1,5 @@
+export type ReportReason = "spam" | "harassment" | "inappropriate" | "impersonation" | "underage" | "other";
+
 export type Database = {
   public: {
     Tables: {
@@ -19,6 +21,7 @@ export type Database = {
           is_seed: boolean;
           onboarding_completed_at: string | null;
           email_notifications: boolean;
+          is_hidden: boolean;
         };
         Insert: {
           id: string;
@@ -37,6 +40,7 @@ export type Database = {
           is_seed?: boolean;
           onboarding_completed_at?: string | null;
           email_notifications?: boolean;
+          is_hidden?: boolean;
         };
         Update: {
           id?: string;
@@ -55,6 +59,7 @@ export type Database = {
           is_seed?: boolean;
           onboarding_completed_at?: string | null;
           email_notifications?: boolean;
+          is_hidden?: boolean;
         };
         Relationships: [];
       };
@@ -281,6 +286,7 @@ export type Database = {
           status: string;
           admin_notes: string | null;
           created_at: string;
+          decided_at: string | null;
         };
         Insert: {
           id?: string;
@@ -300,6 +306,7 @@ export type Database = {
           status?: string;
           admin_notes?: string | null;
           created_at?: string;
+          decided_at?: string | null;
         };
         Update: {
           id?: string;
@@ -319,12 +326,69 @@ export type Database = {
           status?: string;
           admin_notes?: string | null;
           created_at?: string;
+          decided_at?: string | null;
+        };
+        Relationships: [];
+      };
+      blocks: {
+        Row: {
+          blocker_id: string;
+          blocked_id: string;
+          created_at: string;
+        };
+        Insert: {
+          blocker_id: string;
+          blocked_id: string;
+          created_at?: string;
+        };
+        Update: {
+          blocker_id?: string;
+          blocked_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      reports: {
+        Row: {
+          id: string;
+          reporter_id: string | null;
+          reported_id: string | null;
+          message_id: string | null;
+          message_content: string | null;
+          reason: ReportReason;
+          details: string | null;
+          status: "open" | "reviewed" | "actioned" | "dismissed";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reporter_id: string;
+          reported_id: string;
+          message_id?: string | null;
+          reason: ReportReason;
+          details?: string | null;
+        };
+        Update: {
+          status?: "open" | "reviewed" | "actioned" | "dismissed";
         };
         Relationships: [];
       };
     };
     Views: Record<string, never>;
     Functions: {
+      my_profile_settings: {
+        Args: Record<string, never>;
+        Returns: {
+          email_notifications: boolean;
+          onboarding_completed_at: string | null;
+          is_seed: boolean;
+          is_hidden: boolean;
+        }[];
+      };
+      delete_my_account: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
       unsubscribe_email: {
         Args: { p_user: string; p_token: string };
         Returns: boolean;

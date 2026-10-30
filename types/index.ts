@@ -19,10 +19,12 @@ export type Profile = {
   created_at?: string;
   /** Example account (auth email @seed.ph.internal). Set by a DB trigger, read-only. */
   is_seed?: boolean;
-  /** Null until the user finishes or skips /onboarding. */
+  /** Null until the user finishes or skips /onboarding. Owner-only: read via my_profile_settings(). */
   onboarding_completed_at?: string | null;
-  /** Email notifications on/off (default on). Turned off from settings or a one-click unsubscribe link. */
+  /** Email notifications on/off (default on). Owner-only: read via my_profile_settings(). */
   email_notifications?: boolean;
+  /** Hidden from signed-out visitors and search engines; members still see it. */
+  is_hidden?: boolean;
 };
 
 export type Project = {

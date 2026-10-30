@@ -37,6 +37,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .not("username", "is", null)
         // Example profiles are noindex; keep them out of the sitemap too.
         .eq("is_seed", false)
+        // Hidden profiles aren't readable as anon anyway; be explicit.
+        .eq("is_hidden", false)
         .order("created_at", { ascending: false })
         .limit(5000),
     ]);

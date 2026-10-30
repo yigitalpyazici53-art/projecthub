@@ -6,8 +6,11 @@ import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { cleanList, cleanText } from "@/utils/display";
 import { normalizeUrl } from "@/utils/url";
+import { GENERATED_USERNAME } from "@/utils/onboarding";
 
 // Three steps, each skippable: (1) who you are, (2) skills, (3) first project.
+// Step 1 also asks new accounts to pick a username: they start with a random
+// "builder-xxxxxx" one, never one derived from their email address.
 // Finishing or skipping the last step stamps profiles.onboarding_completed_at,
 // which is what stops the one-time redirect here (see utils/onboarding.ts).
 
@@ -43,6 +46,8 @@ export default function OnboardingPage() {
 
   // Step 1
   const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [usernameIsGenerated, setUsernameIsGenerated] = useState(false);
   const [bio, setBio] = useState("");
   const [university, setUniversity] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -65,12 +70,16 @@ export default function OnboardingPage() {
     // Prefill from the profile (and the auth name for brand-new accounts).
     createClient()
       .from("profiles")
-      .select("full_name, bio, university, avatar_url, skills")
+      .select("full_name, username, bio, university, avatar_url, skills")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         const metaName = (user.user_metadata?.full_name ?? user.user_metadata?.name ?? "") as string;
         setFullName(cleanText(data?.full_name) ?? metaName);
+        const current = data?.username ?? "";
+        const generated = GENERATED_USERNAME.test(current);
+        setUsernameIsGenerated(generated);
+        setUsername(generated ? "" : current);
         setBio(cleanText(data?.bio) ?? "");
         setUniversity(cleanText(data?.university) ?? "");
         setAvatarUrl(cleanText(data?.avatar_url));
@@ -112,13 +121,28 @@ export default function OnboardingPage() {
   const saveStep1 = async () => {
     if (!user) return;
     if (!fullName.trim()) { setError("Add your name, or skip this step for now."); return; }
+    const nextUsername = username.trim().toLowerCase();
+    if (usernameIsGenerated && !nextUsername) { setError("Pick a username for your profile link."); return; }
+    if (nextUsername && !/^[a-z0-9._-]{3,30}$/.test(nextUsername)) {
+      setError("Username must be 3–30 characters: lowercase letters, numbers, dots, underscores or hyphens.");
+      return;
+    }
     setSaving(true);
     const { error: err } = await createClient()
       .from("profiles")
-      .update({ full_name: fullName.trim(), bio: bio.trim() || null, university: university.trim() || null })
+      .update({
+        full_name: fullName.trim(),
+        bio: bio.trim() || null,
+        university: university.trim() || null,
+        ...(nextUsername ? { username: nextUsername } : {}),
+      })
       .eq("id", user.id);
     setSaving(false);
-    if (err) { setError(err.message); return; }
+    if (err) {
+      setError(err.code === "23505" ? "That username is already taken." : err.message);
+      return;
+    }
+    if (nextUsername) setUsernameIsGenerated(false);
     goTo(2);
   };
 
@@ -239,6 +263,15 @@ export default function OnboardingPage() {
                 <label style={labelStyle} htmlFor="onb-name">Full name</label>
                 <input id="onb-name" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Alex Johnson" style={inputStyle} autoComplete="name" />
+              </div>
+              <div style={fieldGroupStyle}>
+                <label style={labelStyle} htmlFor="onb-username">Username</label>
+                <input id="onb-username" type="text" value={username}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""))}
+                  placeholder="adalovelace" style={inputStyle} autoComplete="off" autoCapitalize="off" spellCheck={false} />
+                <span style={hintStyle}>
+                  {usernameIsGenerated ? "Choose the name for your profile link: projecthubstudents.com/u/…" : "Your profile link: projecthubstudents.com/u/…"}
+                </span>
               </div>
               <div style={fieldGroupStyle}>
                 <label style={labelStyle} htmlFor="onb-bio">Short bio</label>

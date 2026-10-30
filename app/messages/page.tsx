@@ -8,6 +8,7 @@ import { getInitials } from "@/utils/getInitials";
 import type { Profile, Message } from "@/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { cleanProfiles } from "@/utils/display";
+import SafetyActions from "@/components/SafetyActions";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -271,7 +272,8 @@ function MessagesInner() {
     });
 
     if (error) {
-      setSendError("Failed to send message.");
+      // RLS rejects messages without an accepted connection or across a block.
+      setSendError("Failed to send message. You can only message your connections.");
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
     } else {
       setConversations((prev) =>
@@ -427,6 +429,22 @@ function MessagesInner() {
                       <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{activeConv.partner.role}</div>
                     )}
                   </div>
+                  {myId && (
+                    <div style={{ marginLeft: "auto" }}>
+                      <SafetyActions
+                        myId={myId}
+                        targetId={activeConv.partner.id}
+                        targetName={(activeConv.partner.full_name || activeConv.partner.username || "this person").split(" ")[0]}
+                        messageId={[...messages].reverse().find((m) => m.sender_id === activeConv.partner.id)?.id ?? null}
+                        onBlockedChange={(isBlocked) => {
+                          // Blocking ends the connection, so the conversation closes.
+                          if (!isBlocked) return;
+                          setConversations((prev) => prev.filter((c) => c.partner.id !== activeConv.partner.id));
+                          setActivePartnerId(null);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 

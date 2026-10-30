@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      const dest = data.user ? await postAuthPath(supabase, data.user.id, next) : next
+      const dest = data.user ? await postAuthPath(supabase, next) : next
       return NextResponse.redirect(`${origin}${dest}`)
     }
   }

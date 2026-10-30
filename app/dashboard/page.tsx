@@ -12,7 +12,7 @@ import ApplicationsInbox from "@/components/ApplicationsInbox";
 import { cleanProfile, cleanProfiles } from "@/utils/display";
 import { profilePath } from "@/utils/profileUrl";
 import ProfileCompletion from "@/components/ProfileCompletion";
-import { needsOnboarding } from "@/utils/onboarding";
+import { generateUsername, getMySettings, needsOnboarding } from "@/utils/onboarding";
 
 export const dynamic = "force-dynamic";
 
@@ -128,13 +128,15 @@ export default function DashboardPage() {
       setLoading(true);
       setError("");
       try {
-        const [profileResult, incomingResult, outgoingResult, projectsResult, connCountResult] =
+        const [profileResult, settings, incomingResult, outgoingResult, projectsResult, connCountResult] =
           await Promise.all([
             supabase
               .from("profiles")
-              .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, is_seed, onboarding_completed_at")
+              .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, is_seed")
               .eq("id", user.id)
               .maybeSingle(),
+
+            getMySettings(supabase),
 
             supabase
               .from("connections")
@@ -166,16 +168,15 @@ export default function DashboardPage() {
         if (profileResult.error) {
           setError(`Profile error: ${profileResult.error.message}`);
         } else if (!profileResult.data) {
-          const baseUsername = (user.email?.split("@")[0] ?? "user")
-            .toLowerCase().replace(/[^a-z0-9._-]/g, "_").slice(0, 24).padEnd(3, "_");
+          // Never derive the username from the email; onboarding asks for one.
           await supabase.from("profiles").insert({
             id: user.id,
             full_name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
-            username: baseUsername,
+            username: generateUsername(),
           });
           const { data: created } = await supabase
             .from("profiles")
-            .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, is_seed, onboarding_completed_at")
+            .select("id, full_name, username, university, role, bio, skills, interests, github_url, avatar_url, is_seed")
             .eq("id", user.id)
             .maybeSingle();
           setProfile(cleanProfile(created as Profile | null));
@@ -186,7 +187,7 @@ export default function DashboardPage() {
           const pd = profileResult.data as Profile;
           // One-time onboarding for anyone who hasn't finished or skipped it
           // (stored on the profile, so it holds across devices).
-          if (needsOnboarding(pd)) {
+          if (needsOnboarding(settings)) {
             if (mounted) router.replace("/onboarding");
             return;
           }

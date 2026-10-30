@@ -7,6 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import { getInitials } from "@/utils/getInitials";
 import type { Profile } from "@/types";
+import { getMySettings } from "@/utils/onboarding";
+import DeleteAccount from "@/components/DeleteAccount";
 
 const SKILL_OPTIONS = [
   "Python", "React", "ML", "Figma", "Node.js", "Swift",
@@ -34,6 +36,8 @@ export default function ProfileEditPage() {
   const [originalUsername, setOriginalUsername] = useState<string | null>(null);
   const [emailSaving, setEmailSaving] = useState(false);
   const [emailMsg, setEmailMsg] = useState("");
+  const [hiddenSaving, setHiddenSaving] = useState(false);
+  const [hiddenMsg, setHiddenMsg] = useState("");
   const [profile, setProfile] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -48,19 +52,22 @@ export default function ProfileEditPage() {
       return;
     }
     const supabase = createClient();
-    supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          setProfile(data);
-          setOriginalUsername(data.username ?? null);
-          if (data.avatar_url) setAvatarPreview(data.avatar_url);
-        }
-        setLoading(false);
-      });
+    // Owner-only fields (notifications, visibility) come from the settings RPC.
+    Promise.all([
+      supabase
+        .from("profiles")
+        .select("id, full_name, username, university, role, bio, skills, interests, github_url, linkedin_url, portfolio_url, avatar_url, is_seed")
+        .eq("id", user.id)
+        .maybeSingle(),
+      getMySettings(supabase),
+    ]).then(([{ data }, settings]) => {
+      if (data) {
+        setProfile({ ...data, email_notifications: settings?.email_notifications, is_hidden: settings?.is_hidden });
+        setOriginalUsername(data.username ?? null);
+        if (data.avatar_url) setAvatarPreview(data.avatar_url);
+      }
+      setLoading(false);
+    });
   }, [authLoading, user, router]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +102,7 @@ export default function ProfileEditPage() {
   };
 
   const emailOn = profile.email_notifications !== false;
+  const hidden = profile.is_hidden === true;
 
   // Links from emails land on #notifications; the section only exists once
   // the profile has loaded, so the browser's own anchor jump misses it.
@@ -114,6 +122,20 @@ export default function ProfileEditPage() {
     if (error) { setEmailMsg("Could not save: " + error.message); return; }
     setProfile(prev => ({ ...prev, email_notifications: next }));
     setEmailMsg(next ? "Email notifications are on." : "Email notifications are off.");
+  };
+
+  const toggleHidden = async () => {
+    if (!user || hiddenSaving) return;
+    const next = !hidden;
+    setHiddenSaving(true);
+    setHiddenMsg("");
+    const { error } = await createClient().from("profiles").update({ is_hidden: next }).eq("id", user.id);
+    setHiddenSaving(false);
+    if (error) { setHiddenMsg("Could not save: " + error.message); return; }
+    setProfile(prev => ({ ...prev, is_hidden: next }));
+    setHiddenMsg(next
+      ? "Your profile is hidden from signed-out visitors and search engines."
+      : "Your profile is public again.");
   };
 
   const handleSave = async () => {
@@ -422,40 +444,22 @@ export default function ProfileEditPage() {
                   Email me about connection requests, applications and new messages.
                   At most one email per type per hour.
                 </p>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={emailOn}
-                  aria-label="Email notifications"
-                  onClick={toggleEmail}
-                  disabled={emailSaving}
-                  style={{
-                    flexShrink: 0,
-                    width: 46,
-                    height: 26,
-                    borderRadius: 999,
-                    border: "1px solid var(--border)",
-                    background: emailOn ? "var(--accent)" : "var(--surface-raised)",
-                    position: "relative",
-                    cursor: emailSaving ? "default" : "pointer",
-                    opacity: emailSaving ? 0.6 : 1,
-                    transition: "background 0.15s ease",
-                    padding: 0,
-                  }}
-                >
-                  <span style={{
-                    position: "absolute",
-                    top: 2,
-                    left: emailOn ? 22 : 2,
-                    width: 20,
-                    height: 20,
-                    borderRadius: "50%",
-                    background: "#FFFFFF",
-                    transition: "left 0.15s ease",
-                  }} />
-                </button>
+                <Switch on={emailOn} onClick={toggleEmail} disabled={emailSaving} label="Email notifications" />
               </div>
               {emailMsg && <p style={{ ...helpTextStyle, marginTop: 10, marginBottom: 0 }}>{emailMsg}</p>}
+            </div>
+
+            {/* Profile visibility — saves on toggle, independent of "Save" */}
+            <div id="visibility" style={{ ...cardStyle, scrollMarginTop: 96 }}>
+              <h2 style={sectionTitleStyle}>👁️ Profile visibility</h2>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+                <p style={{ ...helpTextStyle, margin: 0 }}>
+                  <strong>Hide my profile.</strong> Signed-out visitors and search engines can&apos;t see your
+                  profile, and it&apos;s left out of search results and link previews. Signed-in members can still view it.
+                </p>
+                <Switch on={hidden} onClick={toggleHidden} disabled={hiddenSaving} label="Hide my profile" />
+              </div>
+              {hiddenMsg && <p style={{ ...helpTextStyle, marginTop: 10, marginBottom: 0 }}>{hiddenMsg}</p>}
             </div>
 
             {/* Availability */}
@@ -542,8 +546,56 @@ export default function ProfileEditPage() {
           )}
         </div>
 
+        {/* ── Delete account ── */}
+        {user && !profile.is_seed && (
+          <div id="delete-account" style={{ ...cardStyle, marginBottom: 60, scrollMarginTop: 96 }}>
+            <h2 style={sectionTitleStyle}>Delete account</h2>
+            <p style={helpTextStyle}>
+              Permanently delete your account and everything in it. You&apos;ll see exactly what will be removed before anything happens.
+            </p>
+            <DeleteAccount userId={user.id} />
+          </div>
+        )}
+
       </div>
     </main>
+  );
+}
+
+function Switch({ on, onClick, disabled, label }: { on: boolean; onClick: () => void; disabled: boolean; label: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        flexShrink: 0,
+        width: 46,
+        height: 26,
+        borderRadius: 999,
+        border: "1px solid var(--border)",
+        background: on ? "var(--accent)" : "var(--surface-raised)",
+        position: "relative",
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.6 : 1,
+        transition: "background 0.15s ease",
+        padding: 0,
+      }}
+    >
+      <span style={{
+        position: "absolute",
+        top: 2,
+        left: on ? 22 : 2,
+        width: 20,
+        height: 20,
+        borderRadius: "50%",
+        background: "#FFFFFF",
+        transition: "left 0.15s ease",
+      }} />
+    </button>
   );
 }
 

@@ -86,7 +86,7 @@ function LoginForm() {
     }
 
     const next = searchParams.get("next") ?? "/dashboard";
-    router.replace(signInData.user ? await postAuthPath(supabase, signInData.user.id, next) : next);
+    router.replace(signInData.user ? await postAuthPath(supabase, next) : next);
     router.refresh();
   };
 

@@ -4,6 +4,7 @@ import { use, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import { getInitials } from "@/utils/getInitials";
 import { stageBadge } from "@/utils/stage";
@@ -13,6 +14,7 @@ import { cleanProfile } from "@/utils/display";
 import AIBadge from "@/components/AIBadge";
 import ProfileCompletion from "@/components/ProfileCompletion";
 import ShareProfile from "@/components/ShareProfile";
+import SafetyActions from "@/components/SafetyActions";
 import { decodeUsernameParam, profilePath } from "@/utils/profileUrl";
 
 type PageProps = { params: Promise<{ username: string }> };
@@ -54,6 +56,7 @@ export default function BuilderProfilePage({ params }: PageProps) {
   const [connectStatus, setConnectStatus] = useState<ConnectStatus>("idle");
   const [connectError, setConnectError] = useState("");
   const [myId, setMyId] = useState<string | null>(null);
+  const { user: authUser } = useAuth();
   const [endorsements, setEndorsements] = useState<SkillEndorsements>({});
   const [endorsing, setEndorsing] = useState<string | null>(null);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
@@ -257,8 +260,17 @@ export default function BuilderProfilePage({ params }: PageProps) {
             <h1 className="font-serif" style={{ fontSize: 24, color: "var(--text-primary)", marginBottom: 8 }}>
               Builder not found
             </h1>
-            <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>No builder with username &ldquo;{username}&rdquo; exists.</p>
-            <Link href="/builders" className="btn-secondary" style={{ marginTop: 20, display: "inline-flex" }}>← Back to builders</Link>
+            <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
+              No builder with username &ldquo;{username}&rdquo; exists, or their profile is only visible to signed-in members.
+            </p>
+            <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
+              <Link href="/builders" className="btn-secondary" style={{ display: "inline-flex" }}>← Back to builders</Link>
+              {!authUser && (
+                <Link href={`/login?next=${encodeURIComponent(profilePath(username))}`} className="btn-secondary" style={{ display: "inline-flex" }}>
+                  Sign in
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </main>
@@ -380,6 +392,14 @@ export default function BuilderProfilePage({ params }: PageProps) {
                   </>
                 )}
               </div>
+              {myId && connectStatus !== "own_profile" && !builder.is_seed && (
+                <SafetyActions
+                  myId={myId}
+                  targetId={builder.id}
+                  targetName={builderFirstName}
+                  onBlockedChange={(isBlocked) => { if (isBlocked) setConnectStatus("idle"); }}
+                />
+              )}
             </div>
 
             {/* Links */}

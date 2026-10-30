@@ -158,7 +158,7 @@ export default function SignupPage() {
     }
 
     router.refresh();
-    router.push(userId ? await postAuthPath(supabase, userId) : "/dashboard");
+    router.push(userId ? await postAuthPath(supabase) : "/dashboard");
   };
 
   const handleResend = async () => {

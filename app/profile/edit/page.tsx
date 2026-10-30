@@ -300,10 +300,10 @@ export default function ProfileEditPage() {
 
               <div className="responsive-2col">
                 <div>
-                  <label style={labelStyle}>School or university</label>
+                  <label style={labelStyle}>University</label>
                   <input
                     type="text"
-                    placeholder="e.g. Robert College, Boğaziçi University"
+                    placeholder="e.g. Boğaziçi University, METU"
                     value={profile.university || ""}
                     onChange={e => setProfile(prev => ({ ...prev, university: e.target.value }))}
                     style={inputStyle}

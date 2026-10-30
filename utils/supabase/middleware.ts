@@ -9,6 +9,7 @@ const PROTECTED_PREFIXES = [
   '/connections',
   '/messages',
   '/onboarding',
+  '/consent',
 ]
 
 export async function updateSession(request: NextRequest) {

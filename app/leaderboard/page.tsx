@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { getInitials } from "@/utils/getInitials";
 import { cleanProfiles } from "@/utils/display";
 import { profilePath } from "@/utils/profileUrl";
+import AIBadge from "@/components/AIBadge";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ interface BuilderScore {
   university: string | null;
   role: string | null;
   avatar_url: string | null;
+  is_seed: boolean;
   points: number;
   projectCount: number;
   connectionCount: number;
@@ -121,7 +123,7 @@ export default function LeaderboardPage() {
         // Fetch all profiles
         const { data: rawProfiles } = await supabase
           .from("profiles")
-          .select("id, full_name, username, university, role, avatar_url");
+          .select("id, full_name, username, university, role, avatar_url, is_seed");
         const profiles = rawProfiles ? cleanProfiles(rawProfiles) : null;
 
         if (!profiles || profiles.length === 0) { setLoading(false); return; }
@@ -183,7 +185,7 @@ export default function LeaderboardPage() {
         });
 
         // Calculate scores
-        const scored: BuilderScore[] = (profiles as { id: string; full_name: string | null; username: string | null; university: string | null; role: string | null; avatar_url: string | null }[]).map((p) => {
+        const scored: BuilderScore[] = (profiles as { id: string; full_name: string | null; username: string | null; university: string | null; role: string | null; avatar_url: string | null; is_seed: boolean }[]).map((p) => {
           const pc = projectCount[p.id] ?? 0;
           const cc = connectionCount[p.id] ?? 0;
           const ec = endorsementCount[p.id] ?? 0;
@@ -336,6 +338,7 @@ export default function LeaderboardPage() {
                         >
                           {builder.full_name || builder.username || "Builder"}
                         </Link>
+                        {builder.is_seed && <AIBadge />}
                         {isRising && (
                           <span style={{ fontSize: 10, fontWeight: 700, color: "var(--tint-amber-text)", background: "var(--tint-amber-bg)", border: "1px solid var(--tint-amber-bg)", borderRadius: 10, padding: "2px 7px" }}>
                             ↑ Rising
@@ -403,12 +406,12 @@ export default function LeaderboardPage() {
 
         {/* Top Universities */}
         <div className="animate-fade-up animate-delay-2" style={{ ...cardStyle, marginTop: 20 }}>
-          <h2 style={sectionTitleStyle}>Top Schools</h2>
+          <h2 style={sectionTitleStyle}>Top Universities</h2>
 
           {loading ? (
             <div style={{ padding: "24px 0", textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>Loading…</div>
           ) : universities.length === 0 ? (
-            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>No school data yet.</p>
+            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>No university data yet.</p>
           ) : (
             <div style={{ display: "grid", gap: 14 }}>
               {universities.map((uni, idx) => {

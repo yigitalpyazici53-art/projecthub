@@ -280,9 +280,9 @@ export default function OnboardingPage() {
                 <span style={hintStyle}>{bio.length}/160</span>
               </div>
               <div style={fieldGroupStyle}>
-                <label style={labelStyle} htmlFor="onb-uni">School or university <span style={optionalStyle}>optional</span></label>
+                <label style={labelStyle} htmlFor="onb-uni">University <span style={optionalStyle}>optional</span></label>
                 <input id="onb-uni" type="text" value={university} onChange={(e) => setUniversity(e.target.value)}
-                  placeholder="e.g. Robert College, Boğaziçi University" style={inputStyle} />
+                  placeholder="e.g. Boğaziçi University, METU" style={inputStyle} />
               </div>
 
               {error && <p style={errorStyle}>{error}</p>}

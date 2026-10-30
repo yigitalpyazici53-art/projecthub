@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import Logo from "@/components/Logo";
 import { createClient } from "@/utils/supabase/client";
+import ConsentCheckboxes, { consentComplete, type ConsentState } from "@/components/ConsentCheckboxes";
+import { POLICY_VERSION } from "@/utils/legal";
 
 type FormData = {
   full_name: string;
@@ -42,6 +44,7 @@ export default function ApplyPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [consent, setConsent] = useState<ConsentState>({ age: false, policies: false });
 
   const field =
     (key: keyof FormData) =>
@@ -51,6 +54,10 @@ export default function ApplyPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (submitting) return;
+    if (!consentComplete(consent)) {
+      setSubmitError("Please confirm you're 18 or older and that you've read the policies.");
+      return;
+    }
     setSubmitting(true);
     setSubmitError(null);
 
@@ -69,6 +76,9 @@ export default function ApplyPage() {
       linkedin_url: form.linkedin_url.trim() || null,
       demo_url: form.demo_url.trim() || null,
       why_join: form.why_join.trim() || null,
+      age_confirmed: consent.age,
+      policies_accepted: consent.policies,
+      policy_version: POLICY_VERSION,
     });
 
     if (error) {
@@ -362,12 +372,12 @@ export default function ApplyPage() {
                       style={inp}
                     />
                   </Field>
-                  <Field label="School or university">
+                  <Field label="University">
                     <input
                       type="text"
                       value={form.university}
                       onChange={field("university")}
-                      placeholder="e.g. Robert College, Boğaziçi University"
+                      placeholder="e.g. Boğaziçi University, METU"
                       style={inp}
                     />
                   </Field>
@@ -536,6 +546,9 @@ export default function ApplyPage() {
               </FormSection>
 
               <div>
+                <div style={{ marginBottom: 16 }}>
+                  <ConsentCheckboxes value={consent} onChange={(c) => { setConsent(c); setSubmitError(null); }} />
+                </div>
                 {submitError && (
                   <div
                     style={{
@@ -555,13 +568,13 @@ export default function ApplyPage() {
                 )}
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !consentComplete(consent)}
                   className="btn-primary"
                   style={{
                     width: "100%",
                     fontSize: 15,
                     padding: "14px 24px",
-                    opacity: submitting ? 0.7 : 1,
+                    opacity: submitting || !consentComplete(consent) ? 0.5 : 1,
                     cursor: submitting ? "wait" : "pointer",
                   }}
                 >

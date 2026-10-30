@@ -108,7 +108,7 @@ export default function ContactPage() {
         <h1 style={h1Style}>Contact</h1>
         <p style={leadStyle}>
           ProjectHub is a community platform for student founders and builders &mdash; post your
-          startup idea, meet talented collaborators at school or university, and build real projects
+          startup idea, meet talented collaborators at university and beyond, and build real projects
           together. We&apos;re pre-launch and actively shaping the product, so your feedback
           genuinely matters.
         </p>
@@ -165,7 +165,7 @@ export default function ContactPage() {
             </li>
             <li>
               <strong style={{ color: "var(--text-primary)" }}>Collaboration</strong> &mdash; student
-              clubs, school and university orgs, accelerators, or anyone who wants to bring ProjectHub to their
+              clubs, university orgs, accelerators, or anyone who wants to bring ProjectHub to their
               community.
             </li>
           </ul>

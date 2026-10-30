@@ -287,6 +287,10 @@ export type Database = {
           admin_notes: string | null;
           created_at: string;
           decided_at: string | null;
+          age_confirmed: boolean;
+          policies_accepted: boolean;
+          consented_at: string | null;
+          policy_version: string | null;
         };
         Insert: {
           id?: string;
@@ -307,6 +311,9 @@ export type Database = {
           admin_notes?: string | null;
           created_at?: string;
           decided_at?: string | null;
+          age_confirmed?: boolean;
+          policies_accepted?: boolean;
+          policy_version?: string | null;
         };
         Update: {
           id?: string;
@@ -327,7 +334,24 @@ export type Database = {
           admin_notes?: string | null;
           created_at?: string;
           decided_at?: string | null;
+          age_confirmed?: boolean;
+          policies_accepted?: boolean;
+          policy_version?: string | null;
         };
+        Relationships: [];
+      };
+      user_consents: {
+        Row: {
+          user_id: string;
+          age_confirmed_at: string;
+          policies_accepted_at: string;
+          policy_version: string;
+          source: "signup" | "oauth" | "reconsent";
+          updated_at: string;
+        };
+        // Written only through record_consent().
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
         Relationships: [];
       };
       blocks: {
@@ -383,7 +407,13 @@ export type Database = {
           onboarding_completed_at: string | null;
           is_seed: boolean;
           is_hidden: boolean;
+          age_confirmed_at: string | null;
+          policy_version: string | null;
         }[];
+      };
+      record_consent: {
+        Args: { p_version: string; p_source: "signup" | "oauth" | "reconsent" };
+        Returns: undefined;
       };
       delete_my_account: {
         Args: Record<string, never>;
@@ -396,14 +426,6 @@ export type Database = {
       health_report: {
         Args: { p_token: string };
         Returns: { stale_queued_emails: number } | null;
-      };
-      get_public_stats: {
-        Args: Record<string, never>;
-        Returns: {
-          builders: number;
-          projects: number;
-          connections: number;
-        }[];
       };
     };
   };

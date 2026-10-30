@@ -1,192 +1,197 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { publicMetadata } from "@/utils/seo";
+import { LegalDoc, Section, P, UL, A, Table } from "@/components/legal/LegalDoc";
+import { CONTACT_EMAIL, CONTROLLER_LOCATION, CONTROLLER_NAME, POLICY_UPDATED } from "@/utils/legal";
 
 export const metadata: Metadata = publicMetadata({
   title: "Privacy Policy",
   description:
-    "How ProjectHub collects, uses, and protects your data. We don't sell your information.",
+    "What ProjectHub collects, why, where it is stored, who can see it, how long we keep it, and your rights. We don't sell your data.",
   path: "/privacy",
 });
 
-const LAST_UPDATED = "April 24, 2026";
-
-const pageStyle: React.CSSProperties = {
-  minHeight: "100vh",
-  paddingTop: 32,
-  position: "relative",
-};
-
-const wrapStyle: React.CSSProperties = {
-  maxWidth: 760,
-  margin: "0 auto",
-  padding: "64px 24px 96px",
-};
-
-const h1Style: React.CSSProperties = {
-  fontFamily: "var(--font-serif)",
-  fontWeight: 500,
-  fontSize: "clamp(32px, 5vw, 44px)",
-  letterSpacing: "-0.02em",
-  color: "var(--text-primary)",
-  marginBottom: 12,
-};
-
-const leadStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 15,
-  color: "var(--text-secondary)",
-  lineHeight: 1.7,
-  marginBottom: 8,
-};
-
-const updatedStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 12,
-  color: "var(--text-muted)",
-  letterSpacing: "0.04em",
-  textTransform: "uppercase",
-  marginBottom: 40,
-};
-
-const sectionStyle: React.CSSProperties = {
-  background: "var(--gradient-card)",
-  border: "1px solid var(--border)",
-  borderRadius: 16,
-  padding: "28px 28px",
-  marginBottom: 20,
-};
-
-const h2Style: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontWeight: 700,
-  fontSize: 20,
-  color: "var(--text-primary)",
-  marginBottom: 14,
-  letterSpacing: "-0.01em",
-};
-
-const pStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 14.5,
-  color: "var(--text-secondary)",
-  lineHeight: 1.7,
-  marginBottom: 10,
-};
-
-const ulStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 14.5,
-  color: "var(--text-secondary)",
-  lineHeight: 1.75,
-  paddingLeft: 22,
-  marginBottom: 4,
-};
-
-const linkStyle: React.CSSProperties = {
-  color: "var(--accent-bright)",
-  textDecoration: "none",
-  fontWeight: 500,
-};
-
 export default function PrivacyPage() {
   return (
-    <main style={pageStyle}>
-      <div className="page-grid-bg" />
-      <div className="page-radial-glow" />
-      <div className="page-z animate-fade-up" style={wrapStyle}>
-        <h1 style={h1Style}>Privacy Policy</h1>
-        <p style={leadStyle}>
-          ProjectHub is a pre-launch community platform for student founders and builders. This
-          policy explains what we collect, why we collect it, and what control you have over it.
-        </p>
-        <div style={updatedStyle}>Last updated · {LAST_UPDATED}</div>
+    <LegalDoc
+      title="Privacy Policy"
+      lead={
+        <>
+          ProjectHub is a portfolio and collaboration platform for university students and early-career
+          builders aged 18 and over. This policy explains what personal data we process, why, where it is
+          stored, who can see it, how long we keep it and what rights you have. A Turkish information notice
+          under the Personal Data Protection Law No. 6698 (KVKK) is available at <A href="/kvkk">/kvkk</A>.
+        </>
+      }
+      updated={POLICY_UPDATED}
+      seeAlso={[
+        { href: "/kvkk", label: "KVKK Aydınlatma Metni" },
+        { href: "/cookies", label: "Cookie Policy" },
+        { href: "/terms", label: "Terms of Service" },
+        { href: "/contact", label: "Contact" },
+      ]}
+    >
+      <Section title="1. Who is responsible for your data">
+        <P>
+          The data controller is <strong>{CONTROLLER_NAME}</strong>, {CONTROLLER_LOCATION}, who operates ProjectHub.
+          For any privacy question or request, email <A href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</A>.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>What we collect</h2>
-          <p style={pStyle}>When you create an account and use ProjectHub, we store:</p>
-          <ul style={ulStyle}>
-            <li>Your email address (used for sign-in and essential account messages).</li>
-            <li>
-              Profile information you provide &mdash; full name, username, school, role,
-              bio, skills, interests, and links (GitHub, LinkedIn, portfolio, avatar).
-            </li>
-            <li>Projects you post, including title, description, tech stack, and roles you&apos;re looking for.</li>
-            <li>
-              Connections and applications &mdash; the requests you send or accept, and the
-              projects you apply to.
-            </li>
-            <li>
-              Messages exchanged with other users, if you use the messaging feature.
-            </li>
-            <li>
-              Basic technical data &mdash; session cookies used by our auth provider, and
-              standard server logs.
-            </li>
-          </ul>
-        </section>
+      <Section title="2. ProjectHub is for people aged 18 and over">
+        <P>
+          You must be at least 18 to create an account or submit the application form. We ask you to confirm
+          this at signup and record when you did. If we learn that an account belongs to someone under 18, we
+          delete it. Members can report a profile that appears to belong to a minor.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>How we use your data</h2>
-          <ul style={ulStyle}>
-            <li>To create and secure your account.</li>
-            <li>To show your public profile and projects to other users so they can connect with you.</li>
-            <li>To power collaboration features: applications, connections, endorsements, and direct messages.</li>
-            <li>To match you with relevant projects, builders, and opportunities on the platform.</li>
-            <li>To send essential service notifications (e.g., a connection request or accepted application).</li>
-          </ul>
-        </section>
+      <Section title="3. What we collect" id="data">
+        <Table
+          head={["Data", "Where it comes from", "Where it is stored"]}
+          rows={[
+            ["Account: email address, password (stored only as a hash), sign-in times; if you use Google sign-in, the name, email and account ID Google shares", "You, Google", "Supabase Auth"],
+            ["Profile: full name, username, university, role, bio, skills, availability, GitHub / LinkedIn / portfolio links, profile photo", "You", "Supabase database and storage"],
+            ["Projects and project updates you post", "You", "Supabase database"],
+            ["Applications to projects (chosen role and your message)", "You", "Supabase database"],
+            ["Connection requests (including any note) and their status", "You and the other member", "Supabase database"],
+            ["Direct messages and read status", "You and the other member", "Supabase database"],
+            ["Endorsements you give and receive", "Members", "Supabase database"],
+            ["In-app notifications (e.g. a new connection request)", "Generated by the service", "Supabase database"],
+            ["Email log: which notification emails were sent to you, when, delivery status and the email provider's message ID", "Generated by the service", "Supabase database"],
+            ["Settings: email notification preference, profile visibility, onboarding completion", "You", "Supabase database"],
+            ["Confirmations: that you are 18+ and have read this policy, the Terms and the KVKK notice, with time and policy version", "You", "Supabase database"],
+            ["Safety: reports you file (reason, details and, if you choose, a copy of the reported message) and the people you block", "You", "Supabase database"],
+            ["Application form (/apply): name, email, university, role, skills, project details, links, why you want to join, your 18+ and policy confirmations, and our review notes and decision", "You, us", "Supabase database"],
+            ["Technical data: authentication cookies, and server logs (IP address, browser, requested page, time) kept by our hosting providers", "Your browser", "Vercel, Supabase"],
+            ["Analytics (only if you accept analytics cookies): pages viewed, approximate location, device and browser, via Google Analytics", "Your browser", "Google"],
+          ]}
+        />
+        <P>
+          We don&apos;t collect your date of birth, school grade, phone number or payment details. Please don&apos;t
+          put sensitive personal data (health, religion, political opinions, etc.) in your profile or messages.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>We do not sell your data</h2>
-          <p style={pStyle}>
-            ProjectHub does not sell your personal information to third parties and does not share
-            it for advertising purposes. We only share data with the infrastructure providers we
-            rely on to operate the service (for example, database and authentication hosting), and
-            only to the extent required to run ProjectHub.
-          </p>
-        </section>
+      <Section title="4. Why we use it and on what legal basis">
+        <UL>
+          <li><strong>Running your account and the platform</strong> (profile, projects, applications, connections, messages, endorsements, notification emails): necessary to provide the service you signed up for (KVKK Art. 5(2)(c); GDPR Art. 6(1)(b)).</li>
+          <li><strong>Showing your public profile and projects</strong> so others can find and contact you: part of the service; you can hide your profile at any time (see section 6).</li>
+          <li><strong>Safety and abuse prevention</strong> (reports, blocks, message rules, keeping a copy of a reported message, rate limits, server logs): our legitimate interest in keeping members safe and the service secure (KVKK Art. 5(2)(f); GDPR Art. 6(1)(f)).</li>
+          <li><strong>Email log</strong>: our legitimate interest in not sending duplicate emails and in diagnosing delivery problems.</li>
+          <li><strong>Reviewing applications</strong> submitted through /apply: steps taken at your request before you join (KVKK Art. 5(2)(c)).</li>
+          <li><strong>Recording your 18+ and policy confirmations</strong>: to establish and defend our rights and meet our obligations (KVKK Art. 5(2)(ç), (e)).</li>
+          <li><strong>Analytics</strong>: only with your consent, given in the cookie banner (KVKK Art. 5(1); GDPR Art. 6(1)(a)). You can withdraw it at any time with &ldquo;Cookie settings&rdquo; in the footer.</li>
+        </UL>
+        <P>We don&apos;t sell your data, we don&apos;t use it for advertising, and we don&apos;t make automated decisions about you.</P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Cookies and sessions</h2>
-          <p style={pStyle}>
-            We use cookies only for authentication and session management &mdash; the minimum needed
-            to keep you signed in. We don&apos;t use third-party advertising or tracking cookies.
-            Basic privacy-respecting analytics may be used to understand aggregate usage.
-          </p>
-        </section>
+      <Section title="5. Emails">
+        <P>
+          We send sign-in codes and password reset emails, and notification emails about activity on your account
+          (connection requests and acceptances, applications and their outcome, new messages). These are service
+          emails, not marketing. You can turn notification emails off in your profile settings or with the
+          unsubscribe link in every email; sign-in and security emails can&apos;t be turned off. We don&apos;t send
+          marketing emails.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Your rights &amp; deletion requests</h2>
-          <p style={pStyle}>
-            You can edit your profile information at any time from your account settings. If you
-            want your account deleted, or want a copy of the data we hold about you, email us and
-            we&apos;ll handle your request within a reasonable time frame.
-          </p>
-          <p style={pStyle}>
-            Contact:{" "}
-            <a href="mailto:yigitalpyazici53@gmail.com" style={linkStyle}>
-              yigitalpyazici53@gmail.com
-            </a>
-          </p>
-        </section>
+      <Section title="6. What is public and what is private" id="visibility">
+        <P><strong>Visible to everyone, including search engines</strong> (unless you hide your profile): your full name,
+          username, university, role, bio, skills, availability, links, profile photo and join date; your projects and
+          project updates; endorsements.</P>
+        <P><strong>Hide my profile</strong>: in your profile settings you can hide your profile. Signed-out visitors and
+          search engines then can&apos;t see it, it is removed from the sitemap and link previews, and only signed-in
+          members can view it. Your projects stay visible, but without your name for signed-out visitors.</P>
+        <P><strong>Never public</strong>: your email address, messages, applications and their messages, connection
+          requests, notifications, settings, reports and blocks. Messages are visible only to the two people in the
+          conversation; applications only to the applicant and the project owner.</P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Changes to this policy</h2>
-          <p style={pStyle}>
-            ProjectHub is early-stage, and this policy may evolve as the product matures. When we
-            make material changes, we&apos;ll update the &ldquo;last updated&rdquo; date above and,
-            where appropriate, notify you in-app or by email.
-          </p>
-        </section>
+      <Section title="7. Who we share it with, and where it goes" id="processors">
+        <P>We use the following service providers to run ProjectHub. They process data on our behalf and only to provide their service:</P>
+        <Table
+          head={["Provider", "What for", "Location"]}
+          rows={[
+            ["Supabase, Inc.", "Database, authentication, file storage, background functions", "Company in the USA; your data is stored in the EU (AWS eu-west-1, Ireland)"],
+            ["Vercel, Inc.", "Website hosting; server functions", "Company in the USA; server functions run in Dublin, Ireland (dub1); pages are delivered through a global network"],
+            ["Resend, Inc.", "Sending notification emails (your email address, the email's content)", "USA"],
+            ["Google LLC / Google Ireland Ltd.", "Google Analytics, only if you accept analytics cookies; Google sign-in, only if you use it", "USA and other countries"],
+          ]}
+        />
+        <P>
+          Other members see what is described in section 6. We may disclose data to authorities where the law
+          requires it.
+        </P>
+        <P>
+          <strong>Transfers abroad.</strong> Because these providers are based in, or may access data from, countries
+          outside Türkiye (the EU and the USA), using them involves a transfer of personal data abroad. We carry out
+          these transfers under the safeguards set out in Article 9 of the KVKK (such as standard contracts) and the
+          providers&apos; data processing terms. You can ask us for details of the safeguards for each provider.
+        </P>
+      </Section>
 
-        <div style={{ marginTop: 32, fontSize: 13, color: "var(--text-muted)", fontFamily: "var(--font-sans)" }}>
-          See also:{" "}
-          <Link href="/terms" style={linkStyle}>Terms of Service</Link>
-          {"  ·  "}
-          <Link href="/contact" style={linkStyle}>Contact</Link>
-        </div>
-      </div>
-    </main>
+      <Section title="8. How long we keep it" id="retention">
+        <UL>
+          <li><strong>Account, profile, projects, messages, connections, applications, endorsements, notifications, settings and confirmations</strong>: until you delete your account. Deletion is immediate.</li>
+          <li><strong>Email log</strong>: 90 days, then deleted automatically.</li>
+          <li><strong>Application form (/apply)</strong>: until we decide on it, then 12 months after the decision, then deleted automatically. It is also deleted when you delete an account with the same email.</li>
+          <li><strong>Reports</strong>: 12 months after they are filed, then deleted automatically. If you delete your account, reports you filed or that concern you are kept without your account link until then.</li>
+          <li><strong>Server logs and backups</strong>: for the limited periods set by our hosting providers; deleted data can remain in their backups until those are overwritten.</li>
+          <li><strong>Analytics</strong>: according to the data retention setting of our Google Analytics property.</li>
+        </UL>
+      </Section>
+
+      <Section title="9. Deleting your account">
+        <P>
+          You can delete your account yourself in <A href="/profile/edit#delete-account">Profile settings → Delete account</A>.
+          This permanently deletes your profile and photo, your projects and their updates and applications, your
+          messages (for both people in the conversation), your applications, connections, endorsements,
+          notifications, blocks, email log, confirmations, and any /apply submission made with your email address.
+        </P>
+      </Section>
+
+      <Section title="10. Your rights" id="rights">
+        <P>Under Article 11 of the KVKK (and the GDPR, where it applies) you can:</P>
+        <UL>
+          <li>learn whether we process your data and request information about it;</li>
+          <li>learn the purpose of processing and whether data is used for that purpose;</li>
+          <li>know the third parties in Türkiye or abroad to whom it is transferred;</li>
+          <li>ask us to correct incomplete or inaccurate data (you can also edit your profile yourself);</li>
+          <li>ask us to delete or destroy your data (you can also delete your account yourself) and to notify third parties of this;</li>
+          <li>object to a result against you arising from analysis exclusively by automated systems;</li>
+          <li>claim compensation if you suffer damage from unlawful processing;</li>
+          <li>get a copy of your data in a portable format;</li>
+          <li>withdraw your consent to analytics cookies at any time.</li>
+        </UL>
+        <P>
+          To make a request, including a request for a copy of your data, email{" "}
+          <A href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</A> from the email address on your account. We reply within
+          30 days at the latest. If you&apos;re not satisfied, you can complain to the Personal Data Protection Authority
+          (Kişisel Verileri Koruma Kurumu) in Türkiye, or to your local data protection authority.
+        </P>
+      </Section>
+
+      <Section title="11. Cookies">
+        <P>
+          We use cookies that are strictly necessary to keep you signed in, and Google Analytics cookies only if you
+          accept them in the cookie banner. Details of every cookie are in the <A href="/cookies">Cookie Policy</A>.
+        </P>
+      </Section>
+
+      <Section title="12. Security">
+        <P>
+          Data is encrypted in transit, access is restricted by database row-level security so members can only read
+          what this policy says they can, and passwords are stored only as hashes. No system is perfectly secure; if a
+          breach affects you, we will notify you and the authorities as the law requires.
+        </P>
+      </Section>
+
+      <Section title="13. Changes to this policy">
+        <P>
+          When we change this policy materially we update the date above and ask you to confirm the new version the
+          next time you use ProjectHub.
+        </P>
+      </Section>
+    </LegalDoc>
   );
 }

@@ -1,9 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { POLICY_VERSION } from "@/utils/legal";
 
 /**
  * Where a user should land after signing in.
  *
+ * Accounts that haven't confirmed 18+ and the current policies go to
+ * /consent first (once per policy version).
  * Anyone whose profile has no onboarding_completed_at is sent to /onboarding
  * once; finishing or skipping it stamps the column. Seed accounts and builders
  * who already had a project were stamped by the migration, so they never see it.
@@ -15,6 +18,7 @@ export async function postAuthPath(
   // Only same-site paths; "//host" would be protocol-relative.
   const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
   const data = await getMySettings(supabase);
+  if (needsConsent(data)) return `/consent?next=${encodeURIComponent(safeNext)}`;
   if (data && !data.is_seed && !data.onboarding_completed_at) return "/onboarding";
   // No profile row yet (trigger lag): onboarding creates nothing, so let the
   // dashboard's own fallback handle it.
@@ -31,6 +35,11 @@ export type MySettings = Database["public"]["Functions"]["my_profile_settings"][
 export async function getMySettings(supabase: SupabaseClient<Database>): Promise<MySettings | null> {
   const { data } = await supabase.rpc("my_profile_settings");
   return (Array.isArray(data) ? data[0] : data) ?? null;
+}
+
+/** True when a real account hasn't confirmed 18+ and the current policy version. */
+export function needsConsent(settings: { is_seed?: boolean; policy_version?: string | null } | null): boolean {
+  return Boolean(settings && !settings.is_seed && settings.policy_version !== POLICY_VERSION);
 }
 
 /** True when this profile still owes its one-time onboarding visit. */

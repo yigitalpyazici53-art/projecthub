@@ -1,194 +1,118 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { publicMetadata } from "@/utils/seo";
+import { LegalDoc, Section, P, UL, A } from "@/components/legal/LegalDoc";
+import { CONTACT_EMAIL, CONTROLLER_LOCATION, CONTROLLER_NAME, POLICY_UPDATED } from "@/utils/legal";
 
 export const metadata: Metadata = publicMetadata({
   title: "Terms of Service",
   description:
-    "The rules for using ProjectHub during our pre-launch period. Be respectful, don't spam or impersonate others, and build cool things.",
+    "The rules for using ProjectHub: 18+ only, be respectful, don't spam or impersonate others, and build cool things.",
   path: "/terms",
 });
 
-const LAST_UPDATED = "April 24, 2026";
-
-const pageStyle: React.CSSProperties = {
-  minHeight: "100vh",
-  paddingTop: 32,
-  position: "relative",
-};
-
-const wrapStyle: React.CSSProperties = {
-  maxWidth: 760,
-  margin: "0 auto",
-  padding: "64px 24px 96px",
-};
-
-const h1Style: React.CSSProperties = {
-  fontFamily: "var(--font-serif)",
-  fontWeight: 500,
-  fontSize: "clamp(32px, 5vw, 44px)",
-  letterSpacing: "-0.02em",
-  color: "var(--text-primary)",
-  marginBottom: 12,
-};
-
-const leadStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 15,
-  color: "var(--text-secondary)",
-  lineHeight: 1.7,
-  marginBottom: 8,
-};
-
-const updatedStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 12,
-  color: "var(--text-muted)",
-  letterSpacing: "0.04em",
-  textTransform: "uppercase",
-  marginBottom: 40,
-};
-
-const sectionStyle: React.CSSProperties = {
-  background: "var(--gradient-card)",
-  border: "1px solid var(--border)",
-  borderRadius: 16,
-  padding: "28px 28px",
-  marginBottom: 20,
-};
-
-const h2Style: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontWeight: 700,
-  fontSize: 20,
-  color: "var(--text-primary)",
-  marginBottom: 14,
-  letterSpacing: "-0.01em",
-};
-
-const pStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 14.5,
-  color: "var(--text-secondary)",
-  lineHeight: 1.7,
-  marginBottom: 10,
-};
-
-const ulStyle: React.CSSProperties = {
-  fontFamily: "var(--font-sans)",
-  fontSize: 14.5,
-  color: "var(--text-secondary)",
-  lineHeight: 1.75,
-  paddingLeft: 22,
-  marginBottom: 4,
-};
-
-const linkStyle: React.CSSProperties = {
-  color: "var(--accent-bright)",
-  textDecoration: "none",
-  fontWeight: 500,
-};
-
 export default function TermsPage() {
   return (
-    <main style={pageStyle}>
-      <div className="page-grid-bg" />
-      <div className="page-radial-glow" />
-      <div className="page-z animate-fade-up" style={wrapStyle}>
-        <h1 style={h1Style}>Terms of Service</h1>
-        <p style={leadStyle}>
-          These are the ground rules for using ProjectHub. By creating an account or using the
-          service you agree to them. They&apos;re short on purpose &mdash; we want this to be a
-          place student founders actually enjoy.
-        </p>
-        <div style={updatedStyle}>Last updated · {LAST_UPDATED}</div>
+    <LegalDoc
+      title="Terms of Service"
+      lead={
+        <>
+          These are the ground rules for using ProjectHub, operated by {CONTROLLER_NAME}, {CONTROLLER_LOCATION}. By
+          creating an account, submitting the application form or using the service you agree to them.
+        </>
+      }
+      updated={POLICY_UPDATED}
+      seeAlso={[
+        { href: "/privacy", label: "Privacy Policy" },
+        { href: "/kvkk", label: "KVKK Aydınlatma Metni" },
+        { href: "/cookies", label: "Cookie Policy" },
+        { href: "/contact", label: "Contact" },
+      ]}
+    >
+      <Section title="1. You must be 18 or older" id="age">
+        <P>
+          ProjectHub is only for people aged <strong>18 and over</strong>. By creating an account or submitting the
+          application form you confirm that you are at least 18. We delete accounts that we learn belong to someone
+          under 18. If you see a profile that appears to belong to a minor, please report it.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Who can use ProjectHub</h2>
-          <p style={pStyle}>
-            ProjectHub is intended for students and early-career builders who want to meet
-            collaborators and post projects. You must provide accurate information about yourself
-            and keep your account credentials secure.
-          </p>
-        </section>
+      <Section title="2. Who ProjectHub is for">
+        <P>
+          ProjectHub is for university students and early-career builders who want to show their work, meet
+          collaborators and post projects. You must provide accurate information about yourself and keep your
+          account credentials secure. One person, one account.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Acceptable use</h2>
-          <p style={pStyle}>When using ProjectHub, you agree to <strong>not</strong>:</p>
-          <ul style={ulStyle}>
-            <li>Spam other users, send unsolicited bulk messages, or mass-send connection requests.</li>
-            <li>Harass, bully, threaten, or discriminate against anyone on the platform.</li>
-            <li>Impersonate another person, organization, school, or university.</li>
-            <li>Post illegal, abusive, hateful, sexual, or deliberately misleading content.</li>
-            <li>Scrape, crawl, or abuse the platform with automated tools.</li>
-            <li>Attempt to break security, bypass access controls, or disrupt the service.</li>
-          </ul>
-          <p style={pStyle}>
-            We may suspend or remove accounts that violate these rules, at our discretion, to
-            keep ProjectHub safe for everyone.
-          </p>
-        </section>
+      <Section title="3. Acceptable use">
+        <P>When using ProjectHub, you agree <strong>not</strong> to:</P>
+        <UL>
+          <li>Spam other users, send unsolicited bulk messages, or mass-send connection requests.</li>
+          <li>Harass, bully, threaten, or discriminate against anyone on the platform.</li>
+          <li>Impersonate another person, organization, or university.</li>
+          <li>Post illegal, abusive, hateful, sexual, or deliberately misleading content.</li>
+          <li>Share other people&apos;s personal data without their permission.</li>
+          <li>Scrape, crawl, or abuse the platform with automated tools.</li>
+          <li>Attempt to break security, bypass access controls, or disrupt the service.</li>
+        </UL>
+        <P>
+          You can message only people you&apos;re connected with. Use <strong>Report</strong> on a profile or in a
+          conversation to tell us about content or behaviour that breaks these rules, and <strong>Block</strong> to
+          stop someone from messaging you or sending you connection requests. We review every report and may remove
+          content or suspend or delete accounts that violate these rules.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Your content</h2>
-          <p style={pStyle}>
-            You&apos;re responsible for what you post &mdash; your profile, projects, applications,
-            and messages. You retain ownership of your content, and you grant ProjectHub a limited
-            license to host and display it on the platform as needed to run the service.
-          </p>
-        </section>
+      <Section title="4. Your content">
+        <P>
+          You&apos;re responsible for what you post: your profile, projects, applications, and messages. You keep
+          ownership of your content, and you grant ProjectHub a limited license to host and display it on the
+          platform as needed to run the service. Your public profile and projects are visible to everyone unless you
+          hide your profile; see the <A href="/privacy#visibility">Privacy Policy</A>.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Early-stage service &mdash; provided as-is</h2>
-          <p style={pStyle}>
-            ProjectHub is a pre-launch, early-stage product. Features may change, break, or be
-            removed as we iterate. The service is provided <strong>as-is</strong> and{" "}
-            <strong>as-available</strong>, without warranties of any kind, either express or
-            implied, including fitness for a particular purpose, reliability, accuracy, or
-            non-infringement.
-          </p>
-          <p style={pStyle}>
-            To the maximum extent permitted by law, ProjectHub and its maintainers are not liable
-            for indirect, incidental, or consequential damages arising from your use of the
-            service.
-          </p>
-        </section>
+      <Section title="5. Early-stage service, provided as-is">
+        <P>
+          ProjectHub is an early-stage product. Features may change, break, or be removed as we iterate. The service
+          is provided <strong>as-is</strong> and <strong>as-available</strong>, without warranties of any kind,
+          either express or implied, including fitness for a particular purpose, reliability, accuracy, or
+          non-infringement.
+        </P>
+        <P>
+          To the maximum extent permitted by law, ProjectHub and its operator are not liable for indirect,
+          incidental, or consequential damages arising from your use of the service. Nothing in these terms limits
+          rights you have under mandatory consumer protection law.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Account termination</h2>
-          <p style={pStyle}>
-            You can stop using ProjectHub at any time and request account deletion by emailing us.
-            We may also suspend or terminate accounts that break these terms or put other users at
-            risk.
-          </p>
-        </section>
+      <Section title="6. Deleting your account">
+        <P>
+          You can stop using ProjectHub at any time and delete your account yourself in{" "}
+          <A href="/profile/edit#delete-account">Profile settings → Delete account</A>. We may also suspend or
+          delete accounts that break these terms or put other users at risk.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Governing law</h2>
-          <p style={pStyle}>
-            These terms are governed by the laws of the Republic of Türkiye (Turkey). Any disputes
-            shall be subject to the jurisdiction of the competent courts in Turkey.
-          </p>
-        </section>
+      <Section title="7. Changes">
+        <P>
+          When we change these terms materially we update the date above and ask you to confirm the new version the
+          next time you use ProjectHub.
+        </P>
+      </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={h2Style}>Contact</h2>
-          <p style={pStyle}>
-            Questions, concerns, or reports of abuse? Email{" "}
-            <a href="mailto:yigitalpyazici53@gmail.com" style={linkStyle}>
-              yigitalpyazici53@gmail.com
-            </a>{" "}
-            and we&apos;ll get back to you.
-          </p>
-        </section>
+      <Section title="8. Governing law">
+        <P>
+          These terms are governed by the laws of the Republic of Türkiye. Any disputes shall be subject to the
+          jurisdiction of the competent courts in Türkiye.
+        </P>
+      </Section>
 
-        <div style={{ marginTop: 32, fontSize: 13, color: "var(--text-muted)", fontFamily: "var(--font-sans)" }}>
-          See also:{" "}
-          <Link href="/privacy" style={linkStyle}>Privacy Policy</Link>
-          {"  ·  "}
-          <Link href="/contact" style={linkStyle}>Contact</Link>
-        </div>
-      </div>
-    </main>
+      <Section title="9. Contact">
+        <P>
+          Questions, concerns, or reports of abuse? Email <A href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</A>.
+        </P>
+      </Section>
+    </LegalDoc>
   );
 }

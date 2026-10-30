@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
+import LegalLinks from "@/components/LegalLinks";
 
-const HIDDEN_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/apply"];
+// The landing page renders its own footer (with the same legal links).
+const HIDDEN_ROUTES = ["/"];
 
 export default function Footer() {
   const pathname = usePathname();
@@ -34,24 +35,7 @@ export default function Footer() {
         <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
           © {new Date().getFullYear()} ProjectHub
         </div>
-        <div style={{ display: "flex", gap: 20 }}>
-          {[
-            { label: "Terms", href: "/terms" },
-            { label: "Privacy", href: "/privacy" },
-          ].map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="u-link"
-              style={{
-                fontSize: 12,
-                color: "var(--text-muted)",
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
+        <LegalLinks linkClassName="u-link" linkStyle={{ fontSize: 12, color: "var(--text-muted)" }} />
       </div>
     </footer>
   );

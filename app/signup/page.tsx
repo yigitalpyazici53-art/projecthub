@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import Logo from "@/components/Logo";
 import { postAuthPath } from "@/utils/onboarding";
+import ConsentCheckboxes, { consentComplete, type ConsentState } from "@/components/ConsentCheckboxes";
+import { POLICY_VERSION } from "@/utils/legal";
 
 const GOOGLE_SVG = (
   <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -28,6 +30,8 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [consent, setConsent] = useState<ConsentState>({ age: false, policies: false });
+  const consentMissing = "Please confirm you're 18 or older and that you've read the policies.";
 
   // OTP state
   const [step, setStep] = useState<"form" | "otp">("form");
@@ -56,12 +60,14 @@ export default function SignupPage() {
 
   const handleGoogleSignIn = async () => {
     setError("");
+    if (!consentComplete(consent)) { setError(consentMissing); return; }
     setGoogleLoading(true);
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        // consent=1: the callback records the confirmations given here.
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard&consent=1`,
       },
     });
     if (authError) {
@@ -85,6 +91,7 @@ export default function SignupPage() {
     if (!/^[a-z0-9._-]+$/.test(trimmedUsername)) { setError("Username can only contain lowercase letters, numbers, dots, underscores and hyphens."); setLoading(false); return; }
     if (trimmedUsername.length < 3 || trimmedUsername.length > 30) { setError("Username must be 3–30 characters."); setLoading(false); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); setLoading(false); return; }
+    if (!consentComplete(consent)) { setError(consentMissing); setLoading(false); return; }
 
     try {
       const supabase = createClient();
@@ -155,6 +162,8 @@ export default function SignupPage() {
         full_name: trimmedName,
         username: trimmedUsername,
       });
+      // The 18+ and policy confirmations ticked on the form, stamped server-side.
+      await supabase.rpc("record_consent", { p_version: POLICY_VERSION, p_source: "signup" });
     }
 
     router.refresh();
@@ -292,14 +301,19 @@ export default function SignupPage() {
               <Logo size="lg" gradient tone="dark" />
             </div>
             <h1 style={titleStyle}>Create your account</h1>
-            <p style={subtitleStyle}>Connect with builders at your school or university</p>
+            <p style={subtitleStyle}>Connect with student builders at your university and beyond</p>
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <ConsentCheckboxes value={consent} onChange={(c) => { setConsent(c); setError(""); }} />
           </div>
 
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            disabled={googleLoading}
-            style={{ ...googleButtonStyle, opacity: googleLoading ? 0.7 : 1, cursor: googleLoading ? "not-allowed" : "pointer" }}
+            disabled={googleLoading || !consentComplete(consent)}
+            aria-disabled={!consentComplete(consent)}
+            style={{ ...googleButtonStyle, opacity: googleLoading || !consentComplete(consent) ? 0.5 : 1, cursor: googleLoading || !consentComplete(consent) ? "not-allowed" : "pointer" }}
           >
             {GOOGLE_SVG}
             {googleLoading ? "Redirecting…" : "Continue with Google"}
@@ -333,7 +347,7 @@ export default function SignupPage() {
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="At least 8 characters" autoComplete="new-password" style={inputStyle} />
             </div>
 
-            <button type="submit" disabled={loading} style={{ ...buttonStyle, opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}>
+            <button type="submit" disabled={loading || !consentComplete(consent)} style={{ ...buttonStyle, opacity: loading || !consentComplete(consent) ? 0.5 : 1, cursor: loading || !consentComplete(consent) ? "not-allowed" : "pointer" }}>
               {loading ? "Sending code…" : "Create account"}
             </button>
 

@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import CookieConsent from "@/components/CookieConsent";
+import ConsentGate from "@/components/ConsentGate";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SITE_NAME, SITE_URL } from "@/utils/seo";
 
@@ -54,12 +56,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-42Q18RT9S6" />
+        {/* Consent Mode v2: everything denied until the visitor accepts.
+            gtag.js itself is loaded by <CookieConsent /> only after Accept. */}
         <script dangerouslySetInnerHTML={{ __html: `
           window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-42Q18RT9S6');
+          window.gtag = function(){ dataLayer.push(arguments); };
+          gtag('consent', 'default', {
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            analytics_storage: 'denied'
+          });
         `}} />
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }} suppressHydrationWarning>
@@ -68,6 +75,8 @@ export default function RootLayout({
             <Navbar />
             {children}
             <Footer />
+            <ConsentGate />
+            <CookieConsent />
           </ErrorBoundary>
         </AuthProvider>
       </body>

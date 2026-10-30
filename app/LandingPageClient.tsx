@@ -1,17 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion, type Variants } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import Logo from "@/components/Logo";
 import FeaturedProjectCard from "@/components/landing/FeaturedProjectCard";
+import LegalLinks from "@/components/LegalLinks";
 import type { Profile, Project } from "@/types";
-
-export type PublicStats = {
-  builders: number;
-  projects: number;
-  shipped: number;
-};
 
 export type FeaturedProject = {
   project: Project;
@@ -90,35 +85,6 @@ function StaggerItem({ children, style }: { children: React.ReactNode; style?: R
   const reduced = useReducedMotion();
   if (reduced) return <div style={style}>{children}</div>;
   return <motion.div variants={staggerChild} style={style}>{children}</motion.div>;
-}
-
-/**
- * Counts up to `value` when scrolled into view. Unlike the shared CountUp, the
- * initial state is the final number, so server HTML (and a no-JS visitor)
- * carries the real count instead of a zero.
- */
-function Counter({ value }: { value: number }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-20px" });
-  const reduced = useReducedMotion();
-  const [display, setDisplay] = useState(value);
-
-  useEffect(() => {
-    if (!inView || reduced) return;
-    const duration = 1100;
-    const start = performance.now();
-    let raf = 0;
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setDisplay(Math.round(eased * value));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, value, reduced]);
-
-  return <span ref={ref}>{reduced ? value : display}</span>;
 }
 
 // ─── Hero headline: per-character stagger, kept readable to screen readers ────
@@ -202,7 +168,7 @@ function Navbar() {
 
 const PREVIEW_PROJECTS = [
   { title: "StudySync", desc: "AI study group matcher", year: "2026", stage: "shipped" },
-  { title: "Science Fair Tracker", desc: "Project log for the school fair", year: "2025", stage: "shipped" },
+  { title: "LabSlot", desc: "Booking for shared campus lab equipment", year: "2025", stage: "shipped" },
 ];
 
 const PREVIEW_SKILLS = [
@@ -218,7 +184,7 @@ function ProfilePreview() {
         <span className="lp-preview-avatar">ED</span>
         <div>
           <div className="font-serif lp-preview-name">Elif Demir</div>
-          <div className="lp-caps" style={{ marginTop: 4 }}>Robert College · High school · Full-stack Developer</div>
+          <div className="lp-caps" style={{ marginTop: 4 }}>Boğaziçi University · Computer Engineering · Full-stack Developer</div>
         </div>
         <span className="lp-pill lp-pill-shipped" style={{ marginLeft: "auto" }}>2 shipped</span>
       </div>
@@ -246,29 +212,6 @@ function ProfilePreview() {
         ))}
       </div>
     </div>
-  );
-}
-
-// ─── Social proof ─────────────────────────────────────────────────────────────
-
-function ProofLine({ stats }: { stats: PublicStats }) {
-  // Zero counts read as anti-proof, so they're left out rather than shown.
-  const items = [
-    { value: stats.builders, label: "builders" },
-    { value: stats.projects, label: "projects" },
-    { value: stats.shipped, label: "shipped" },
-  ].filter((item) => item.value > 0);
-  if (items.length === 0) return null;
-
-  return (
-    <p className="lp-proof">
-      {items.map((item, i) => (
-        <span key={item.label}>
-          {i > 0 && <span aria-hidden="true" className="lp-proof-sep">·</span>}
-          <strong className="lp-proof-value"><Counter value={item.value} /></strong> {item.label}
-        </span>
-      ))}
-    </p>
   );
 }
 
@@ -308,7 +251,7 @@ const HOW_IT_WORKS = [
   {
     num: "1",
     title: "Create your builder profile",
-    desc: "Add your skills, school, and links. Your profile is the single page that shows what you can actually do.",
+    desc: "Add your skills, university, and links. Your profile is the single page that shows what you can actually do.",
   },
   {
     num: "2",
@@ -322,13 +265,7 @@ const HOW_IT_WORKS = [
   },
 ];
 
-export default function LandingPage({
-  stats,
-  featured,
-}: {
-  stats: PublicStats | null;
-  featured: FeaturedProject[];
-}) {
+export default function LandingPage({ featured }: { featured: FeaturedProject[] }) {
   const reduced = useReducedMotion();
 
   return (
@@ -354,8 +291,8 @@ export default function LandingPage({
               animate={reduced ? undefined : { opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE, delay: 0.75 }}
             >
-              The portfolio platform for student builders. Ship projects, collect
-              endorsements, share your proof-of-work profile.
+              The portfolio platform for university students and early-career builders.
+              Ship projects, collect endorsements, share your proof-of-work profile.
             </motion.p>
 
             <motion.p
@@ -364,7 +301,7 @@ export default function LandingPage({
               animate={reduced ? undefined : { opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE, delay: 0.85 }}
             >
-              High school or university — if you build, you belong here.
+              For builders aged 18 and over — if you build, you belong here.
             </motion.p>
 
             <motion.div
@@ -380,7 +317,6 @@ export default function LandingPage({
                   Browse projects →
                 </Link>
               </div>
-              {stats && <ProofLine stats={stats} />}
             </motion.div>
           </div>
 
@@ -441,10 +377,7 @@ export default function LandingPage({
               <Logo size="sm" tone="dark" />
               <span className="lp-footer-muted">© {new Date().getFullYear()}</span>
             </div>
-            <div style={{ display: "flex", gap: 24 }}>
-              <Link href="/terms" className="lp-link-sm">Terms</Link>
-              <Link href="/privacy" className="lp-link-sm">Privacy</Link>
-            </div>
+            <LegalLinks linkClassName="lp-link-sm" />
           </div>
         </footer>
       </main>
@@ -595,9 +528,6 @@ export default function LandingPage({
           gap: 16px; flex-wrap: wrap;
         }
 
-        .lp-proof { margin-top: 26px; font-size: 14px; color: #94A3B8; }
-        .lp-proof-value { font-weight: 600; color: #FAFAFA; }
-        .lp-proof-sep { margin: 0 10px; color: #64748B; }
 
         .lp-caps {
           font-size: 12px; font-weight: 500; letter-spacing: 0.06em;

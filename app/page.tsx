@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LandingPageClient, { type FeaturedProject, type PublicStats } from "./LandingPageClient";
+import LandingPageClient, { type FeaturedProject } from "./LandingPageClient";
 import { SITE_NAME } from "@/utils/seo";
 import { createPublicClient } from "@/utils/supabase/public";
 import type { Profile, Project } from "@/types";
@@ -9,7 +9,7 @@ export const revalidate = 60;
 
 const HOME_TITLE = "ProjectHub | Where student builders prove what they've built";
 const HOME_DESCRIPTION =
-  "The proof-of-work portfolio platform for student builders. Ship projects, collect endorsements, and share a verified record of what you've built.";
+  "The proof-of-work portfolio platform for university students and early-career builders (18+). Ship projects, collect endorsements, and share a verified record of what you've built.";
 
 export const metadata: Metadata = {
   title: { absolute: HOME_TITLE },
@@ -29,26 +29,6 @@ const STAGE_RANK: Record<string, number> = { launched: 0, mvp: 1, building: 2, i
 const FEATURED_COUNT = 6;
 
 // Public reads only — the cookie-less client keeps this page ISR-cacheable.
-async function getPublicStats(): Promise<PublicStats | null> {
-  try {
-    const supabase = createPublicClient();
-    const [statsRes, shippedRes] = await Promise.all([
-      supabase.rpc("get_public_stats"),
-      supabase.from("projects").select("id", { count: "exact", head: true }).eq("stage", "launched"),
-    ]);
-    if (statsRes.error || !statsRes.data) return null;
-    const row = Array.isArray(statsRes.data) ? statsRes.data[0] : statsRes.data;
-    if (!row) return null;
-    return {
-      builders: Number(row.builders) || 0,
-      projects: Number(row.projects) || 0,
-      shipped: shippedRes.count ?? 0,
-    };
-  } catch {
-    return null;
-  }
-}
-
 // Real projects first, then the furthest stage, then newest (sort is stable).
 async function getFeaturedProjects(): Promise<FeaturedProject[]> {
   try {
@@ -85,6 +65,6 @@ async function getFeaturedProjects(): Promise<FeaturedProject[]> {
 }
 
 export default async function Page() {
-  const [stats, featured] = await Promise.all([getPublicStats(), getFeaturedProjects()]);
-  return <LandingPageClient stats={stats} featured={featured} />;
+  const featured = await getFeaturedProjects();
+  return <LandingPageClient featured={featured} />;
 }

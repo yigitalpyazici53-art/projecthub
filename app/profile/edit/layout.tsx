@@ -3,7 +3,7 @@ import { privateMetadata } from "@/utils/seo";
 
 export const metadata: Metadata = privateMetadata(
   "Edit Profile",
-  "Update your ProjectHub builder profile — skills, bio, school, and more.",
+  "Update your ProjectHub builder profile — skills, bio, university, and more.",
 );
 
 export default function EditProfileLayout({ children }: { children: React.ReactNode }) {

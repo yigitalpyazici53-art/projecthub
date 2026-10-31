@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import Logo from "@/components/Logo";
-import { postAuthPath } from "@/utils/onboarding";
+import { postAuthPath, safeNextPath } from "@/utils/onboarding";
 
 const GOOGLE_SVG = (
   <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -86,7 +86,7 @@ function LoginForm() {
     }
 
     const next = searchParams.get("next") ?? "/dashboard";
-    router.replace(signInData.user ? await postAuthPath(supabase, next) : next);
+    router.replace(signInData.user ? await postAuthPath(supabase, next) : safeNextPath(next));
     router.refresh();
   };
 

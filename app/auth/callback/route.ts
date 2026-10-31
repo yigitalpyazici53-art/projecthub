@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { postAuthPath } from '@/utils/onboarding'
+import { postAuthPath, safeNextPath } from '@/utils/onboarding'
 import { POLICY_VERSION } from '@/utils/legal'
 
 export async function GET(request: Request) {
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
       if (data.user && searchParams.get('consent') === '1') {
         await supabase.rpc('record_consent', { p_version: POLICY_VERSION, p_source: 'oauth' })
       }
-      const dest = data.user ? await postAuthPath(supabase, next) : next
+      const dest = data.user ? await postAuthPath(supabase, next) : safeNextPath(next)
       return NextResponse.redirect(`${origin}${dest}`)
     }
   }

@@ -3,6 +3,23 @@ import type { Database } from "@/types/database";
 import { POLICY_VERSION } from "@/utils/legal";
 
 /**
+ * A same-origin path for `next`, or "/dashboard". Rejects "//host" and
+ * "/\host" (both protocol-relative in browsers) and anything that resolves
+ * to another origin, e.g. after tabs or newlines are stripped.
+ */
+export function safeNextPath(next: string | null | undefined): string {
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return "/dashboard";
+  const base = "http://same-origin.invalid";
+  try {
+    const url = new URL(next, base);
+    if (url.origin !== base) return "/dashboard";
+    return url.pathname + url.search + url.hash;
+  } catch {
+    return "/dashboard";
+  }
+}
+
+/**
  * Where a user should land after signing in.
  *
  * Accounts that haven't confirmed 18+ and the current policies go to
@@ -15,8 +32,7 @@ export async function postAuthPath(
   supabase: SupabaseClient<Database>,
   next: string = "/dashboard",
 ): Promise<string> {
-  // Only same-site paths; "//host" would be protocol-relative.
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  const safeNext = safeNextPath(next);
   const data = await getMySettings(supabase);
   if (needsConsent(data)) return `/consent?next=${encodeURIComponent(safeNext)}`;
   if (data && !data.is_seed && !data.onboarding_completed_at) return "/onboarding";

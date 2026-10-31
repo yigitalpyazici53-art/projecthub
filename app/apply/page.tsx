@@ -39,6 +39,21 @@ const INITIAL: FormData = {
   why_join: "",
 };
 
+// Mirrors the length CHECKs on builder_applications
+// (supabase/migrations/20261031214236_builder_applications_limits.sql).
+const MAX_LENGTH = {
+  full_name: 100,
+  email: 254,
+  university: 120,
+  role: 100,
+  skills: 300,
+  project_name: 120,
+  what_building: 2000,
+  roles_looking_for: 300,
+  url: 300,
+  why_join: 2000,
+} as const;
+
 export default function ApplyPage() {
   const [form, setForm] = useState<FormData>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
@@ -82,7 +97,11 @@ export default function ApplyPage() {
     });
 
     if (error) {
-      setSubmitError("Something went wrong. Please try again in a moment.");
+      setSubmitError(
+        error.message.includes("already applied")
+          ? "You've already applied with this email in the last 24 hours. We'll be in touch."
+          : "Something went wrong. Please try again in a moment.",
+      );
       setSubmitting(false);
       return;
     }
@@ -356,6 +375,7 @@ export default function ApplyPage() {
                     <input
                       type="text"
                       value={form.full_name}
+                      maxLength={MAX_LENGTH.full_name}
                       onChange={field("full_name")}
                       placeholder="Your name"
                       required
@@ -366,6 +386,7 @@ export default function ApplyPage() {
                     <input
                       type="email"
                       value={form.email}
+                      maxLength={MAX_LENGTH.email}
                       onChange={field("email")}
                       placeholder="you@email.com"
                       required
@@ -376,6 +397,7 @@ export default function ApplyPage() {
                     <input
                       type="text"
                       value={form.university}
+                      maxLength={MAX_LENGTH.university}
                       onChange={field("university")}
                       placeholder="e.g. Boğaziçi University, METU"
                       style={inp}
@@ -389,6 +411,7 @@ export default function ApplyPage() {
                     <input
                       type="text"
                       value={form.role}
+                      maxLength={MAX_LENGTH.role}
                       onChange={field("role")}
                       placeholder="Full-stack developer"
                       required
@@ -403,6 +426,7 @@ export default function ApplyPage() {
                   <input
                     type="text"
                     value={form.skills}
+                    maxLength={MAX_LENGTH.skills}
                     onChange={field("skills")}
                     placeholder="React, Python, Figma…"
                     style={inp}
@@ -416,6 +440,7 @@ export default function ApplyPage() {
                   <input
                     type="text"
                     value={form.project_name}
+                    maxLength={MAX_LENGTH.project_name}
                     onChange={field("project_name")}
                     placeholder="e.g. Trckr, OfficeHours, Lecture.fm"
                     style={inp}
@@ -428,6 +453,7 @@ export default function ApplyPage() {
                 >
                   <textarea
                     value={form.what_building}
+                    maxLength={MAX_LENGTH.what_building}
                     onChange={field("what_building")}
                     placeholder="We're building an AI-powered study planner for university students. Currently at MVP stage with 20 active users…"
                     required
@@ -483,6 +509,7 @@ export default function ApplyPage() {
                     <input
                       type="text"
                       value={form.roles_looking_for}
+                      maxLength={MAX_LENGTH.roles_looking_for}
                       onChange={field("roles_looking_for")}
                       placeholder="iOS Developer, ML Engineer…"
                       style={inp}
@@ -498,6 +525,7 @@ export default function ApplyPage() {
                     <input
                       type="url"
                       value={form.github_url}
+                      maxLength={MAX_LENGTH.url}
                       onChange={field("github_url")}
                       placeholder="https://github.com/username"
                       style={inp}
@@ -507,6 +535,7 @@ export default function ApplyPage() {
                     <input
                       type="url"
                       value={form.linkedin_url}
+                      maxLength={MAX_LENGTH.url}
                       onChange={field("linkedin_url")}
                       placeholder="https://linkedin.com/in/username"
                       style={inp}
@@ -520,6 +549,7 @@ export default function ApplyPage() {
                   <input
                     type="url"
                     value={form.demo_url}
+                    maxLength={MAX_LENGTH.url}
                     onChange={field("demo_url")}
                     placeholder="https://yourproject.com"
                     style={inp}
@@ -536,6 +566,7 @@ export default function ApplyPage() {
                 >
                   <textarea
                     value={form.why_join}
+                    maxLength={MAX_LENGTH.why_join}
                     onChange={field("why_join")}
                     placeholder="I'm building X because Y. I'm looking for a Z who can help with W. I ship weekly and want teammates who do the same…"
                     required
